@@ -257,13 +257,13 @@ NMSActionBar.instance.send(player, "欢迎来到服务器！")
 ```kotlin
 // 泛型版本（推荐）
 inline fun <reified T> nmsProxy(
-    bind: String = "{name}Impl",
+    bind: String = "\{name}Impl",
     vararg parameter: Any
 ): T
 
 // 带父类列表的版本
 inline fun <reified T> nmsProxy(
-    bind: String = "{name}Impl",
+    bind: String = "\{name}Impl",
     parent: List<String> = emptyList(),
     vararg parameter: Any
 ): T
@@ -273,7 +273,7 @@ inline fun <reified T> nmsProxy(
 
 | 参数 | 类型 | 默认值 | 说明 |
 |------|------|--------|------|
-| `bind` | String | "{name}Impl" | 实现类名称模板 |
+| `bind` | String | "\{name}Impl" | 实现类名称模板 |
 | `parameter` | Array&lt;Any&gt; | 空数组 | 构造函数参数 |
 | `parent` | List&lt;String&gt; | 空列表 | 父类实现类名称列表 |
 
@@ -308,7 +308,7 @@ val extended = nmsProxy<NMSExtended>(
 
 ```kotlin
 inline fun <reified T> nmsProxyClass(
-    bind: String = "{name}Impl",
+    bind: String = "\{name}Impl",
     parent: List<String> = emptyList()
 ): Class<T>
 ```
@@ -430,7 +430,7 @@ class CustomNMSHandlerImpl : MyNMSHandler() {
 
 **bind 参数的占位符：**
 
-- `{name}` 会被替换为抽象类的完整包名+类名
+- `\{name}` 会被替换为抽象类的完整包名+类名
 - 示例：`com.example.MyHandler` → `com.example.MyHandlerImpl`
 
 ### 4. 传递构造函数参数
@@ -509,8 +509,8 @@ assert(instance1 === instance2)
 val key = "${抽象类完整名}:$bind:${构造参数类型列表}"
 
 // 示例
-"com.example.NMSMessage:{name}Impl:"  // 无参数
-"com.example.NMSDatabase:{name}Impl:com.example.DatabaseConfig"  // 有参数
+"com.example.NMSMessage:\{name}Impl:"  // 无参数
+"com.example.NMSDatabase:\{name}Impl:com.example.DatabaseConfig"  // 有参数
 ```
 
 ## 实战案例

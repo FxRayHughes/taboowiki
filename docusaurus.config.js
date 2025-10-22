@@ -153,11 +153,11 @@ const config = {
                             },
                             {
                                 label: '命令系统',
-                                to: '/docs/command',
+                                to: '/docs/basic-tech/command/',
                             },
                             {
                                 label: '实用工具集',
-                                to: '/docs/utilities',
+                                to: '/docs/basic-tech/utilities/',
                             },
                         ],
                     },
