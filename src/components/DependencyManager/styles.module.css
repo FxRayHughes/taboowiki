@@ -1,4 +1,4 @@
-.pluginInstallList {
+.dependencyManager {
     margin: 2rem 0;
 }
 
@@ -9,8 +9,8 @@
     align-items: start;
 }
 
-/* 左侧：模块列表 */
-.moduleList {
+/* 左侧：依赖列表 */
+.depList {
     background: var(--ifm-background-surface-color);
     border: 1px solid var(--ifm-color-emphasis-300);
     border-radius: 8px;
@@ -144,14 +144,162 @@
     color: var(--ifm-color-emphasis-600);
 }
 
-.moduleItems {
+.categoryHint {
+    margin: 0.75rem 1rem;
+    padding: 0.75rem;
+    background: var(--ifm-color-info-contrast-background);
+    border-left: 3px solid var(--ifm-color-info);
+    border-radius: 4px;
+    font-size: 0.85rem;
+    color: var(--ifm-color-emphasis-800);
+    line-height: 1.6;
+}
+
+.categoryHint code {
+    padding: 0.15rem 0.4rem;
+    background: var(--ifm-code-background);
+    border-radius: 3px;
+    font-size: 0.85rem;
+}
+
+/* Core 版本选择器 */
+.coreVersionSelector {
+    margin: 0.75rem 1rem 0.5rem 1rem;
+    padding: 1rem;
+    background: var(--ifm-color-emphasis-50);
+    border: 1px solid var(--ifm-color-emphasis-200);
+    border-radius: 6px;
+}
+
+.coreInputGroup {
+    display: flex;
+    gap: 0.5rem;
+    margin-bottom: 0.75rem;
+}
+
+.coreInput {
+    flex: 1;
+    padding: 0.5rem 0.75rem;
+    border: 1px solid var(--ifm-color-emphasis-300);
+    border-radius: 4px;
+    font-size: 0.9rem;
+    background: var(--ifm-background-color);
+    color: var(--ifm-font-color-base);
+}
+
+.coreInput:focus {
+    outline: none;
+    border-color: var(--ifm-color-primary);
+}
+
+.addButton {
+    padding: 0.5rem 1rem;
+    border: 1px solid var(--ifm-color-primary);
+    border-radius: 4px;
+    background: var(--ifm-color-primary);
+    color: white;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: all 0.2s;
+    white-space: nowrap;
+}
+
+.addButton:hover {
+    background: var(--ifm-color-primary-dark);
+}
+
+.subTypeSelector {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 0.75rem;
+    padding: 0.75rem;
+    background: var(--ifm-background-color);
+    border-radius: 4px;
+    border: 1px solid var(--ifm-color-emphasis-200);
+}
+
+.subTypeLabel {
+    font-size: 0.9rem;
+    font-weight: 500;
+    color: var(--ifm-color-emphasis-800);
+}
+
+.subTypeOption {
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+    font-size: 0.9rem;
+    color: var(--ifm-color-emphasis-800);
+    cursor: pointer;
+    margin: 0;
+}
+
+.subTypeOption input[type="radio"] {
+    cursor: pointer;
+}
+
+.subTypeOption span {
+    white-space: nowrap;
+}
+
+.selectedVersions {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.5rem;
+    padding-top: 0.75rem;
+    border-top: 1px solid var(--ifm-color-emphasis-200);
+}
+
+.selectedLabel {
+    font-size: 0.85rem;
+    color: var(--ifm-color-emphasis-700);
+    font-weight: 500;
+}
+
+.versionTag {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+    padding: 0.25rem 0.5rem;
+    background: var(--ifm-color-primary-lightest);
+    border: 1px solid var(--ifm-color-primary-light);
+    border-radius: 4px;
+    font-size: 0.85rem;
+    color: var(--ifm-color-primary-dark);
+}
+
+.removeTag {
+    padding: 0;
+    margin-left: 0.25rem;
+    background: none;
+    border: none;
+    color: var(--ifm-color-primary);
+    font-size: 1.2rem;
+    line-height: 1;
+    cursor: pointer;
+    transition: color 0.2s;
+}
+
+.removeTag:hover {
+    color: var(--ifm-color-danger);
+}
+
+.coreCount {
+    margin-left: 0.5rem;
+    font-size: 0.85rem;
+    color: var(--ifm-color-emphasis-600);
+}
+
+.depItems {
     display: flex;
     flex-direction: column;
     gap: 0.75rem;
     padding: 1rem;
 }
 
-.moduleItem {
+.depItem {
     padding: 0.75rem;
     border: 1px solid var(--ifm-color-emphasis-200);
     border-radius: 4px;
@@ -159,18 +307,18 @@
     transition: box-shadow 0.2s;
 }
 
-.moduleItem:hover {
+.depItem:hover {
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
-.moduleHeader {
+.depHeader {
     display: flex;
     align-items: center;
     justify-content: space-between;
     margin-bottom: 0.5rem;
 }
 
-.moduleLabel {
+.depLabel {
     display: flex;
     align-items: center;
     gap: 0.5rem;
@@ -179,20 +327,28 @@
     flex: 1;
 }
 
-.moduleCheckbox {
+.depCheckbox {
     cursor: pointer;
 }
 
-.moduleCheckbox:disabled {
+.depCheckbox:disabled {
     cursor: not-allowed;
 }
 
-.moduleName {
+.depName {
     display: flex;
     align-items: center;
     gap: 0.5rem;
     font-weight: 500;
     color: var(--ifm-heading-color);
+}
+
+.scopeBadge {
+    font-size: 0.7rem;
+    padding: 0.15rem 0.4rem;
+    background: var(--ifm-color-success);
+    color: white;
+    border-radius: 3px;
 }
 
 .requiredBadge {
@@ -201,6 +357,44 @@
     background: var(--ifm-color-primary);
     color: white;
     border-radius: 3px;
+}
+
+.recommendedBadge {
+    font-size: 0.7rem;
+    padding: 0.15rem 0.4rem;
+    background: var(--ifm-color-warning);
+    color: white;
+    border-radius: 3px;
+}
+
+.depDescription {
+    margin: 0 0 0 1.75rem;
+    font-size: 0.9rem;
+    color: var(--ifm-color-emphasis-700);
+}
+
+.depDetails {
+    margin: 0.75rem 0 0 1.75rem;
+    padding: 0.75rem;
+    background: var(--ifm-color-emphasis-100);
+    border-radius: 4px;
+    font-size: 0.85rem;
+}
+
+.depInfo {
+    margin: 0.5rem 0;
+    color: var(--ifm-color-emphasis-800);
+}
+
+.depInfo strong {
+    color: var(--ifm-heading-color);
+}
+
+.depInfo code {
+    padding: 0.15rem 0.4rem;
+    background: var(--ifm-code-background);
+    border-radius: 3px;
+    font-size: 0.85rem;
 }
 
 .detailsButton {
@@ -217,34 +411,6 @@
 .detailsButton:hover {
     background: var(--ifm-color-primary);
     color: white;
-}
-
-.moduleDescription {
-    margin: 0 0 0 1.75rem;
-    font-size: 0.9rem;
-    color: var(--ifm-color-emphasis-700);
-}
-
-.moduleFeatures {
-    margin: 0.75rem 0 0 1.75rem;
-    padding: 0.75rem;
-    background: var(--ifm-color-emphasis-100);
-    border-radius: 4px;
-    font-size: 0.85rem;
-}
-
-.moduleFeatures strong {
-    color: var(--ifm-heading-color);
-}
-
-.moduleFeatures ul {
-    margin: 0.5rem 0 0 0;
-    padding-left: 1.25rem;
-}
-
-.moduleFeatures li {
-    margin: 0.25rem 0;
-    color: var(--ifm-color-emphasis-800);
 }
 
 /* 右侧：代码面板 */
@@ -436,7 +602,7 @@
     }
 
     /* 移动端模块列表优化 */
-    .moduleList {
+    .depList {
         padding: 1rem;
     }
 
@@ -453,26 +619,51 @@
         font-size: 0.95rem;
     }
 
-    /* 移动端模块项优化 */
-    .moduleItems {
+    /* 移动端依赖项优化 */
+    .depItems {
         padding: 0.75rem;
         gap: 0.5rem;
     }
 
-    .moduleItem {
+    /* Core 版本选择器移动端优化 */
+    .coreVersionSelector {
+        margin: 0.75rem;
+        padding: 0.75rem;
+    }
+
+    .coreInputGroup {
+        flex-direction: column;
+    }
+
+    .addButton {
+        width: 100%;
+    }
+
+    .subTypeSelector {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.5rem;
         padding: 0.6rem;
     }
 
-    .moduleName {
+    .subTypeOption {
+        width: 100%;
+    }
+
+    .depItem {
+        padding: 0.6rem;
+    }
+
+    .depName {
         font-size: 0.9rem;
     }
 
-    .moduleDescription {
+    .depDescription {
         font-size: 0.85rem;
         margin-left: 1.5rem;
     }
 
-    .moduleFeatures {
+    .depDetails {
         margin-left: 1.5rem;
         font-size: 0.8rem;
     }
@@ -515,7 +706,7 @@
 
 /* 小屏幕进一步优化 */
 @media (max-width: 576px) {
-    .pluginInstallList {
+    .dependencyManager {
         margin: 1rem 0;
     }
 
@@ -523,7 +714,7 @@
         gap: 1rem;
     }
 
-    .moduleList,
+    .depList,
     .codePanel {
         padding: 0.75rem;
         border-radius: 6px;
@@ -539,17 +730,17 @@
         font-size: 0.9rem;
     }
 
-    .moduleItem {
+    .depItem {
         padding: 0.5rem;
     }
 
-    .moduleHeader {
+    .depHeader {
         flex-direction: column;
         align-items: flex-start;
         gap: 0.5rem;
     }
 
-    .moduleLabel {
+    .depLabel {
         width: 100%;
     }
 

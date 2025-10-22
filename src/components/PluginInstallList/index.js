@@ -9,33 +9,87 @@ const PluginInstallList = () => {
             name: 'Basic',
             category: '核心模块',
             required: true,
-            description: '提供 TabooLib 的基础功能',
+            description: '配置文件，任务链',
             features: [
-                '插件生命周期管理',
-                '平台抽象层',
+                '配置文件管理',
+                '任务链系统',
                 '基础工具类',
-                '日志系统'
+                '插件生命周期管理'
             ]
         },
+        // 平台模块
         {
             id: 'Bukkit',
             name: 'Bukkit',
             category: '平台模块',
             required: false,
-            description: 'Bukkit/Spigot 平台支持',
+            description: '包含 Bukkit 平台的启动项',
             features: [
-                'Bukkit API 封装',
+                'Bukkit/Spigot 平台支持',
                 '事件监听器',
                 '命令注册',
                 '插件消息通道'
             ]
         },
         {
-            id: 'BukkitHook',
-            name: 'BukkitHook',
+            id: 'BungeeCord',
+            name: 'BungeeCord',
             category: '平台模块',
             required: false,
-            description: '常用 Bukkit 插件钩子',
+            description: '包含 BungeeCord 平台的启动项',
+            features: [
+                'BungeeCord 代理服务器支持',
+                '跨服通信',
+                '玩家管理',
+                '服务器切换'
+            ]
+        },
+        {
+            id: 'Velocity',
+            name: 'Velocity',
+            category: '平台模块',
+            required: false,
+            description: '包含 Velocity 平台的启动项',
+            features: [
+                'Velocity 代理服务器支持',
+                '现代化 API',
+                '高性能设计',
+                '插件兼容性'
+            ]
+        },
+        {
+            id: 'AfyBroker',
+            name: 'AfyBroker',
+            category: '平台模块',
+            required: false,
+            description: '包含 AfyBroker 平台的启动项',
+            features: [
+                'AfyBroker 平台支持',
+                '消息代理',
+                '跨平台通信',
+                '事件分发'
+            ]
+        },
+        {
+            id: 'App',
+            name: 'App',
+            category: '平台模块',
+            required: false,
+            description: '可独立运行的 Java 程序',
+            features: [
+                '独立应用程序',
+                '无需 Minecraft 服务器',
+                '命令行工具',
+                '自定义程序入口'
+            ]
+        },
+        // Bukkit 扩展模块
+        {
+            id: 'BukkitHook',
+            name: 'BukkitHook',
+            category: 'Bukkit 扩展',
+            required: false,
+            description: 'Bukkit 与 Vault、PlaceholderAPI 等插件交互',
             features: [
                 'Vault 经济系统',
                 'PlaceholderAPI 支持',
@@ -44,24 +98,63 @@ const PluginInstallList = () => {
             ]
         },
         {
-            id: 'BukkitNMSUtil',
-            name: 'BukkitNMSUtil',
-            category: '平台模块',
+            id: 'BukkitUtil',
+            name: 'BukkitUtil',
+            category: 'Bukkit 扩展',
             required: false,
-            description: 'Bukkit NMS 工具集',
+            description: 'Bukkit 扩展工具',
             features: [
-                'NMS 版本适配',
-                '数据包操作',
-                '实体操作',
-                '物品操作'
+                'Bukkit 工具类',
+                'XSeries 支持',
+                'Minecraft 聊天',
+                '国际化'
             ]
         },
         {
-            id: 'BukkitXSeries',
-            name: 'BukkitXSeries',
-            category: '平台模块',
+            id: 'BukkitUI',
+            name: 'BukkitUI',
+            category: 'Bukkit 扩展',
             required: false,
-            description: '跨版本材质和声音支持',
+            description: 'Bukkit 箱子菜单',
+            features: [
+                '箱子 GUI 界面',
+                '物品构建器',
+                '点击事件处理',
+                '多版本兼容'
+            ]
+        },
+        {
+            id: 'BukkitNavigation',
+            name: 'BukkitNavigation',
+            category: 'Bukkit 扩展',
+            required: false,
+            description: 'Bukkit 寻路工具',
+            features: [
+                'A* 寻路算法',
+                '路径优化',
+                '障碍物检测',
+                '实体导航'
+            ]
+        },
+        {
+            id: 'BukkitFakeOp',
+            name: 'BukkitFakeOp',
+            category: 'Bukkit 扩展',
+            required: false,
+            description: 'Bukkit 虚拟 OP 工具',
+            features: [
+                '临时 OP 权限',
+                '权限模拟',
+                '命令执行',
+                '安全控制'
+            ]
+        },
+        {
+            id: 'XSeries',
+            name: 'XSeries',
+            category: 'Bukkit 扩展',
+            required: false,
+            description: 'XSeries 跨版本兼容库',
             features: [
                 'XMaterial 材质枚举',
                 'XSound 声音枚举',
@@ -70,48 +163,75 @@ const PluginInstallList = () => {
             ]
         },
         {
-            id: 'Chat',
-            name: 'Chat',
-            category: '功能模块',
+            id: 'BukkitNMS',
+            name: 'BukkitNMS',
+            category: 'Bukkit 扩展',
             required: false,
-            description: '聊天组件系统',
+            description: 'Bukkit NMS 工具',
             features: [
-                '文本组件构建',
-                '悬停和点击事件',
-                'RGB 颜色支持',
-                '渐变色文本'
+                'NMS 版本适配',
+                '底层 API 访问',
+                '反射工具',
+                '代理系统'
             ]
         },
         {
-            id: 'CommandHelper',
-            name: 'CommandHelper',
-            category: '功能模块',
+            id: 'BukkitNMSUtil',
+            name: 'BukkitNMSUtil',
+            category: 'Bukkit 扩展',
             required: false,
-            description: '命令系统增强',
+            description: 'Bukkit NMS 扩展工具',
             features: [
-                '命令构建器',
-                '参数解析',
-                '子命令支持',
-                '权限检查'
+                'NMS 工具集',
+                '数据包操作',
+                '实体操作',
+                '物品操作'
             ]
         },
         {
-            id: 'Configuration',
-            name: 'Configuration',
-            category: '工具模块',
+            id: 'BukkitNMSItemTag',
+            name: 'BukkitNMSItemTag',
+            category: 'Bukkit 扩展',
             required: false,
-            description: '配置文件系统',
+            description: 'Bukkit NMS ItemTag 工具',
             features: [
-                'YAML 配置',
-                'JSON 配置',
-                'TOML 配置',
-                '配置热重载'
+                'NBT 标签操作',
+                '物品数据存储',
+                '跨版本兼容',
+                '数据序列化'
             ]
         },
+        {
+            id: 'BukkitNMSDataSerializer',
+            name: 'BukkitNMSDataSerializer',
+            category: 'Bukkit 扩展',
+            required: false,
+            description: 'Bukkit NMS 数据序列化工具',
+            features: [
+                '数据序列化',
+                'Base64 编码',
+                '对象存储',
+                '跨版本支持'
+            ]
+        },
+        {
+            id: 'BukkitNMSEntityAI',
+            name: 'BukkitNMSEntityAI',
+            category: 'Bukkit 扩展',
+            required: false,
+            description: 'Bukkit NMS 实体 AI',
+            features: [
+                '实体 AI 控制',
+                '目标选择器',
+                '路径导航',
+                '行为定制'
+            ]
+        },
+        // 数据库模块
         {
             id: 'Database',
             name: 'Database',
-            category: '工具模块',
+            category: '数据库',
             required: false,
             description: '数据库管理系统',
             features: [
@@ -122,11 +242,155 @@ const PluginInstallList = () => {
             ]
         },
         {
+            id: 'DatabasePlayer',
+            name: 'DatabasePlayer',
+            category: '数据库',
+            required: false,
+            description: '玩家数据库',
+            features: [
+                '玩家数据管理',
+                '自动创建表',
+                '数据缓存',
+                '异步操作'
+            ]
+        },
+        {
+            id: 'DatabasePlayerRedis',
+            name: 'DatabasePlayerRedis',
+            category: '数据库',
+            required: false,
+            description: '玩家 Redis 数据库',
+            features: [
+                'Redis 缓存',
+                '玩家数据同步',
+                '跨服数据共享',
+                '高性能访问'
+            ]
+        },
+        {
+            id: 'AlkaidRedis',
+            name: 'AlkaidRedis',
+            category: '数据库',
+            required: false,
+            description: 'Alkaid Redis 客户端',
+            features: [
+                'Redis 连接',
+                '简单 API',
+                '连接池管理',
+                '异步操作'
+            ]
+        },
+        {
+            id: 'LettuceRedis',
+            name: 'LettuceRedis',
+            category: '数据库',
+            required: false,
+            description: 'Lettuce Redis 客户端',
+            features: [
+                'Lettuce 框架',
+                '响应式编程',
+                '集群支持',
+                '高级功能'
+            ]
+        },
+        {
+            id: 'IOC',
+            name: 'IOC',
+            category: '数据库',
+            required: false,
+            description: '依赖注入容器',
+            features: [
+                '依赖注入',
+                '自动装配',
+                '生命周期管理',
+                'Bean 容器'
+            ]
+        },
+        {
+            id: 'Ptc',
+            name: 'Ptc',
+            category: '数据库',
+            required: false,
+            description: 'Persistent Container 持久化容器',
+            features: [
+                '数据持久化',
+                '自动保存',
+                '配置管理',
+                '类型安全'
+            ]
+        },
+        {
+            id: 'PtcObject',
+            name: 'PtcObject',
+            category: '数据库',
+            required: false,
+            description: 'Persistent Container With Object',
+            features: [
+                '对象持久化',
+                'JSON 序列化',
+                '自动映射',
+                '嵌套对象支持'
+            ]
+        },
+        // Minecraft 功能模块
+        {
+            id: 'MinecraftChat',
+            name: 'MinecraftChat',
+            category: 'Minecraft 功能',
+            required: false,
+            description: 'Minecraft 文本工具',
+            features: [
+                '文本组件构建',
+                '悬停和点击事件',
+                'RGB 颜色支持',
+                '渐变色文本'
+            ]
+        },
+        {
+            id: 'MinecraftEffect',
+            name: 'MinecraftEffect',
+            category: 'Minecraft 功能',
+            required: false,
+            description: 'Minecraft 效果工具',
+            features: [
+                '粒子效果',
+                '音效播放',
+                '药水效果',
+                '视觉特效'
+            ]
+        },
+        {
+            id: 'CommandHelper',
+            name: 'CommandHelper',
+            category: 'Minecraft 功能',
+            required: false,
+            description: '指令帮助系统',
+            features: [
+                '命令构建器',
+                '参数解析',
+                '子命令支持',
+                '权限检查'
+            ]
+        },
+        {
+            id: 'I18n',
+            name: 'I18n',
+            category: 'Minecraft 功能',
+            required: false,
+            description: '国际化接口',
+            features: [
+                '多语言支持',
+                '语言文件管理',
+                'PlaceholderAPI 集成',
+                '变量替换'
+            ]
+        },
+        {
             id: 'Kether',
             name: 'Kether',
-            category: '高级模块',
+            category: 'Minecraft 功能',
             required: false,
-            description: '脚本引擎系统',
+            description: 'Kether 脚本引擎',
             features: [
                 '自定义脚本语言',
                 '动作系统',
@@ -135,37 +399,11 @@ const PluginInstallList = () => {
             ]
         },
         {
-            id: 'Lang',
-            name: 'Lang',
-            category: '工具模块',
-            required: false,
-            description: '多语言支持系统',
-            features: [
-                '语言文件管理',
-                'PlaceholderAPI 集成',
-                '变量替换',
-                '自动检测玩家语言'
-            ]
-        },
-        {
-            id: 'Navigation',
-            name: 'Navigation',
-            category: '功能模块',
-            required: false,
-            description: '寻路系统',
-            features: [
-                'A* 寻路算法',
-                '路径优化',
-                '障碍物检测',
-                '实体导航'
-            ]
-        },
-        {
             id: 'Metrics',
             name: 'Metrics',
-            category: '扩展模块',
+            category: 'Minecraft 功能',
             required: false,
-            description: 'bStats 数据统计',
+            description: 'BStats 数据统计',
             features: [
                 '插件使用统计',
                 '服务器信息收集',
@@ -176,9 +414,9 @@ const PluginInstallList = () => {
         {
             id: 'Porticus',
             name: 'Porticus',
-            category: '功能模块',
+            category: 'Minecraft 功能',
             required: false,
-            description: 'BungeeCord 通信',
+            description: 'BungeeCord 通讯',
             features: [
                 '跨服消息传递',
                 '玩家传送',
@@ -186,17 +424,31 @@ const PluginInstallList = () => {
                 '子服务器管理'
             ]
         },
+        // 脚本模块
         {
-            id: 'Test',
-            name: 'Test',
-            category: '开发工具',
+            id: 'JavaScript',
+            name: 'JavaScript',
+            category: '脚本引擎',
             required: false,
-            description: '单元测试支持',
+            description: 'Javascript 脚本环境',
             features: [
-                '测试框架',
-                'Mock 对象',
-                '断言工具',
-                '测试报告生成'
+                'JavaScript 支持',
+                'Nashorn/GraalVM',
+                '脚本热加载',
+                'Java 互操作'
+            ]
+        },
+        {
+            id: 'Jexl',
+            name: 'Jexl',
+            category: '脚本引擎',
+            required: false,
+            description: 'Jexl 表达式引擎',
+            features: [
+                'Jexl 表达式',
+                '条件判断',
+                '变量计算',
+                '简单脚本'
             ]
         }
     ];
@@ -225,11 +477,10 @@ const PluginInstallList = () => {
     const categoryOrder = [
         '核心模块',
         '平台模块',
-        '扩展模块',
-        '工具模块',
-        '功能模块',
-        '高级模块',
-        '开发工具',
+        'Bukkit 扩展',
+        '数据库',
+        'Minecraft 功能',
+        '脚本引擎',
         '其他模块'
     ];
 

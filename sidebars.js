@@ -23,7 +23,8 @@ const sidebars = {
             label: '👋🏻 快速上手',
             collapsed: false,
             items: [
-                'start-hand/index'
+                'start-hand/create-manually/index',
+                'start-hand/taboostart/index'
             ]
         },
         {
@@ -47,6 +48,14 @@ const sidebars = {
                 'basic-tech/utilities/index',
                 'basic-tech/reflex/index',
                 'basic-tech/nms-proxy/index',
+            ],
+        },
+        {
+            type: 'category',
+            label: '📚 进阶技术',
+            collapsed: false,
+            items: [
+                'advanced-skills/isolated-classloader/index'
             ],
         },
     ],
