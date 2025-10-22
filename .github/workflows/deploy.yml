@@ -14,6 +14,21 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
+      # 在构建之前测试 SSH 连接
+      - name: Test SSH Connection
+        uses: appleboy/ssh-action@v1.0.0
+        with:
+          host: ${{ secrets.SERVER_IP }}
+          username: ${{ secrets.SERVER_USER }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          port: 22
+          script: |
+            echo "✅ SSH connection successful!"
+            echo "Server hostname: $(hostname)"
+            echo "Current user: $(whoami)"
+            echo "Server time: $(date)"
+            echo "Disk space: $(df -h / | tail -1)"
+
       - name: Install dependencies
         run: npm install
 
