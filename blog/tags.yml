@@ -1,19 +1,24 @@
-facebook:
-  label: Facebook
-  permalink: /facebook
-  description: Facebook tag description
+公告:
+  label: 公告
+  permalink: /announcement
+  description: TabooLib 官方公告
 
-hello:
-  label: Hello
-  permalink: /hello
-  description: Hello tag description
+文档:
+  label: 文档
+  permalink: /documentation
+  description: 文档更新和说明
 
-docusaurus:
-  label: Docusaurus
-  permalink: /docusaurus
-  description: Docusaurus tag description
+更新日志:
+  label: 更新日志
+  permalink: /changelog
+  description: TabooLib 版本更新记录
 
-hola:
-  label: Hola
-  permalink: /hola
-  description: Hola tag description
+教程:
+  label: 教程
+  permalink: /tutorial
+  description: TabooLib 使用教程
+
+技术分享:
+  label: 技术分享
+  permalink: /tech-share
+  description: 技术文章和经验分享

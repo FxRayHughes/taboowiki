@@ -2,46 +2,76 @@
 sidebar_position: 1
 ---
 
-# Tutorial Intro
+# TabooLib 简介
 
-Let's discover **Docusaurus in less than 5 minutes**.
+欢迎来到 **TabooLib** 官方文档！TabooLib 是一个现代化的 Minecraft 插件开发框架，旨在简化插件开发流程，提供丰富的工具和组件。
 
-## Getting Started
+## 什么是 TabooLib？
 
-Get started by **creating a new site**.
+TabooLib 是一个功能强大的 Minecraft 插件开发框架，提供了：
 
-Or **try Docusaurus immediately** with **[docusaurus.new](https://docusaurus.new)**.
+- **跨平台支持**：支持 Bukkit、BungeeCord、Velocity 等多个平台
+- **模块化设计**：按需加载所需功能模块，减少插件体积
+- **丰富的工具集**：命令系统、配置文件、数据库、GUI 菜单等开箱即用
+- **完善的 NMS 支持**：简化版本适配，提供统一的 NMS 操作接口
+- **Kotlin 优先**：充分利用 Kotlin 语言特性，提升开发效率
 
-### What you'll need
+## 快速开始
 
-- [Node.js](https://nodejs.org/en/download/) version 20.0 or above:
-  - When installing Node.js, you are recommended to check all checkboxes related to dependencies.
+### 环境要求
 
-## Generate a new site
+- **JDK 8** 或更高版本
+- **Gradle** 或 **Maven** 构建工具
+- 基本的 **Kotlin** 或 **Java** 编程知识
 
-Generate a new Docusaurus site using the **classic template**.
+### 创建第一个插件
 
-The classic template will automatically be added to your project after you run the command:
+使用 Gradle 添加 TabooLib 依赖：
 
-```bash
-npm init docusaurus@latest my-website classic
+```kotlin
+plugins {
+    id("io.izzel.taboolib") version "2.0.23"
+}
+
+dependencies {
+    compileOnly("ink.ptms.core:v12004:12004:mapped")
+    compileOnly("ink.ptms.core:v12004:12004:universal")
+    compileOnly(kotlin("stdlib"))
+    taboo("platform:platform-bukkit")
+}
 ```
 
-You can type this command into Command Prompt, Powershell, Terminal, or any other integrated terminal of your code editor.
+### 主类示例
 
-The command also installs all necessary dependencies you need to run Docusaurus.
+```kotlin
+import taboolib.common.platform.Plugin
 
-## Start your site
+object ExamplePlugin : Plugin() {
 
-Run the development server:
+    override fun onEnable() {
+        println("TabooLib 插件已启动！")
+    }
 
-```bash
-cd my-website
-npm run start
+    override fun onDisable() {
+        println("TabooLib 插件已关闭！")
+    }
+}
 ```
 
-The `cd` command changes the directory you're working with. In order to work with your newly created Docusaurus site, you'll need to navigate the terminal there.
+## 文档导航
 
-The `npm run start` command builds your website locally and serves it through a development server, ready for you to view at http://localhost:3000/.
+- **核心功能**：了解 TabooLib 的基础架构和核心概念
+- **命令系统**：学习如何创建强大的命令系统
+- **配置文件**：掌握配置文件的读写和热重载
+- **数据库**：使用内置的数据库操作工具
+- **GUI 菜单**：创建美观的箱子菜单界面
+- **实用工具集**：探索各种便捷的工具函数
 
-Open `docs/intro.md` (this page) and edit some lines: the site **reloads automatically** and displays your changes.
+## 获取帮助
+
+- **GitHub**：[https://github.com/TabooLib/taboolib](https://github.com/TabooLib/taboolib)
+- **QQ 群**：[点击加入](https://qm.qq.com/q/i4Q9SFRqq4)
+
+## 贡献文档
+
+发现文档错误或想要补充内容？欢迎访问 [GitHub 仓库](https://github.com/FxRayHughes/taboowiki) 提交 Pull Request！
