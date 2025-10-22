@@ -21,7 +21,7 @@ jobs:
         run: npm run build
 
       - name: Package build output
-        run: tar -czf taboowiki.tar.gz -C dist .
+        run: tar -czf taboowiki.tar.gz -C build .
 
       - name: Upload to server and deploy
         uses: appleboy/scp-action@v0.1.7
