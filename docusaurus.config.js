@@ -41,6 +41,8 @@ const config = {
         },
     },
 
+    themes: ['@docusaurus/theme-mermaid'],
+
     // 中文语言支持
     i18n: {
         defaultLocale: 'zh-Hans',
@@ -89,120 +91,128 @@ const config = {
         ],
     ],
 
-    themeConfig:
-    /** @type {import('@docusaurus/preset-classic').ThemeConfig} */
-        ({
-            // 替换为项目的社交卡片
-            image: 'img/taboolib-logo.png',
-            // 颜色模式配置
-            colorMode: {
-                defaultMode: 'light',
-                disableSwitch: false,
-                respectPrefersColorScheme: false,
-            },
-            // 导航栏配置
-            navbar: {
-                title: 'TabooWiki',
-                logo: {
-                    alt: 'TabooLib Logo',
-                    src: 'img/logo.png',
+    themeConfig: {
+        // 替换为项目的社交卡片
+        image: 'img/taboolib-logo.png',
+        // 颜色模式配置
+        colorMode: {
+            defaultMode: 'light',
+            disableSwitch: false,
+            respectPrefersColorScheme: false,
+        },
+        // Mermaid 主题配置
+        mermaid: {
+            theme: {light: 'neutral', dark: 'dark'},
+            options: {
+                look: "handDrawn",
+                themeVariables: {
+                    lineColor: '#0084b8'
                 },
-                items: [
-                    {
-                        type: 'docSidebar',
-                        sidebarId: 'tutorialSidebar',
-                        position: 'left',
-                        label: '文档',
-                    },
-                    {
-                        to: '/docs/teaching',
-                        label: '教学',
-                        position: 'left'
-                    },
-                    {
-                        to: '/blog',
-                        label: '公告与日志',
-                        position: 'left'
-                    },
-                    {
-                        type: 'search',
-                        position: 'right',
-                    },
-                    {
-                        href: 'https://github.com/TabooLib/taboolib',
-                        label: 'GitHub',
-                        position: 'right',
-                    },
-                    {
-                        href: 'https://qm.qq.com/q/i4Q9SFRqq4',
-                        label: 'QQ群',
-                        position: 'right',
-                    },
-                ],
             },
-            // 页脚配置
-            footer: {
-                style: 'dark',
-                links: [
-                    {
-                        title: '📖 文档',
-                        items: [
-                            {
-                                label: '快速开始',
-                                to: '/docs/intro',
-                            },
-                            {
-                                label: '命令系统',
-                                to: '/docs/basic-tech/command/',
-                            },
-                            {
-                                label: '实用工具集',
-                                to: '/docs/basic-tech/utilities/',
-                            },
-                        ],
-                    },
-                    {
-                        title: '🌐 社区',
-                        items: [
-                            {
-                                label: 'GitHub',
-                                href: 'https://github.com/TabooLib/taboolib',
-                            },
-                            {
-                                label: 'QQ 群',
-                                href: 'https://qm.qq.com/q/i4Q9SFRqq4',
-                            },
-                        ],
-                    },
-                ],
-                copyright: `Copyright © ${new Date().getFullYear()} TabooLib. Built with Docusaurus.`,
+        },
+        // 导航栏配置
+        navbar: {
+            title: 'TabooWiki',
+            logo: {
+                alt: 'TabooLib Logo',
+                src: 'img/logo.png',
             },
-            // 代码高亮配置
-            prism: {
-                theme: prismThemes.github,
-                darkTheme: prismThemes.dracula,
-                // 添加 Kotlin 语言支持
-                additionalLanguages: ['kotlin', 'java', 'groovy', 'yaml', 'json', 'bash', 'properties'],
-                // 魔法注释配置 - 支持高亮、错误、警告行
-                magicComments: [
-                    {
-                        className: 'theme-code-block-highlighted-line',
-                        line: 'highlight-next-line',
-                        block: {start: 'highlight-start', end: 'highlight-end'},
-                    },
-                    {
-                        className: 'code-block-error-line',
-                        line: 'error-next-line',
-                        block: {start: 'error-start', end: 'error-end'},
-                    },
-                    {
-                        className: 'code-block-success-line',
-                        line: 'success-next-line',
-                        block: {start: 'success-start', end: 'success-end'},
-                    },
-                ],
-            },
-        }),
+            items: [
+                {
+                    type: 'docSidebar',
+                    sidebarId: 'tutorialSidebar',
+                    position: 'left',
+                    label: '文档',
+                },
+                {
+                    to: '/docs/teaching',
+                    label: '教学',
+                    position: 'left'
+                },
+                {
+                    to: '/blog',
+                    label: '公告与日志',
+                    position: 'left'
+                },
+                {
+                    type: 'search',
+                    position: 'right',
+                },
+                {
+                    href: 'https://github.com/TabooLib/taboolib',
+                    label: 'GitHub',
+                    position: 'right',
+                },
+                {
+                    href: 'https://qm.qq.com/q/i4Q9SFRqq4',
+                    label: 'QQ群',
+                    position: 'right',
+                },
+            ],
+        },
+        // 页脚配置
+        footer: {
+            style: 'dark',
+            links: [
+                {
+                    title: '📖 文档',
+                    items: [
+                        {
+                            label: '快速开始',
+                            to: '/docs/intro',
+                        },
+                        {
+                            label: '命令系统',
+                            to: '/docs/basic-tech/command/',
+                        },
+                        {
+                            label: '实用工具集',
+                            to: '/docs/basic-tech/utilities/',
+                        },
+                    ],
+                },
+                {
+                    title: '🌐 社区',
+                    items: [
+                        {
+                            label: 'GitHub',
+                            href: 'https://github.com/TabooLib/taboolib',
+                        },
+                        {
+                            label: 'QQ 群',
+                            href: 'https://qm.qq.com/q/i4Q9SFRqq4',
+                        },
+                    ],
+                },
+            ],
+            copyright: `Copyright © ${new Date().getFullYear()} TabooLib. Built with Docusaurus.`,
+        },
+        // 代码高亮配置
+        prism: {
+            theme: prismThemes.github,
+            darkTheme: prismThemes.dracula,
+            // 添加 Kotlin 语言支持
+            additionalLanguages: ['kotlin', 'java', 'groovy', 'yaml', 'json', 'bash', 'properties'],
+            // 魔法注释配置 - 支持高亮、错误、警告行
+            magicComments: [
+                {
+                    className: 'theme-code-block-highlighted-line',
+                    line: 'highlight-next-line',
+                    block: {start: 'highlight-start', end: 'highlight-end'},
+                },
+                {
+                    className: 'code-block-error-line',
+                    line: 'error-next-line',
+                    block: {start: 'error-start', end: 'error-end'},
+                },
+                {
+                    className: 'code-block-success-line',
+                    line: 'success-next-line',
+                    block: {start: 'success-start', end: 'success-end'},
+                },
+            ],
+        },
+    },
 };
 
 export default config;

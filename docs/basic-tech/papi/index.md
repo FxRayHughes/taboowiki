@@ -24,9 +24,9 @@ graph TB
     C --> C2[List.replacePlaceholder<br/>多行文本替换]
     C --> C3[OfflinePlayer 支持<br/>离线玩家变量]
 
-    style A fill:#e3f2fd
-    style B fill:#fff3e0
-    style C fill:#f3e5f5
+    style A fill:#e3f2fd,color:#000000
+    style B fill:#fff3e0,color:#000000
+    style C fill:#f3e5f5,color:#000000
 ```
 
 **关键概念：**

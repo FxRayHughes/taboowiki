@@ -52,10 +52,14 @@ const sidebars = {
         },
         {
             type: 'category',
-            label: '📚 进阶技术',
+            label: '✨ 进阶技术',
             collapsed: false,
             items: [
-                'advanced-skills/isolated-classloader/index'
+                'advanced-skills/isolated-classloader/index',
+                'advanced-skills/script-jexl/index',
+                'advanced-skills/script-javascript/index',
+                'advanced-skills/script-kether/index',
+                'advanced-skills/kotlinx-serialization/index'
             ],
         },
     ],

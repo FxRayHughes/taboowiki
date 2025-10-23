@@ -10,16 +10,16 @@ sidebar_position: 11
 
 ```mermaid
 graph LR
-    A[/taboolib] --> B[give]
-    B --> C["&lt;user&gt;"]
+    A["/taboolib"] --> B["give"]
+    B --> C["user"]
 
-    A -->|主节点 Main| D[命令根节点<br/>通过 @CommandHeader 定义]
-    B -->|子节点 Subcommand| E[固定指令]
-    C -->|参数层 Parameter| F[动态参数<br/>运行时用户输入]
+    A -->|"主节点 Main"| D["命令根节点<br/>通过 @CommandHeader 定义"]
+    B -->|"子节点 Subcommand"| E["固定指令"]
+    C -->|"参数层 Parameter"| F["动态参数<br/>运行时用户输入"]
 
-    style A fill:#e3f2fd
-    style B fill:#fff3e0
-    style C fill:#f3e5f5
+    style A fill:#e3f2fd,color:#000000
+    style B fill:#fff3e0,color:#000000
+    style C fill:#f3e5f5,color:#000000
 ```
 
 - **主节点**: `/taboolib` - 命令的根节点，通过 `@CommandHeader` 定义

@@ -28,3 +28,13 @@
   --docusaurus-highlighted-code-line-bg: rgba(0, 0, 0, 0.3);
 }
 
+/* Mermaid 暗色模式线条颜色 */
+[data-theme='dark'] .mermaid .edgePath .path {
+  stroke: #fff !important;
+}
+
+[data-theme='dark'] .mermaid .flowchart-link {
+  stroke: #fff !important;
+}
+
+

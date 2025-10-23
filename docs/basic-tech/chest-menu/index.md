@@ -34,12 +34,12 @@ graph TB
     B --> E["PageableChest&lt;T&gt;<br/>翻页箱子"]
     B --> F[StorableChest<br/>可储存箱子]
 
-    style A fill:#e3f2fd
-    style B fill:#fff3e0
-    style C fill:#f3e5f5
-    style D fill:#e8f5e9
-    style E fill:#fce4ec
-    style F fill:#f1f8e9
+    style A fill:#e3f2fd,color:#000000
+    style B fill:#fff3e0,color:#000000
+    style C fill:#f3e5f5,color:#000000
+    style D fill:#e8f5e9,color:#000000
+    style E fill:#fce4ec,color:#000000
+    style F fill:#f1f8e9,color:#000000
 ```
 
 - **Chest**：标准箱子容器，1-6 行可配置，支持字符布局映射
@@ -58,7 +58,7 @@ player.openMenu<Chest>("我的菜单") {
 
     map(
         "####B####",  // 第 1 行：# 代表边框，B 代表按钮
-        "#  ...  #",  // 第 2 行：. 代表物品槽位，空格代表空位
+        "#  @@@  #",  // 第 2 行：. 代表物品槽位，空格代表空位
         "####X####"   // 第 3 行：X 代表关闭按钮
     )
 }
@@ -66,31 +66,10 @@ player.openMenu<Chest>("我的菜单") {
 
 布局可视化：
 
-```mermaid
-graph LR
-    subgraph "第 1 行 ####B####"
-        A0[#] --- A1[#] --- A2[#] --- A3[#] --- A4[B] --- A5[#] --- A6[#] --- A7[#] --- A8[#]
-    end
-
-    subgraph "第 2 行 #  ...  #"
-        B0[#] --- B1[ ] --- B2[ ] --- B3[.] --- B4[.] --- B5[.] --- B6[ ] --- B7[ ] --- B8[#]
-    end
-
-    subgraph "第 3 行 ####X####"
-        C0[#] --- C1[#] --- C2[#] --- C3[#] --- C4[X] --- C5[#] --- C6[#] --- C7[#] --- C8[#]
-    end
-
-    style A4 fill:#ffd700
-    style B3 fill:#90ee90
-    style B4 fill:#90ee90
-    style B5 fill:#90ee90
-    style C4 fill:#ff6b6b
-```
-
 **字符说明：**
 - `#`：边框装饰物品
 - `B`：功能按钮
-- `.`：物品展示槽位
+- `@`：物品展示槽位
 - `X`：关闭按钮
 - 空格：空位
 

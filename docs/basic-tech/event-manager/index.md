@@ -17,18 +17,29 @@ sidebar_position: 5
 
 **事件系统架构：**
 
-```
-                                  TabooLib EventBus
-                                         │
-                    ┌────────────────────┼────────────────────┐
-                    │                    │                    │
-            平台事件系统              内部事件系统          可选事件系统
-                    │                    │                    │
-    ┌───────────────┼───────────────┐    │                    │
-    │               │               │    │                    │
-BukkitProxyEvent BungeeProxyEvent VelocityProxyEvent  InternalEvent  OptionalEvent
-    │               │               │    │                    │
-需要导入平台 API  需要导入平台 API  需要导入平台 API  不需要导入       跨版本兼容
+```mermaid
+graph TB
+    A[TabooLib EventBus] --> B[平台事件系统]
+    A --> C[内部事件系统]
+    A --> D[可选事件系统]
+
+    B --> E[BukkitProxyEvent<br/>需要导入平台 API]
+    B --> F[BungeeProxyEvent<br/>需要导入平台 API]
+    B --> G[VelocityProxyEvent<br/>需要导入平台 API]
+
+    C --> H[InternalEvent<br/>不需要导入]
+
+    D --> I[OptionalEvent<br/>跨版本兼容]
+
+    style A fill:#e3f2fd,color:#000000
+    style B fill:#fff3e0,color:#000000
+    style C fill:#f3e5f5,color:#000000
+    style D fill:#e8f5e9,color:#000000
+    style E fill:#ffebee,color:#000000
+    style F fill:#ffebee,color:#000000
+    style G fill:#ffebee,color:#000000
+    style H fill:#f3e5f5,color:#000000
+    style I fill:#e8f5e9,color:#000000
 ```
 
 ## 基础用法 - @SubscribeEvent

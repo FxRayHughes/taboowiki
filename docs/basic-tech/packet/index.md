@@ -19,8 +19,8 @@ graph TB
     C --> D[PacketSend<br/>服务端→客户端]
     D --> E[客户端 - 渲染显示]
 
-    style B fill:#e1f5ff
-    style D fill:#fff4e1
+    style B fill:#e1f5ff,color:#000000
+    style D fill:#fff4e1,color:#000000
 ```
 
 **数据包流向：**
@@ -47,11 +47,11 @@ graph TB
         E --> F["• read&lt;T&gt;(name) - 读取字段<br/>• write(name, value) - 写入字段<br/>• name - 数据包名称<br/>• source - 原始 NMS 对象"]
     end
 
-    style A fill:#e3f2fd
-    style B fill:#fff3e0
-    style C fill:#e1f5ff
-    style D fill:#fff4e1
-    style E fill:#f3e5f5
+    style A fill:#e3f2fd,color:#000000
+    style B fill:#fff3e0,color:#000000
+    style C fill:#e1f5ff,color:#000000
+    style D fill:#fff4e1,color:#000000
+    style E fill:#f3e5f5,color:#000000
 ```
 
 **核心组件：**
@@ -74,8 +74,8 @@ graph LR
     C --> D[Encoder]
     C --> E[拦截并触发<br/>TabooLib 事件]
 
-    style C fill:#ffeb3b
-    style E fill:#e1f5ff
+    style C fill:#ffeb3b,color:#000000
+    style E fill:#e1f5ff,color:#000000
 ```
 
 #### 2. 多插件共享机制

@@ -44,14 +44,14 @@ graph TB
     H --> H1[非安全延迟 unsafeLazy]
     H --> H2[可重置延迟 resettableLazy]
 
-    style A fill:#e3f2fd
-    style B fill:#fff3e0
-    style C fill:#f3e5f5
-    style D fill:#e8f5e9
-    style E fill:#fce4ec
-    style F fill:#f1f8e9
-    style G fill:#ffe0b2
-    style H fill:#f8bbd0
+    style A fill:#e3f2fd,color:#000000
+    style B fill:#fff3e0,color:#000000
+    style C fill:#f3e5f5,color:#000000
+    style D fill:#e8f5e9,color:#000000
+    style E fill:#fce4ec,color:#000000
+    style F fill:#f1f8e9,color:#000000
+    style G fill:#ffe0b2,color:#000000
+    style H fill:#f8bbd0,color:#000000
 ```
 
 ## 流量控制
@@ -338,9 +338,9 @@ graph TB
     C1 --> C2[示例: 技能冷却<br/>每 5 秒只能释放一次]
     D1 --> D2[示例: 搜索建议<br/>停止输入 500ms 后查询]
 
-    style A fill:#e3f2fd
-    style C fill:#fff3e0
-    style D fill:#f3e5f5
+    style A fill:#e3f2fd,color:#000000
+    style C fill:#fff3e0,color:#000000
+    style D fill:#f3e5f5,color:#000000
 ```
 
 **核心区别：**

@@ -21,10 +21,10 @@ graph TB
     D --> G[update 更新数据]
     D --> H[delete 删除数据]
 
-    style A fill:#e3f2fd
-    style B fill:#fff3e0
-    style C fill:#f3e5f5
-    style D fill:#e8f5e9
+    style A fill:#e3f2fd,color:#000000
+    style B fill:#fff3e0,color:#000000
+    style C fill:#f3e5f5,color:#000000
+    style D fill:#e8f5e9,color:#000000
 ```
 
 - **Host**：数据库连接配置，包含主机地址、端口、用户名、密码等信息

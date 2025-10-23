@@ -31,10 +31,10 @@ graph TB
     D --> D2[SimpleComponent<br/>行内语法]
     D --> D3[TellrawJson<br/>底层 JSON 构建]
 
-    style A fill:#e3f2fd
-    style B fill:#fff3e0
-    style C fill:#f3e5f5
-    style D fill:#e8f5e9
+    style A fill:#e3f2fd,color:#000000
+    style B fill:#fff3e0,color:#000000
+    style C fill:#f3e5f5,color:#000000
+    style D fill:#e8f5e9,color:#000000
 ```
 
 **关键概念：**
@@ -640,12 +640,12 @@ graph TB
     A --> E[交互功能<br/>click..., hover...]
     A --> F[多行构建<br/>newLine, +=]
 
-    style A fill:#e3f2fd
-    style B fill:#fff3e0
-    style C fill:#f3e5f5
-    style D fill:#e8f5e9
-    style E fill:#fce4ec
-    style F fill:#f1f8e9
+    style A fill:#e3f2fd,color:#000000
+    style B fill:#fff3e0,color:#000000
+    style C fill:#f3e5f5,color:#000000
+    style D fill:#e8f5e9,color:#000000
+    style E fill:#fce4ec,color:#000000
+    style F fill:#f1f8e9,color:#000000
 ```
 
 #### 创建 ComponentText
