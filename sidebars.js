@@ -53,13 +53,37 @@ const sidebars = {
         {
             type: 'category',
             label: '✨ 进阶技术',
-            collapsed: false,
             items: [
                 'advanced-skills/isolated-classloader/index',
                 'advanced-skills/script-jexl/index',
                 'advanced-skills/script-javascript/index',
                 'advanced-skills/script-kether/index',
                 'advanced-skills/kotlinx-serialization/index'
+            ],
+        },
+        {
+            type: 'category',
+            label: '🎠 拓展技术',
+            collapsed: false,
+            items: [
+                {
+                    type: 'category',
+                    label: 'Arim - 工具箱',
+                    items: [
+                        'expanding-technology/arim/index',
+                        'expanding-technology/arim/condition-evaluator/index',
+                        'expanding-technology/arim/fixed-calculator/index',
+                        'expanding-technology/arim/variable-calculator/index',
+                        'expanding-technology/arim/item-match/index',
+                        'expanding-technology/arim/entity-match/index',
+                        'expanding-technology/arim/glow/index',
+                        'expanding-technology/arim/weight-random/index',
+                        'expanding-technology/arim/item-manager/index',
+                        'expanding-technology/arim/folder-reader/index',
+                        'expanding-technology/arim/menu-helper/index',
+                        'expanding-technology/arim/command-helper/index',
+                    ],
+                },
             ],
         },
     ],

@@ -11,7 +11,13 @@ description: TabooLib Kether 脚本引擎完整指南
 
 Kether 是 TabooLib 内置的一套功能强大的脚本语言，专为 Minecraft 插件开发设计。它提供了简洁的语法、丰富的内置功能和强大的扩展能力。
 
+**项目历史：**
+- 最初由 **海螺** 开发，设计了带栈的脚本语法解释器
+- 后续由 **坏黑** 进行二次开发
+- 现已集成到 TabooLib 作为官方脚本引擎
+
 **核心特点：**
+- 基于栈的脚本解释器设计
 - 专为 Minecraft 设计的脚本语言
 - 简洁易懂的自然语言风格语法
 - 支持变量、循环、条件等控制结构
@@ -20,27 +26,6 @@ Kether 是 TabooLib 内置的一套功能强大的脚本语言，专为 Minecraf
 - 内置脚本缓存机制
 - 异步执行支持
 
-## 引入依赖
-
-Kether 是 TabooLib 的内置模块，无需额外引入依赖。只需要在你的项目中引入 `minecraft-kether` 模块即可。
-
-### Gradle 配置
-
-```kotlin title="build.gradle.kts"
-taboolib {
-    install("minecraft-kether")
-}
-```
-
-:::info[自动依赖]
-
-Kether 模块会自动引入以下依赖：
-- `commons-jexl3:3.2.1` - 用于表达式计算
-- `datafixerupper:4.0.26` - Mojang 数据修复工具
-
-这些依赖会通过 `@RuntimeDependency` 自动加载。
-
-:::
 
 ## 核心 API
 
