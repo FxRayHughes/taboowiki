@@ -82,6 +82,7 @@ const sidebars = {
                         'expanding-technology/arim/folder-reader/index',
                         'expanding-technology/arim/menu-helper/index',
                         'expanding-technology/arim/command-helper/index',
+                        'expanding-technology/arim/gson-utils/index',
                     ],
                 },
                 'expanding-technology/player-database/index',
