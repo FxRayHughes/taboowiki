@@ -87,6 +87,7 @@ const sidebars = {
                 'expanding-technology/player-database/index',
                 'expanding-technology/persistent-container/index',
                 'expanding-technology/universal-mythic/index',
+                'expanding-technology/alkaid-redis/index',
             ],
         },
     ],

@@ -179,6 +179,298 @@ bool("选项") {
 
 **适用场景：** 开关选项、模式切换等
 
+### 字面量类型 (Literal)
+
+Literal 类型用于定义固定的子命令节点，类似于 `@CommandBody` 定义的子命令，但可以在参数层级中灵活使用。
+
+```kotlin
+@CommandBody
+val config = subCommand {
+    // 使用 literal 定义固定的子命令选项
+    literal("reload", "rl") {
+        execute<CommandSender> { sender, context, argument ->
+            ConfigManager.reload()
+            sender.sendMessage("配置已重载")
+        }
+    }
+
+    literal("save") {
+        execute<CommandSender> { sender, context, argument ->
+            ConfigManager.save()
+            sender.sendMessage("配置已保存")
+        }
+    }
+
+    literal("reset") {
+        execute<CommandSender> { sender, context, argument ->
+            ConfigManager.reset()
+            sender.sendMessage("配置已重置")
+        }
+    }
+}
+```
+
+**命令示例：**
+- `/mycommand config reload` - 重载配置
+- `/mycommand config rl` - 使用别名重载配置
+- `/mycommand config save` - 保存配置
+- `/mycommand config reset` - 重置配置
+
+**特性：**
+- `aliases`：支持多个别名，如 `literal("reload", "rl")`
+- `optional`：是否为可选节点（默认 false）
+- `permission`：该节点所需的权限
+- `hidden`：是否在补全列表中隐藏（默认 false）
+- 可以嵌套使用，构建多层级命令结构
+
+**进阶示例：嵌套 literal 构建复杂命令**
+
+```kotlin
+@CommandBody
+val admin = subCommand {
+    literal("player") {
+        literal("kick") {
+            player("目标玩家") {
+                execute<CommandSender> { sender, context, argument ->
+                    val target = context.player("目标玩家")
+                    target.cast<Player>().kickPlayer("已被管理员踢出")
+                    sender.sendMessage("已踢出玩家: ${target.name}")
+                }
+            }
+        }
+
+        literal("ban") {
+            player("目标玩家") {
+                execute<CommandSender> { sender, context, argument ->
+                    val target = context.player("目标玩家")
+                    // 执行封禁逻辑
+                    sender.sendMessage("已封禁玩家: ${target.name}")
+                }
+            }
+        }
+    }
+
+    literal("server", "srv") {
+        literal("stop") {
+            execute<CommandSender> { sender, context, argument ->
+                sender.sendMessage("服务器即将关闭...")
+                // 执行关闭逻辑
+            }
+        }
+
+        literal("restart", "reboot") {
+            execute<CommandSender> { sender, context, argument ->
+                sender.sendMessage("服务器即将重启...")
+                // 执行重启逻辑
+            }
+        }
+    }
+}
+```
+
+**命令结构：**
+```
+/mycommand admin player kick <玩家>
+/mycommand admin player ban <玩家>
+/mycommand admin server stop
+/mycommand admin srv restart
+/mycommand admin srv reboot
+```
+
+**Literal vs Dynamic 的选择：**
+
+| 场景 | 推荐类型 | 原因 |
+|------|---------|------|
+| 固定的几个选项（如 reload/save/reset） | `literal` | 明确的命令结构，更好的补全体验 |
+| 用户输入的数据（如玩家名、商店名） | `dynamic` | 动态内容，需要运行时确定 |
+| 枚举值（如 true/false、模式选择） | `literal` 或专用类型 | literal 提供精确匹配，专用类型提供类型安全 |
+
+**带权限的 Literal 示例：**
+
+```kotlin
+literal("debug", permission = "myplugin.admin.debug") {
+    execute<CommandSender> { sender, context, argument ->
+        sender.sendMessage("调试信息: ...")
+    }
+}
+
+literal("normal") {
+    execute<CommandSender> { sender, context, argument ->
+        sender.sendMessage("普通功能")
+    }
+}
+```
+
+只有拥有 `myplugin.admin.debug` 权限的玩家才能看到和使用 `debug` 子命令。
+
+**隐藏 Literal 示例：**
+
+```kotlin
+literal("secret", hidden = true) {
+    execute<CommandSender> { sender, context, argument ->
+        sender.sendMessage("你发现了隐藏命令！")
+    }
+}
+```
+
+`hidden = true` 使得该命令不会出现在 Tab 补全列表中，但仍然可以执行。
+
+**适用场景：** 固定子命令、多级命令菜单、带别名的命令选项
+
+### 世界类型 (World)
+
+自动补全服务器中的世界名称，支持 `~` 代表当前玩家所在世界。
+
+```kotlin
+world("世界名") {
+    execute<Player> { sender, context, argument ->
+        val worldName = context.world("世界名")
+        sender.sendMessage("目标世界: $worldName")
+    }
+}
+```
+
+**特性：**
+- 自动补全所有已加载的世界名称
+- 支持 `~` 代表玩家当前世界
+- 使用 `context.world()` 获取，返回 `String` 类型
+
+**适用场景：** 传送命令、世界管理、跨世界操作
+
+### 坐标类型 (XYZ)
+
+快速定义三维坐标参数，支持相对坐标（`~` 语法）。
+
+```kotlin
+xyz("x", "y", "z") {
+    execute<Player> { sender, context, argument ->
+        val x = context.x("x")
+        val y = context.y("y")
+        val z = context.z("z")
+
+        sender.sendMessage("目标坐标: $x, $y, $z")
+        sender.teleport(Location(sender.world, x, y, z))
+    }
+}
+```
+
+**特性：**
+- 自动创建三个浮点数参数
+- 支持相对坐标：`~` 表示玩家当前位置，`~10` 表示偏移10格
+- 自动补全玩家当前坐标
+- 使用 `context.x()`, `context.y()`, `context.z()` 获取，返回 `Double` 类型
+
+**命令示例：**
+- `/tp 100 64 200` - 传送到绝对坐标
+- `/tp ~ ~10 ~` - 传送到当前X/Z，向上10格
+- `/tp ~5 ~ ~-3` - X+5, Z-3
+
+**适用场景：** 传送命令、设置坐标点、区域选择
+
+### 欧拉角类型 (Euler)
+
+定义视角参数（yaw 和 pitch）。
+
+```kotlin
+euler("yaw", "pitch") {
+    execute<Player> { sender, context, argument ->
+        val yaw = context.yaw("yaw")
+        val pitch = context.pitch("pitch")
+
+        val loc = sender.location.clone()
+        loc.yaw = yaw
+        loc.pitch = pitch
+        sender.teleport(loc)
+    }
+}
+```
+
+**特性：**
+- 自动创建两个浮点数参数
+- 支持相对角度：`~45` 表示在当前基础上旋转45度
+- 自动补全玩家当前视角
+- 使用 `context.yaw()`, `context.pitch()` 获取，返回 `Float` 类型
+
+**适用场景：** 设置视角、相机控制、精确传送
+
+### 完整位置类型 (Location)
+
+组合世界、坐标和视角的完整位置参数。
+
+```kotlin
+location() {
+    execute<Player> { sender, context, argument ->
+        val loc = context.location()
+        sender.teleport(loc)
+        sender.sendMessage("已传送到: ${loc.world} ${loc.x} ${loc.y} ${loc.z}")
+    }
+}
+```
+
+**特性：**
+- 自动创建 `world`, `x`, `y`, `z`, `yaw`, `pitch` 六个参数
+- 支持相对坐标和相对视角
+- 使用 `context.location()` 获取，返回 `Location` 对象
+
+**自定义参数名：**
+
+```kotlin
+location(
+    world = "目标世界",
+    x = "X坐标",
+    y = "Y坐标",
+    z = "Z坐标",
+    yaw = "偏航角",
+    pitch = "俯仰角",
+    euler = true  // 是否包含视角参数
+) {
+    execute<Player> { sender, context, argument ->
+        val loc = context.location("目标世界", "X坐标", "Y坐标", "Z坐标", "偏航角", "俯仰角")
+        sender.teleport(loc)
+    }
+}
+```
+
+**命令示例：**
+```
+/tp world 100 64 200 90 0
+/tp ~ ~ ~10 ~ ~ ~
+```
+
+**适用场景：** 完整传送命令、设置出生点、保存位置
+
+### 不带世界的位置类型 (LocationWithoutWorld)
+
+仅包含坐标和视角，自动使用玩家当前世界。
+
+```kotlin
+locationWithoutWorld() {
+    execute<Player> { sender, context, argument ->
+        val loc = context.locationWithoutWorld()
+        sender.teleport(loc)
+        sender.sendMessage("已传送到当前世界的: ${loc.x} ${loc.y} ${loc.z}")
+    }
+}
+```
+
+**特性：**
+- 自动创建 `x`, `y`, `z`, `yaw`, `pitch` 五个参数
+- 自动使用玩家当前世界
+- 支持相对坐标和相对视角
+- 使用 `context.locationWithoutWorld()` 获取，返回 `Location` 对象
+
+**与 Location 的区别：**
+- `location()` - 需要指定世界，6个参数
+- `locationWithoutWorld()` - 使用当前世界，5个参数
+
+**命令示例：**
+```
+/setpos 100 64 200 90 0
+/setpos ~ ~10 ~ ~ ~
+```
+
+**适用场景：** 同一世界内的传送、设置家、保存坐标点
+
 ## 参数层级与可选参数
 
 ### 可选参数 - 实现命令省略
