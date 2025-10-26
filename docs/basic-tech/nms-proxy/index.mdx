@@ -513,6 +513,182 @@ val key = "${抽象类完整名}:$bind:${构造参数类型列表}"
 "com.example.NMSDatabase:\{name}Impl:com.example.DatabaseConfig"  // 有参数
 ```
 
+### 7. 运行时类存在性检查 - require 函数
+
+在编写跨版本 NMS 代码时，经常需要根据类是否存在来决定使用哪个版本的实现。TabooLib 提供了 `require` 函数，可以在**编译时检查类是否存在**，并在字节码转译阶段直接替换为布尔常量。
+
+:::tip[性能优势]
+
+`require` 函数会在字节码转译时被替换为 `true` 或 `false` 常量，运行时**零性能开销**！
+
+:::
+
+**使用场景：**
+
+当你需要在同一个方法中处理多个版本的 NMS 类时：
+
+```kotlin
+class NMSChatImpl : NMSChat() {
+
+    override fun sendMessage(player: Player, message: String) {
+        // highlight-start
+        // 编译时检查 1.20.5+ 的类是否存在
+        if (require(net.minecraft.network.protocol.game.ClientboundSystemChatPacket::class.java)) {
+            // 1.20.5+ 实现
+            val component = Component.literal(message)
+            val packet = ClientboundSystemChatPacket(component, false)
+            player.sendPacket(packet)
+        }
+        // 编译时检查 1.19+ 的类是否存在
+        else if (require(net.minecraft.network.protocol.game.ClientboundChatPacket::class.java)) {
+            // 1.19-1.20.4 实现
+            val component = Component.literal(message)
+            val packet = ClientboundChatPacket(component, ChatType.SYSTEM, UUID.randomUUID())
+            player.sendPacket(packet)
+        }
+        // 其他版本的后备实现
+        else {
+            // 1.8-1.18 实现
+            player.sendMessage(message)
+        }
+        // highlight-end
+    }
+}
+```
+
+**工作原理：**
+
+```mermaid
+graph TB
+    A[编写代码<br/>require SomeClass::class.java] --> B[编译为 JAR]
+    B --> C[nmsProxy 字节码转译]
+
+    C --> D{检测类是否存在}
+    D -->|类存在| E[替换为 ICONST_1<br/>即 true]
+    D -->|类不存在| F[替换为 ICONST_0<br/>即 false]
+
+    E --> G[运行时直接使用常量]
+    F --> G
+
+    style A fill:#e3f2fd,color:#000000
+    style C fill:#fff3e0,color:#000000
+    style D fill:#f3e5f5,color:#000000
+    style G fill:#e8f5e9,color:#000000
+```
+
+**转译流程：**
+
+1. **编译阶段**：`require(SomeClass::class.java)` 被编译为字节码
+2. **转译阶段**：ASM 检测到 `require` 调用模式
+3. **类检查**：尝试加载指定的类
+4. **替换常量**：
+   - 类存在 → 替换为 `true`（ICONST_1）
+   - 类不存在 → 替换为 `false`（ICONST_0）
+5. **运行时**：直接使用布尔常量，无需再检查
+
+**与传统方式的对比：**
+
+```kotlin
+// ❌ 传统方式：运行时开销
+if (MinecraftVersion.versionId >= 12005) {
+    // 1.20.5+ 实现
+}
+
+// ❌ 传统方式：运行时反射检查（性能差）
+try {
+    Class.forName("net.minecraft.network.protocol.game.ClientboundSystemChatPacket")
+    // 类存在
+} catch (e: ClassNotFoundException) {
+    // 类不存在
+}
+
+// ✅ require 方式：编译时确定，零开销
+if (require(ClientboundSystemChatPacket::class.java)) {
+    // 类存在
+}
+```
+
+**适用场景：**
+
+- ✅ 需要根据类是否存在来决定实现逻辑
+- ✅ 同一方法需要兼容多个版本的 NMS 类
+- ✅ 避免使用版本号硬编码（如 `versionId >= 12005`）
+- ✅ 需要最优性能（零运行时开销）
+
+**注意事项：**
+
+:::warning[类引用格式]
+
+必须使用 `SomeClass::class.java` 格式，不能使用字符串：
+
+```kotlin
+// ✅ 正确
+if (require(ClientboundSystemChatPacket::class.java)) { }
+
+// ❌ 错误：不支持字符串
+if (require("net.minecraft.network.protocol.game.ClientboundSystemChatPacket")) { }
+```
+
+:::
+
+**完整示例：处理多个版本的聊天数据包**
+
+```kotlin title="NMSChatImpl.kt" showLineNumbers
+class NMSChatImpl : NMSChat() {
+
+    override fun sendJsonMessage(player: Player, json: String) {
+        val component = CraftChatMessage.fromJSON(json)
+
+        // 1.20.5+ 使用 ClientboundSystemChatPacket
+        if (require(ClientboundSystemChatPacket::class.java)) {
+            val packet = ClientboundSystemChatPacket(component, false)
+            player.sendPacket(packet)
+        }
+        // 1.19-1.20.4 使用 ClientboundChatPacket
+        else if (require(ClientboundChatPacket::class.java)) {
+            val packet = ClientboundChatPacket(
+                component,
+                ChatType.SYSTEM,
+                UUID.randomUUID()
+            )
+            player.sendPacket(packet)
+        }
+        // 1.17-1.18 使用旧版 PacketPlayOutChat
+        else if (require(PacketPlayOutChat17::class.java)) {
+            val serializer = IChatBaseComponent17.ChatSerializer.a(json)
+            val packet = PacketPlayOutChat17(
+                serializer,
+                ChatMessageType17.SYSTEM,
+                UUID.randomUUID()
+            )
+            player.sendPacket(packet)
+        }
+        // 1.8-1.16 使用最旧版 PacketPlayOutChat
+        else {
+            val serializer = IChatBaseComponent12.ChatSerializer.a(json)
+            val packet = PacketPlayOutChat12(serializer)
+            player.sendPacket(packet)
+        }
+    }
+}
+
+// Typealias 定义
+private typealias ClientboundSystemChatPacket = net.minecraft.network.protocol.game.ClientboundSystemChatPacket
+private typealias ClientboundChatPacket = net.minecraft.network.protocol.game.ClientboundChatPacket
+private typealias PacketPlayOutChat17 = net.minecraft.server.v1_17_R1.PacketPlayOutChat
+private typealias PacketPlayOutChat12 = net.minecraft.server.v1_12_R1.PacketPlayOutChat
+private typealias IChatBaseComponent17 = net.minecraft.server.v1_17_R1.IChatBaseComponent
+private typealias IChatBaseComponent12 = net.minecraft.server.v1_12_R1.IChatBaseComponent
+private typealias ChatMessageType17 = net.minecraft.server.v1_17_R1.ChatMessageType
+```
+
+**代码说明：**
+
+- `require` 会在字节码转译时被替换为布尔常量
+- 不同版本服务器上，不同的 `if` 分支会被优化掉
+- 运行时只执行对应版本的代码，无需每次判断
+- 避免了 `ClassNotFoundException` 的运行时开销
+
 ## 实战案例
 
 ### 案例 1：跨版本粒子效果
