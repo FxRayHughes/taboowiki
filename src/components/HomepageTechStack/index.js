@@ -8,7 +8,6 @@ const TechStack = [
   {
     category: '编程语言',
     icon: '💻',
-    color: '#667eea',
     items: [
       { name: 'Kotlin', description: '现代 JVM 语言' },
       { name: 'Java', description: '传统 JVM 语言' },
@@ -17,7 +16,6 @@ const TechStack = [
   {
     category: '支持平台',
     icon: '🎮',
-    color: '#f093fb',
     items: [
       { name: 'Bukkit/Spigot', description: '1.8-1.21+' },
       { name: 'Paper/Folia', description: '高性能服务端' },
@@ -28,7 +26,6 @@ const TechStack = [
   {
     category: '核心特性',
     icon: '⚡',
-    color: '#4facfe',
     items: [
       { name: '命令系统', description: 'DSL 风格的命令框架' },
       { name: '配置管理', description: '类型安全的配置操作' },
@@ -40,18 +37,17 @@ const TechStack = [
   },
 ];
 
-function TechCategory({ category, icon, color, items, index }) {
+function TechCategory({ category, icon, items, index }) {
   return (
     <div className={clsx('col col--4', styles.techCol)}>
       <div
         className={styles.techCard}
         style={{
-          '--tech-color': color,
           '--animation-delay': `${index * 0.15}s`,
         }}
       >
         <div className={styles.techHeader}>
-          <div className={styles.techIcon} style={{ background: color }}>
+          <div className={styles.techIcon}>
             <span>{icon}</span>
           </div>
           <Heading as="h3" className={styles.techTitle}>
@@ -61,7 +57,7 @@ function TechCategory({ category, icon, color, items, index }) {
         <ul className={styles.techList}>
           {items.map((item, idx) => (
             <li key={idx} className={styles.techItem}>
-              <div className={styles.techItemDot} style={{ background: color }}></div>
+              <div className={styles.techItemDot}></div>
               <div className={styles.techItemContent}>
                 <strong>{item.name}</strong>
                 <span>{item.description}</span>

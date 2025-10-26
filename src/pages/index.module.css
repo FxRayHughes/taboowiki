@@ -9,12 +9,12 @@
   padding: 8rem 0 12rem;
   text-align: center;
   overflow: hidden;
-  background: linear-gradient(180deg,#5b86e5,#36d1dc);
+  background: var(--ifm-color-primary);
   color: white;
 }
 
 [data-theme='dark'] .heroBanner {
-  background: linear-gradient(135deg, #434343 0%, #000000 100%);
+  background: #1a1a1a;
 }
 
 .heroBackground {
@@ -23,11 +23,9 @@
   left: 0;
   right: 0;
   bottom: 0;
-  opacity: 0.1;
+  opacity: 0.05;
   background-image:
-    radial-gradient(circle at 20% 50%, rgba(255, 255, 255, 0.2) 0%, transparent 50%),
-    radial-gradient(circle at 80% 80%, rgba(255, 255, 255, 0.15) 0%, transparent 50%),
-    radial-gradient(circle at 40% 20%, rgba(255, 255, 255, 0.1) 0%, transparent 50%);
+    radial-gradient(circle at 20% 50%, rgba(255, 255, 255, 0.1) 0%, transparent 50%);
   animation: backgroundFloat 20s ease-in-out infinite;
 }
 
@@ -101,18 +99,12 @@
   font-size: 3.5rem;
   font-weight: 800;
   margin-bottom: 1rem;
-  background: linear-gradient(120deg, #ffffff 0%, #e0e7ff 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
+  color: white;
   animation: fadeInUp 0.8s ease-out 0.2s both;
 }
 
 [data-theme='dark'] .heroTitle {
-  background: linear-gradient(120deg, #ffffff 0%, #cbd5e1 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
+  color: white;
 }
 
 .heroSubtitle {
@@ -144,7 +136,7 @@
 
 .buttonPrimary {
   background: white !important;
-  color: #667eea !important;
+  color: var(--ifm-color-primary) !important;
   border: none !important;
   font-weight: 600;
   transition: all 0.3s ease;
@@ -154,16 +146,16 @@
 .buttonPrimary:hover {
   transform: translateY(-2px);
   box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
-  color: #667eea !important;
+  color: var(--ifm-color-primary) !important;
 }
 
 [data-theme='dark'] .buttonPrimary {
-  background: #667eea !important;
+  background: var(--ifm-color-primary) !important;
   color: white !important;
 }
 
 [data-theme='dark'] .buttonPrimary:hover {
-  background: #5568d3 !important;
+  background: var(--ifm-color-primary-dark) !important;
   color: white !important;
 }
 
@@ -179,7 +171,7 @@
 
 .buttonSecondary:hover {
   background: white !important;
-  color: #667eea !important;
+  color: var(--ifm-color-primary) !important;
   transform: translateY(-2px);
   box-shadow: 0 4px 14px rgba(0, 0, 0, 0.2);
 }
@@ -189,7 +181,7 @@
 }
 
 .buttonSecondary:hover svg {
-  fill: #667eea;
+  fill: var(--ifm-color-primary);
 }
 
 .githubIcon {

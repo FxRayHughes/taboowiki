@@ -68,7 +68,6 @@ export default function Home() {
       description="TabooLib 是一个现代化的 Minecraft 插件开发框架，提供丰富的工具和组件，简化插件开发流程。">
       <HomepageHeader />
       <main>
-        <HomepageStats />
         <HomepageFeatures />
         <HomepageCodeExample />
         <HomepageTechStack />

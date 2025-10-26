@@ -12,7 +12,6 @@ const FeatureList = [
         让您快速上手 Minecraft 插件开发。无需繁琐的配置,专注于业务逻辑实现。
       </>
     ),
-    color: '#667eea',
   },
   {
     title: '功能强大',
@@ -23,7 +22,6 @@ const FeatureList = [
         支持跨版本 NMS 操作,提供完善的工具链,大幅提升开发效率。
       </>
     ),
-    color: '#f093fb',
   },
   {
     title: '模块化设计',
@@ -34,7 +32,6 @@ const FeatureList = [
         支持 Bukkit、BungeeCord、Velocity 等多个平台,一套代码多端运行。
       </>
     ),
-    color: '#4facfe',
   },
   {
     title: '跨版本支持',
@@ -45,7 +42,6 @@ const FeatureList = [
         自动处理版本差异,开发者无需关心底层实现细节。
       </>
     ),
-    color: '#43e97b',
   },
   {
     title: '性能优化',
@@ -56,7 +52,6 @@ const FeatureList = [
         支持异步操作和协程,充分利用多核 CPU 性能。
       </>
     ),
-    color: '#fa709a',
   },
   {
     title: '活跃社区',
@@ -67,15 +62,14 @@ const FeatureList = [
         定期更新维护,快速响应问题反馈,提供丰富的示例项目和教程。
       </>
     ),
-    color: '#fee140',
   },
 ];
 
-function Feature({title, icon, description, color, index}) {
+function Feature({title, icon, description, index}) {
   return (
     <div className={clsx('col col--4', styles.featureCol)}>
-      <div className={styles.feature} style={{ '--feature-color': color, '--animation-delay': `${index * 0.1}s` }}>
-        <div className={styles.featureIcon} style={{ background: color }}>
+      <div className={styles.feature} style={{ '--animation-delay': `${index * 0.1}s` }}>
+        <div className={styles.featureIcon}>
           <span>{icon}</span>
         </div>
         <div className={styles.featureContent}>

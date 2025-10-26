@@ -12,17 +12,11 @@
   font-size: 2.5rem;
   font-weight: 700;
   margin-bottom: 1rem;
-  background: linear-gradient(120deg, #667eea 0%, #764ba2 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
+  color: var(--ifm-color-primary);
 }
 
 [data-theme='dark'] .sectionTitle {
-  background: linear-gradient(120deg, #667eea 0%, #4facfe 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
+  color: var(--ifm-color-primary);
 }
 
 .sectionSubtitle {
@@ -74,20 +68,20 @@
 }
 
 .tab:hover {
-  border-color: #667eea;
+  border-color: var(--ifm-color-primary);
   transform: translateY(-2px);
   box-shadow: 0 4px 12px rgba(102, 126, 234, 0.2);
 }
 
 .tabActive {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  border-color: #667eea;
+  background: var(--ifm-color-primary);
+  border-color: var(--ifm-color-primary);
   color: white;
   box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
 }
 
 [data-theme='dark'] .tabActive {
-  background: linear-gradient(135deg, #667eea 0%, #4facfe 100%);
+  background: var(--ifm-color-primary);
 }
 
 .tabIcon {

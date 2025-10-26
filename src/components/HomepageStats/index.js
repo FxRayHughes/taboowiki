@@ -7,25 +7,21 @@ const StatsList = [
         value: '8年',
         label: '版本沉淀',
         icon: '📦',
-        color: '#667eea',
     },
     {
         value: '100+',
         label: '资深开发者',
         icon: '🔥',
-        color: '#ff9d27',
     },
     {
         value: '50+',
         label: '内置模块',
         icon: '🔧',
-        color: '#4facfe',
     },
     {
         value: '55+',
         label: '社区贡献者',
         icon: '👥',
-        color: '#43e97b',
     },
 ];
 
@@ -79,17 +75,16 @@ function Counter({end, duration = 2000}) {
     return <span>{count}{suffix}</span>;
 }
 
-function Stat({value, label, icon, color, index}) {
+function Stat({value, label, icon, index}) {
     return (
         <div className={clsx('col col--3', styles.statCol)}>
             <div
                 className={styles.stat}
                 style={{
-                    '--stat-color': color,
                     '--animation-delay': `${index * 0.1}s`,
                 }}
             >
-                <div className={styles.statIcon} style={{background: color}}>
+                <div className={styles.statIcon}>
                     <span>{icon}</span>
                 </div>
                 <div className={styles.statValue}>
