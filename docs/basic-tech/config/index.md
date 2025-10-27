@@ -615,6 +615,427 @@ fun serialize(obj: Any, type: Type = Type.YAML, concurrent: Boolean = true): Con
 
 **说明：** `serialize` 返回的是 `ConfigurationSection`（不包含文件信息），需要将其内容复制到 `Configuration` 对象后才能保存。两种方式的区别在于数据存储的位置不同。
 
+## 序列化与反序列化深度解析
+
+### 工作原理
+
+TabooLib 的配置序列化基于 Night-Config 的 `ObjectConverter`，通过 Java 反射自动将对象字段与配置节点进行映射。
+
+#### 序列化流程
+
+```mermaid
+graph TB
+    A[Java 对象] --> B[遍历所有字段]
+    B --> C{检查字段修饰符}
+    C -->|transient| D[跳过]
+    C -->|static| D
+    C -->|正常字段| E{查找转换器}
+
+    E -->|找到内置转换器| F[使用 InnerConverter]
+    E -->|找到自定义转换器| G[使用 @Converter]
+    E -->|无转换器| H{检查字段类型}
+
+    H -->|基本类型| I[直接写入配置]
+    H -->|Enum| J[转为字符串或保留]
+    H -->|Collection| K[遍历集合元素]
+    H -->|复杂对象| L[递归序列化]
+
+    F --> M[写入配置节]
+    G --> M
+    I --> M
+    J --> M
+    K --> M
+    L --> M
+
+    style A fill:#e3f2fd,color:#000000
+    style M fill:#e8f5e9,color:#000000
+    style E fill:#fff3e0,color:#000000
+```
+
+#### 反序列化流程
+
+```mermaid
+graph TB
+    A[配置文件] --> B[遍历目标类字段]
+    B --> C{检查字段修饰符}
+    C -->|final 且不允许绕过| D[跳过]
+    C -->|transient| D
+    C -->|正常字段| E{配置中存在该字段?}
+
+    E -->|不存在| D
+    E -->|存在| F{查找转换器}
+
+    F -->|找到内置转换器| G[使用 InnerConverter]
+    F -->|找到自定义转换器| H[使用 @Converter]
+    F -->|无转换器| I{检查值类型}
+
+    I -->|基本类型| J[直接赋值]
+    I -->|Enum| K[字符串转枚举]
+    I -->|Collection| L[遍历并转换集合]
+    I -->|UnmodifiableConfig| M[递归反序列化子对象]
+
+    G --> N[写入对象字段]
+    H --> N
+    J --> N
+    K --> N
+    L --> N
+    M --> N
+
+    style A fill:#e3f2fd,color:#000000
+    style N fill:#e8f5e9,color:#000000
+    style F fill:#fff3e0,color:#000000
+```
+
+### 支持的类型
+
+TabooLib 的序列化系统支持以下类型的自动转换：
+
+| 类型分类 | 具体类型 | 说明 |
+|---------|---------|------|
+| **基本类型** | `String`, `Int`, `Double`, `Boolean`, `Long`, `Float`, `Short`, `Byte` | 直接支持 |
+| **集合类型** | `List`, `ArrayList`, `Set`, `Collection` | 支持嵌套集合 |
+| **映射类型** | `Map` | 需要使用内置的 `MapConverter` |
+| **枚举类型** | `Enum` | 自动转换为字符串（或保留原值） |
+| **UUID** | `UUID` | 使用内置的 `UUIDConverter` |
+| **自定义对象** | 任意 data class 或 POJO | 递归序列化 |
+
+### 字段修饰符处理
+
+#### transient 字段
+
+被 `transient` 修饰的字段默认会被跳过：
+
+```kotlin
+data class PlayerData(
+    val name: String,
+    val level: Int,
+    @Transient val cachedValue: String = "" // 不会被序列化
+)
+```
+
+#### final 字段
+
+反序列化时，`final` 字段默认会被写入（`bypassFinal = true`）：
+
+```kotlin
+data class Config(
+    val version: Int = 1,        // 会被反序列化覆盖
+    var lastModified: Long = 0   // 会被反序列化覆盖
+)
+```
+
+#### static 字段
+
+静态字段会被自动跳过，不参与序列化和反序列化。
+
+### 自定义转换器
+
+#### 使用内置转换器
+
+TabooLib 内置了两个转换器：
+
+##### UUID 转换器
+
+自动将 `UUID` 与 `String` 互相转换：
+
+```kotlin
+data class PlayerData(
+    val uuid: UUID,  // 自动使用 UUIDConverter
+    val name: String
+)
+
+val data = PlayerData(UUID.randomUUID(), "Steve")
+val config = Configuration.loadFromFile(File("player.yml"))
+config.setObject("player", data)
+config.saveToFile()
+```
+
+**保存结果：**
+
+```yaml
+player:
+  uuid: "550e8400-e29b-41d4-a716-446655440000"
+  name: "Steve"
+```
+
+##### Map 转换器
+
+保持 `Map` 类型的字段为 Map 格式：
+
+```kotlin
+data class ServerConfig(
+    val settings: Map<String, Any>  // 自动使用 MapConverter
+)
+```
+
+#### 使用 @Converter 注解
+
+:::warning[开发中功能]
+自定义 `@Converter` 注解支持正在开发中，当前版本只能通过修改 `ObjectConverter.getConverter()` 方法来扩展转换器。
+:::
+
+#### 使用 InnerConverter（伴生对象转换器）
+
+`InnerConverter` 是一种更强大的转换机制，允许在类的伴生对象中定义 `toField` 和 `fromField` 方法：
+
+```kotlin
+data class Location(
+    val world: String,
+    val x: Double,
+    val y: Double,
+    val z: Double
+) {
+    companion object {
+        @JvmStatic
+        fun toField(field: Field, value: Any, root: ConfigurationSection): ConvertResult {
+            // value 是从配置文件读取的值
+            // 返回 ConvertResult.Success(转换后的对象)
+            return if (value is Map<*, *>) {
+                val loc = Location(
+                    value["world"] as String,
+                    (value["x"] as Number).toDouble(),
+                    (value["y"] as Number).toDouble(),
+                    (value["z"] as Number).toDouble()
+                )
+                ConvertResult.Success(loc)
+            } else {
+                ConvertResult.Failure(IllegalArgumentException("Invalid location format"))
+            }
+        }
+
+        @JvmStatic
+        fun fromField(field: Field, value: Any, root: Any): ConvertResult {
+            // value 是 Location 对象
+            // 返回 ConvertResult.Success(Map) 以写入配置
+            return if (value is Location) {
+                val map = mapOf(
+                    "world" to value.world,
+                    "x" to value.x,
+                    "y" to value.y,
+                    "z" to value.z
+                )
+                ConvertResult.Success(map)
+            } else {
+                ConvertResult.Skip
+            }
+        }
+    }
+}
+```
+
+**使用示例：**
+
+```kotlin
+data class GameData(
+    val spawnPoint: Location  // 自动使用 InnerConverter
+)
+
+val data = GameData(Location("world", 0.0, 64.0, 0.0))
+val config = Configuration.loadFromFile(File("game.yml"))
+config.setObject("data", data)
+config.saveToFile()
+```
+
+**保存结果：**
+
+```yaml
+data:
+  spawnPoint:
+    world: world
+    x: 0.0
+    y: 64.0
+    z: 0.0
+```
+
+**ConvertResult 说明：**
+
+| 类型 | 说明 | 使用场景 |
+|-----|------|---------|
+| `ConvertResult.Success(value)` | 转换成功，返回转换后的值 | 正常转换 |
+| `ConvertResult.Failure(exception)` | 转换失败，打印异常并跳过该字段 | 数据格式错误 |
+| `ConvertResult.Skip` | 跳过此字段的转换，使用默认处理 | 不需要特殊处理 |
+
+### @ConfigNode 注解
+
+使用 `@ConfigNode` 可以自定义字段在配置文件中的路径：
+
+```kotlin
+data class DatabaseConfig(
+    @ConfigNode("database.mysql.host")
+    val host: String = "localhost",
+
+    @ConfigNode("database.mysql.port")
+    val port: Int = 3306
+)
+
+val config = Configuration.loadFromFile(File("config.yml"))
+config.setObject("", DatabaseConfig())  // 根节点
+config.saveToFile()
+```
+
+**保存结果：**
+
+```yaml
+database:
+  mysql:
+    host: localhost
+    port: 3306
+```
+
+### 集合类型的序列化
+
+#### 简单集合
+
+```kotlin
+data class ItemList(
+    val items: List<String>,
+    val prices: Map<String, Double>
+)
+
+val data = ItemList(
+    items = listOf("Apple", "Banana", "Orange"),
+    prices = mapOf("Apple" to 10.0, "Banana" to 5.0)
+)
+```
+
+**保存结果：**
+
+```yaml
+items:
+  - Apple
+  - Banana
+  - Orange
+prices:
+  Apple: 10.0
+  Banana: 5.0
+```
+
+#### 复杂对象集合
+
+```kotlin
+data class Item(val name: String, val price: Double)
+
+data class Shop(
+    val items: List<Item>
+)
+
+val shop = Shop(
+    items = listOf(
+        Item("Sword", 100.0),
+        Item("Shield", 50.0)
+    )
+)
+
+val config = Configuration.loadFromFile(File("shop.yml"))
+config.setObject("shop", shop)
+config.saveToFile()
+```
+
+**保存结果：**
+
+```yaml
+shop:
+  items:
+    - name: Sword
+      price: 100.0
+    - name: Shield
+      price: 50.0
+```
+
+#### 嵌套集合
+
+```kotlin
+data class Matrix(
+    val data: List<List<Int>>
+)
+
+val matrix = Matrix(
+    data = listOf(
+        listOf(1, 2, 3),
+        listOf(4, 5, 6),
+        listOf(7, 8, 9)
+    )
+)
+```
+
+**保存结果：**
+
+```yaml
+data:
+  - [1, 2, 3]
+  - [4, 5, 6]
+  - [7, 8, 9]
+```
+
+### ignoreConstructor 参数
+
+当类没有无参构造函数或构造函数有副作用时，可以使用 `ignoreConstructor` 参数：
+
+```kotlin
+data class ComplexData(val id: Int) {
+    init {
+        println("Constructor called!")  // 有副作用
+    }
+}
+
+val config = Configuration.loadFromFile(File("data.yml"))
+// 使用 unsafeInstance() 创建对象，跳过构造函数
+val data = config.toObject<ComplexData>(ignoreConstructor = true)
+```
+
+:::warning[使用注意]
+使用 `ignoreConstructor = true` 会跳过对象的构造函数和 `init` 块，字段的默认值也不会被初始化。仅在必要时使用。
+:::
+
+### 常见序列化问题
+
+#### 为什么某些字段没有被序列化？
+
+检查以下几点：
+
+1. 字段是否被 `transient` 修饰
+2. 字段是否为 `static`（静态字段不会被序列化）
+3. 字段类型是否被配置格式支持（如 YAML 不直接支持所有类型）
+
+#### 如何序列化接口类型？
+
+接口类型无法直接序列化，需要使用具体实现类：
+
+```kotlin
+// ❌ 错误
+data class Config(
+    val handler: Runnable  // 接口类型无法序列化
+)
+
+// ✅ 正确
+data class Config(
+    val handlerClass: String  // 保存类名，运行时再实例化
+)
+```
+
+#### 如何处理循环引用？
+
+TabooLib 的序列化不支持循环引用，会导致 `StackOverflowError`：
+
+```kotlin
+// ❌ 循环引用
+data class Node(
+    val value: Int,
+    var next: Node? = null
+)
+
+val node1 = Node(1)
+val node2 = Node(2)
+node1.next = node2
+node2.next = node1  // 循环引用！
+
+// ✅ 使用 transient 或 ID 引用
+data class Node(
+    val value: Int,
+    val nextId: Int? = null  // 使用 ID 而非直接引用
+)
+```
+
 #### deserialize - 配置反序列化
 
 从配置节反序列化为对象：
