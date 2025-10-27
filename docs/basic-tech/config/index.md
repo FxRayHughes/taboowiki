@@ -758,22 +758,6 @@ player:
   name: "Steve"
 ```
 
-##### Map 转换器
-
-保持 `Map` 类型的字段为 Map 格式：
-
-```kotlin
-data class ServerConfig(
-    val settings: Map<String, Any>  // 自动使用 MapConverter
-)
-```
-
-#### 使用 @Converter 注解
-
-:::warning[开发中功能]
-自定义 `@Converter` 注解支持正在开发中，当前版本只能通过修改 `ObjectConverter.getConverter()` 方法来扩展转换器。
-:::
-
 #### 使用 InnerConverter（伴生对象转换器）
 
 `InnerConverter` 是一种更强大的转换机制，允许在类的伴生对象中定义 `toField` 和 `fromField` 方法：
