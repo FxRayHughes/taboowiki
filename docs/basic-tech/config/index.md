@@ -569,15 +569,24 @@ data class PlayerData(
     val inventory: List<String>
 )
 
-// highlight-start
 val playerData = PlayerData("Steve", 10, listOf("Sword", "Shield"))
-val config = Configuration.serialize(playerData)
-// highlight-end
+// highlight-next-line
+val section = Configuration.serialize(playerData)
 
-config.saveToFile(File("player.yml"))
+// 方式 1：复制到 Configuration 根节点
+val config = Configuration.loadFromFile(File(getDataFolder(), "player.yml"))
+section.getKeys(false).forEach { key ->
+    config[key] = section[key]
+}
+config.saveToFile()
+
+// 方式 2：使用 setObject 保存到指定节点（推荐）
+val config2 = Configuration.loadFromFile(File(getDataFolder(), "player2.yml"))
+config2.setObject("playerData", playerData)
+config2.saveToFile()
 ```
 
-**保存结果：**
+**方式 1 保存结果（数据在根节点）：**
 
 ```yaml
 name: Steve
@@ -587,11 +596,24 @@ inventory:
   - Shield
 ```
 
+**方式 2 保存结果（数据在子节点）：**
+
+```yaml
+playerData:
+  name: Steve
+  level: 10
+  inventory:
+    - Sword
+    - Shield
+```
+
 **函数签名：**
 
 ```kotlin
 fun serialize(obj: Any, type: Type = Type.YAML, concurrent: Boolean = true): ConfigurationSection
 ```
+
+**说明：** `serialize` 返回的是 `ConfigurationSection`（不包含文件信息），需要将其内容复制到 `Configuration` 对象后才能保存。两种方式的区别在于数据存储的位置不同。
 
 #### deserialize - 配置反序列化
 
