@@ -21,6 +21,8 @@ Arim.variableCalculator.calculate("1 + 2 * 3")  // 7.0
 
 这种用法不如使用 [固定算数表达式计算器](../fixed-calculator/)，因为需要额外的解析和构建语法树开销。
 
+如果需要数学函数（如 sin、log、sqrt 等），应使用 FixedCalculator，它在 6.2.3+ 版本支持丰富的数学函数。
+
 :::
 
 ### 预解析上下文（推荐）
@@ -44,6 +46,13 @@ val result2 = context.evaluate(
     "b" to 3.0,
     "level" to 10.0
 )  // 65.0
+
+// 4. 使用指数运算
+val powerContext = vc.parseContext("base^exponent + 10")
+val result3 = powerContext.evaluate(
+    "base" to 2.0,
+    "exponent" to 3.0
+)  // 18.0 (2^3 + 10)
 ```
 
 :::tip[最佳实践]
@@ -67,6 +76,7 @@ val result2 = context.evaluate(
 | `MultiplicationNode` | 乘法节点 | `a * b` |
 | `DivisionNode` | 除法节点 | `a / b` |
 | `ModulusNode` | 取模节点 | `a % b` |
+| `PowerNode` | 指数节点 | `a^b` |
 
 ### NodeContext - 解析上下文
 
@@ -103,9 +113,14 @@ val result2 = context.evaluate("a" to 5.0, "b" to 4.0, "c" to 2.0)
 
 ```kotlin
 object DamageCalculator {
-    // 缓存解析后的公式
+    // 基础伤害计算
     private val damageFormula = Arim.variableCalculator.parseContext(
         "baseDamage * attackMultiplier * ( 1 + critRate ) - defense"
+    )
+
+    // 暴击伤害计算（使用指数运算）
+    private val critDamageFormula = Arim.variableCalculator.parseContext(
+        "baseDamage * critMultiplier^critStack"
     )
 
     fun calculateDamage(
@@ -121,6 +136,18 @@ object DamageCalculator {
             "defense" to defense
         )
     }
+
+    fun calculateCritDamage(
+        baseDamage: Double,
+        critMultiplier: Double,
+        critStack: Double
+    ): Double {
+        return critDamageFormula.evaluate(
+            "baseDamage" to baseDamage,
+            "critMultiplier" to critMultiplier,
+            "critStack" to critStack
+        )
+    }
 }
 ```
 
@@ -130,6 +157,10 @@ object DamageCalculator {
 rewards:
   kill_boss:
     gold_formula: "baseGold * bossLevel * ( 1 + playerLevel / 100 )"
+  level_up:
+    exp_formula: "baseExp * level^1.5"
+  daily_reward:
+    bonus_formula: "baseBonus * ( 1 + streak / 10 )^2"
 ```
 
 ```kotlin
@@ -138,15 +169,36 @@ object RewardSystem {
 
     fun loadFormulas(config: Configuration) {
         config.getKeys(false).forEach { key ->
-            val formula = config.getString("$key.gold_formula")
-            if (formula != null) {
-                formulaCache[key] = Arim.variableCalculator.parseContext(formula)
+            // 加载金币公式
+            val goldFormula = config.getString("$key.gold_formula")
+            if (goldFormula != null) {
+                formulaCache["${key}_gold"] = Arim.variableCalculator.parseContext(goldFormula)
+            }
+
+            // 加载经验公式
+            val expFormula = config.getString("$key.exp_formula")
+            if (expFormula != null) {
+                formulaCache["${key}_exp"] = Arim.variableCalculator.parseContext(expFormula)
+            }
+
+            // 加载奖励公式
+            val bonusFormula = config.getString("$key.bonus_formula")
+            if (bonusFormula != null) {
+                formulaCache["${key}_bonus"] = Arim.variableCalculator.parseContext(bonusFormula)
             }
         }
     }
 
     fun calculateReward(rewardType: String, variables: Map<String, Double>): Double {
         return formulaCache[rewardType]?.evaluate(variables) ?: 0.0
+    }
+
+    // 使用示例
+    fun getLevelUpExp(level: Int): Double {
+        return calculateReward("level_up_exp", mapOf(
+            "baseExp" to 100.0,
+            "level" to level.toDouble()
+        ))
     }
 }
 ```
@@ -219,4 +271,40 @@ println(result)  // 10.0
 // ✅ 正确
 context.evaluate("level" to 10.toDouble())
 context.evaluate("level" to 10.0)
+```
+
+### 指数运算的优先级是多少？
+
+指数运算 `^` 的优先级**最高**（优先级 4），高于乘除法（优先级 3）：
+
+```kotlin
+val context1 = Arim.variableCalculator.parseContext("a * b^c")
+context1.evaluate("a" to 2.0, "b" to 3.0, "c" to 2.0)  // 18.0 (2 * 9)
+
+val context2 = Arim.variableCalculator.parseContext("(a + b)^c")
+context2.evaluate("a" to 2.0, "b" to 3.0, "c" to 2.0)  // 25.0 (5^2)
+```
+
+### VariableCalculator 支持数学函数吗？
+
+不支持。VariableCalculator 专注于变量计算，不支持数学函数（sin、log、sqrt 等）。
+
+**功能对比：**
+
+| 特性 | VariableCalculator | FixedCalculator |
+|-----|-------------------|-----------------|
+| 变量支持 | ✅ | ❌ |
+| 数学函数 | ❌ | ✅（6.2.3+ 版本） |
+| 指数运算 | ✅ | ✅ |
+| 推荐场景 | 含变量的重复计算 | 固定公式 + 数学函数 |
+
+**选择建议：**
+
+```kotlin
+// 需要变量 → 使用 VariableCalculator
+val context = Arim.variableCalculator.parseContext("baseDamage * level^1.5")
+val damage = context.evaluate("baseDamage" to 10.0, "level" to 5.0)
+
+// 需要数学函数 → 使用 FixedCalculator
+val angle = Arim.fixedCalculator.evaluate("sin(30) + cos(60)")
 ```
