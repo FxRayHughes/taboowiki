@@ -389,12 +389,14 @@ fun Player.openClickMenu() {
 **ClickEvent 可用属性：**
 - `clicker: Player`：点击玩家
 - `inventory: Inventory`：当前箱子的 Inventory
-- `rawSlot: Int`：点击的槽位索引
+- `rawSlot: Int`：点击的槽位索引（**2025-10-28 增强**）
 - `slot: Char`：点击位置对应的字符
 - `isCancelled: Boolean`：是否取消事件
 - `currentItem: ItemStack?`：被点击的物品
+- `cursorItem: ItemStack?`：光标上的物品（**2025-10-28 添加**）
 - `clickEvent(): InventoryClickEvent`：获取原始点击事件
 - `clickType: ClickType`：点击类型（CLICK, DRAG, VIRTUAL）
+- `dragEvent(): InventoryDragEvent`：获取拖拽事件（**2025-10-28 增强**）
 
 ### 访问原始点击事件
 
@@ -423,6 +425,116 @@ onClick(13) {
 - 使用 `clickEvent()` 获取 Bukkit 原始事件
 - 只有 `ClickType.CLICK` 时才能调用 `clickEvent()`，否则会抛出异常
 - 使用 `clickEventOrNull()` 进行安全的类型转换
+
+### 拖拽交互处理
+
+```kotlin
+fun Player.openDragMenu() {
+    openMenu<Chest>("拖拽示例") {
+        rows(3)
+
+        map(
+            "###@###",
+            "#######",
+            "###X###"
+        )
+
+        set('#', XMaterial.BLACK_STAINED_GLASS_PANE) { name = " " }
+        set('@', buildItem(XMaterial.HOPPER) { name = "§a拖拽区域" })
+        set('X', buildItem(XMaterial.BARRIER) { name = "§c关闭" }) {
+            clicker.closeInventory()
+        }
+
+        // 处理点击事件
+        onClick {
+            when (clickType) {
+                ClickType.CLICK -> {
+                    clicker.sendMessage("§e点击了槽位 $slot")
+                }
+                ClickType.DRAG -> {
+                    val rawSlot = rawSlot
+                    val cursorItem = cursorItem
+
+                    if (rawSlot != -1) {
+                        clicker.sendMessage("§a单槽位拖拽到 $rawSlot")
+                        clicker.sendMessage("§b光标物品: ${cursorItem?.type ?: "空"}")
+
+                        // 自定义拖拽逻辑
+                        if (cursorItem != null && cursorItem.type != Material.AIR) {
+                            // 将光标物品放入槽位
+                            currentItem = cursorItem
+                            // 清空光标
+                            this.cursorItem = null
+                        }
+                    } else {
+                        clicker.sendMessage("§c多槽位拖拽（未处理）")
+                    }
+
+                    isCancelled = true // 取消默认拖拽行为
+                }
+                else -> {}
+            }
+        }
+
+        // 或者使用专用的拖拽处理方法
+        onDrag { clickEvent ->
+            val dragEvent = clickEvent.dragEvent()
+            val draggedSlots = dragEvent.rawSlots
+
+            clicker.sendMessage("§e拖拽了 ${draggedSlots.size} 个槽位")
+
+            if (draggedSlots.size == 1) {
+                val slot = draggedSlots.first()
+                val cursorItem = clickEvent.cursorItem
+
+                clicker.sendMessage("§a拖拽到槽位 $slot")
+
+                // 处理单槽位拖拽
+                if (cursorItem != null) {
+                    inventory.setItem(slot, cursorItem)
+                    clickEvent.cursorItem = null
+                }
+            }
+
+            isCancelled = true
+        }
+    }
+}
+```
+
+**拖拽处理的核心特性：**
+
+1. **统一的属性访问**：
+   - `rawSlot`：自动处理点击和拖拽的槽位索引
+   - `cursorItem`：统一访问光标物品，支持点击和拖拽
+
+2. **灵活的处理方式**：
+   - 在 `onClick` 中通过 `clickType` 判断事件类型
+   - 使用专用的 `onDrag` 方法处理拖拽事件
+   - 支持自定义拖拽逻辑
+
+3. **单槽位拖拽优化**：
+   ```kotlin
+   // 检测是否为单槽位拖拽
+   if (clickType == ClickType.DRAG && rawSlot != -1) {
+       // 单槽位拖拽处理
+       // rawSlot 直接返回目标槽位
+   }
+   ```
+
+**代码说明：**
+- `onDrag { }`：专用拖拽事件处理器
+- `cursorItem`：可读写的光标物品属性
+- `rawSlot`：智能槽位索引，单槽位拖拽时返回具体槽位
+- `isCancelled = true`：取消默认拖拽行为，实现自定义逻辑
+
+:::tip[最佳实践]
+对于复杂的拖拽交互，推荐：
+1. 使用 `onDrag` 方法专门处理拖拽事件
+2. 检查 `rawSlot` 来区分单槽位和多槽位拖拽
+3. 通过 `cursorItem` 属性管理光标物品
+4. 设置 `isCancelled = true` 来实现自定义拖拽逻辑
+:::
 
 ### 生命周期回调
 
@@ -1533,6 +1645,17 @@ fun Player.openStorableMenu() {
                 // 返回该槽位的物品
                 inventory.getItem(slot)
             }
+
+            // Shift 交换规则（2025-10-27 添加）
+            shiftSwap { inventory, itemStack, slot ->
+                // 控制是否允许 Shift 键交换物品
+                // 返回 true 允许交换，false 禁止交换
+                when {
+                    itemStack.type == Material.BARRIER -> false // 禁止交换障碍物
+                    itemStack.type.name.contains("DIAMOND") -> true // 允许交换钻石物品
+                    else -> true // 默认允许
+                }
+            }
         }
 
         onClose { event ->
@@ -1551,6 +1674,7 @@ fun Player.openStorableMenu() {
   - `firstSlot { }`：定义首个可用槽位（用于 Shift 快速放入）
   - `writeItem { }`：物品写入回调
   - `readItem { }`：物品读取回调
+  - `shiftSwap { }`：**（2025-10-27 添加）** 定义 Shift 键物品交换规则
 - StorableChest 继承自 Chest，支持所有 Chest 的功能
 - 规则系统提供了细粒度的物品存取控制
 
