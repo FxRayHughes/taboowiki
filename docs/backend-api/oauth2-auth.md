@@ -89,7 +89,7 @@ window.location.href = response.oauthUrl;
 ```
 https://github.com/login/oauth/authorize?
   client_id=YOUR_CLIENT_ID&
-  redirect_uri=http://skfrp.maplex.top/api/auth/oauth2/success&
+  redirect_uri=http://110.42.109.37:8080/api/auth/oauth2/success&
   scope=read:user,user:email
 ```
 
@@ -98,7 +98,7 @@ https://github.com/login/oauth/authorize?
 用户授权后，GitHub 会重定向到配置的回调地址，并附带授权码：
 
 ```
-http://skfrp.maplex.top/api/auth/oauth2/success?code=AUTHORIZATION_CODE
+http://110.42.109.37:8080/api/auth/oauth2/success?code=AUTHORIZATION_CODE
 ```
 
 ### 3. 换取 Access Token
@@ -112,7 +112,7 @@ Content-Type: application/x-www-form-urlencoded
 client_id=YOUR_CLIENT_ID&
 client_secret=YOUR_CLIENT_SECRET&
 code=AUTHORIZATION_CODE&
-redirect_uri=http://skfrp.maplex.top/api/auth/oauth2/success
+redirect_uri=http://110.42.109.37:8080/api/auth/oauth2/success
 ```
 
 ### 4. 获取用户信息
@@ -271,7 +271,7 @@ spring:
               - user:email
 
 app:
-  redirect_url: http://skfrp.maplex.top/api/auth/oauth2/success
+  redirect_url: http://110.42.109.37:8080/api/auth/oauth2/success
   frontend-url: http://localhost:3000
 
 jwt:
@@ -285,8 +285,8 @@ jwt:
 2. 点击 **New OAuth App**
 3. 填写应用信息：
    - **Application name**: TabooWiki
-   - **Homepage URL**: `http://skfrp.maplex.top`
-   - **Authorization callback URL**: `http://skfrp.maplex.top/api/auth/oauth2/success`
+   - **Homepage URL**: `http://110.42.109.37:8080`
+   - **Authorization callback URL**: `http://110.42.109.37:8080/api/auth/oauth2/success`
 4. 创建后获取 **Client ID** 和 **Client Secret**
 
 ## 安全建议

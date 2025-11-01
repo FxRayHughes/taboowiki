@@ -45,7 +45,7 @@ export default function OAuthCallback() {
 
       const apiBaseUrl = window.location.hostname === 'localhost'
         ? 'http://localhost:8080'
-        : 'http://skfrp.maplex.top';
+        : 'http://110.42.109.37:8080';
 
       const apiUrl = `${apiBaseUrl}/api/auth/oauth2/success?code=${encodeURIComponent(code)}`;
 

@@ -3,10 +3,7 @@ import Layout from '@theme/Layout';
 import ExecutionEnvironment from '@docusaurus/ExecutionEnvironment';
 import { TokenManager } from '@site/src/components/AuthGuard/TokenManager';
 import { SponsorAPI } from '@site/src/utils/api';
-import { Table, Tag, Button, Modal, Form, Input, InputNumber, message, Space, Typography, Card, Empty, Alert, Select } from 'antd';
-
-const { Link, Text } = Typography;
-const { TextArea } = Input;
+import styles from './rewards.module.css';
 
 export default function MyRewards() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -15,7 +12,14 @@ export default function MyRewards() {
   const [loadingRewards, setLoadingRewards] = useState(false);
   const [showRewardModal, setShowRewardModal] = useState(false);
   const [viewingProof, setViewingProof] = useState(null);
-  const [applyForm] = Form.useForm();
+  const [formData, setFormData] = useState({
+    contributorName: '',
+    rewardType: '',
+    description: '',
+    proofUrl: '',
+    selfScore: ''
+  });
+  const [errors, setErrors] = useState({});
 
   useEffect(() => {
     checkAuthAndFetchData();
@@ -56,36 +60,69 @@ export default function MyRewards() {
       }
     } catch (error) {
       console.error('获取奖励数据失败:', error);
-      message.error('获取奖励数据失败');
+      showMessage('获取奖励数据失败', 'error');
     } finally {
       setLoadingRewards(false);
     }
   };
 
-  const handleApplyReward = async (values) => {
+  const validateForm = () => {
+    const newErrors = {};
+
+    if (!formData.rewardType) {
+      newErrors.rewardType = '请选择奖励类型';
+    }
+
+    if (!formData.description || formData.description.trim() === '') {
+      newErrors.description = '请输入贡献描述';
+    } else if (formData.description.length > 100) {
+      newErrors.description = '贡献描述不能超过 100 字';
+    }
+
+    if (!formData.proofUrl || formData.proofUrl.trim() === '') {
+      newErrors.proofUrl = '请输入证明材料链接';
+    } else if (!/^https?:\/\/.+/.test(formData.proofUrl)) {
+      newErrors.proofUrl = '请输入有效的 URL 地址';
+    }
+
+    if (!formData.selfScore || formData.selfScore < 0 || formData.selfScore > 100) {
+      newErrors.selfScore = '分数必须在 0-100 之间';
+    }
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
+  const handleApplyReward = async (e) => {
+    e.preventDefault();
+
+    if (!validateForm()) {
+      return;
+    }
+
     try {
       const data = await SponsorAPI.applyReward({
-        contributorName: values.contributorName || null,
-        rewardType: values.rewardType,
-        description: values.description,
-        proofUrl: values.proofUrl,
-        selfScore: values.selfScore,
+        contributorName: formData.contributorName || null,
+        rewardType: formData.rewardType,
+        description: formData.description,
+        proofUrl: formData.proofUrl,
+        selfScore: parseInt(formData.selfScore),
       });
 
       if (data.success) {
-        message.success('申请成功!您的奖励申请已提交,等待管理员审核');
+        showMessage('申请成功!您的奖励申请已提交,等待管理员审核', 'success');
         setShowRewardModal(false);
-        applyForm.resetFields();
+        setFormData({ contributorName: '', rewardType: '', description: '', proofUrl: '', selfScore: '' });
+        setErrors({});
         fetchRewards();
       } else {
-        message.error(data.message || '申请失败');
+        showMessage(data.message || '申请失败', 'error');
       }
     } catch (err) {
-      message.error(err.message || '申请失败,请重试');
+      showMessage(err.message || '申请失败,请重试', 'error');
     }
   };
 
-  // 复制申请格式模板到剪贴板
   const copyTemplateToClipboard = () => {
     const template = `## 申请内容
 
@@ -117,13 +154,13 @@ export default function MyRewards() {
     if (navigator.clipboard && navigator.clipboard.writeText) {
       navigator.clipboard.writeText(template)
         .then(() => {
-          message.success('申请格式模板已复制到剪贴板');
+          showMessage('申请格式模板已复制到剪贴板', 'success');
         })
         .catch(() => {
-          message.error('复制失败,请手动复制');
+          showMessage('复制失败,请手动复制', 'error');
         });
     } else {
-      // 降级方案：使用 textarea
+      // 降级方案
       const textarea = document.createElement('textarea');
       textarea.value = template;
       textarea.style.position = 'fixed';
@@ -132,15 +169,28 @@ export default function MyRewards() {
       textarea.select();
       try {
         document.execCommand('copy');
-        message.success('申请格式模板已复制到剪贴板');
+        showMessage('申请格式模板已复制到剪贴板', 'success');
       } catch (err) {
-        message.error('复制失败,请手动复制');
+        showMessage('复制失败,请手动复制', 'error');
       }
       document.body.removeChild(textarea);
     }
   };
 
-  // 辅助函数
+  const showMessage = (text, type = 'info') => {
+    const messageEl = document.createElement('div');
+    messageEl.className = `${styles.message} ${styles[type]}`;
+    messageEl.textContent = text;
+    document.body.appendChild(messageEl);
+    setTimeout(() => {
+      messageEl.classList.add(styles.show);
+    }, 10);
+    setTimeout(() => {
+      messageEl.classList.remove(styles.show);
+      setTimeout(() => document.body.removeChild(messageEl), 300);
+    }, 3000);
+  };
+
   const formatDate = (timestamp) => {
     const date = new Date(timestamp);
     return date.toLocaleDateString('zh-CN');
@@ -151,174 +201,42 @@ export default function MyRewards() {
     return date.toLocaleTimeString('zh-CN', { hour: '2-digit', minute: '2-digit' });
   };
 
-  // 奖励类型配置
-  const rewardTypeConfig = {
-    BUG_FIX: { text: '🐛 Bug 修复', color: 'red' },
-    DOCUMENTATION: { text: '📚 文档贡献', color: 'blue' },
-    PROMOTION: { text: '📢 推广贡献', color: 'green' },
-    MAJOR_CONTRIBUTION: { text: '🏆 重大贡献', color: 'gold' },
+  const getRewardTypeText = (type) => {
+    const config = {
+      BUG_FIX: '🐛 Bug 修复',
+      DOCUMENTATION: '📚 文档贡献',
+      PROMOTION: '📢 推广贡献',
+      MAJOR_CONTRIBUTION: '🏆 重大贡献',
+    };
+    return config[type] || type;
   };
 
-  // 表格列定义
-  const columns = [
-    {
-      title: '贡献者',
-      dataIndex: 'contributorName',
-      key: 'contributorName',
-      width: 150,
-      render: (text) => <Text strong>{text}</Text>,
-    },
-    {
-      title: '奖励类型',
-      dataIndex: 'rewardType',
-      key: 'rewardType',
-      width: 150,
-      align: 'center',
-      filters: [
-        { text: 'Bug 修复', value: 'BUG_FIX' },
-        { text: '文档贡献', value: 'DOCUMENTATION' },
-        { text: '推广贡献', value: 'PROMOTION' },
-        { text: '重大贡献', value: 'MAJOR_CONTRIBUTION' },
-      ],
-      onFilter: (value, record) => record.rewardType === value,
-      render: (type) => {
-        const config = rewardTypeConfig[type] || { text: type, color: 'default' };
-        return <Tag color={config.color}>{config.text}</Tag>;
-      },
-    },
-    {
-      title: '贡献描述',
-      dataIndex: 'description',
-      key: 'description',
-      width: 519,
-      render: (text) => <Text>{text}</Text>,
-    },
-    {
-      title: '自评分',
-      dataIndex: 'selfScore',
-      key: 'selfScore',
-      width: 100,
-      align: 'center',
-      sorter: (a, b) => a.selfScore - b.selfScore,
-      render: (score) => <Text strong>{score}</Text>,
-    },
-    {
-      title: '终评分',
-      dataIndex: 'finalScore',
-      key: 'finalScore',
-      width: 100,
-      align: 'center',
-      sorter: (a, b) => (a.finalScore || 0) - (b.finalScore || 0),
-      render: (score) => score ? <Text strong style={{ color: 'var(--ifm-color-primary)' }}>{score}</Text> : <Text type="secondary">-</Text>,
-    },
-    {
-      title: '奖励金额',
-      dataIndex: 'amount',
-      key: 'amount',
-      width: 120,
-      align: 'right',
-      sorter: (a, b) => (a.amount || 0) - (b.amount || 0),
-      render: (amount) => (
-        amount ? (
-          <Text strong style={{ fontSize: '1.1rem', color: 'var(--ifm-color-primary)' }}>
-            ¥{Number(amount).toFixed(2)}
-          </Text>
-        ) : (
-          <Text type="secondary">-</Text>
-        )
-      ),
-    },
-    {
-      title: '状态',
-      dataIndex: 'status',
-      key: 'status',
-      width: 120,
-      align: 'center',
-      filters: [
-        { text: '待审核', value: 'PENDING' },
-        { text: '已批准', value: 'APPROVED' },
-        { text: '已拒绝', value: 'REJECTED' },
-        { text: '已发放', value: 'PAID' },
-      ],
-      onFilter: (value, record) => record.status === value,
-      render: (status) => {
-        const config = {
-          PENDING: { color: 'orange', text: '⏳ 待审核' },
-          APPROVED: { color: 'blue', text: '✅ 已批准' },
-          REJECTED: { color: 'red', text: '❌ 已拒绝' },
-          PAID: { color: 'green', text: '💰 已发放' },
-        };
-        const { color, text } = config[status] || { color: 'default', text: status };
-        return <Tag color={color}>{text}</Tag>;
-      },
-    },
-    {
-      title: '证明材料',
-      dataIndex: 'proofUrl',
-      key: 'proofUrl',
-      width: 120,
-      align: 'center',
-      render: (url, record) => (
-        url ? (
-          <Button
-            type="link"
-            size="small"
-            onClick={() => setViewingProof(record)}
-          >
-            📄 查看详情
-          </Button>
-        ) : (
-          <Text type="secondary">-</Text>
-        )
-      ),
-    },
-    {
-      title: '管理员备注',
-      dataIndex: 'remark',
-      key: 'remark',
-      width: 100,
-      align: 'right',
-      render: (remark) => (
-        remark ? (
-          <Text style={{ fontSize: '0.85rem' }}>{remark}</Text>
-        ) : (
-          <Text type="secondary">-</Text>
-        )
-      ),
-    },
-    {
-      title: '申请时间',
-      dataIndex: 'applyTime',
-      key: 'applyTime',
-      width: 150,
-      align: 'right',
-      sorter: (a, b) => a.applyTime - b.applyTime,
-      defaultSortOrder: 'descend',
-      render: (timestamp) => (
-        <div>
-          <div>{formatDate(timestamp)}</div>
-          <Text type="secondary" style={{ fontSize: '0.75rem' }}>
-            {formatTime(timestamp)}
-          </Text>
-        </div>
-      ),
-    },
-  ];
+  const getRewardTypeClass = (type) => {
+    return type ? type.toLowerCase() : '';
+  };
+
+  const getStatusText = (status) => {
+    const config = {
+      PENDING: '⏳ 待审核',
+      APPROVED: '✅ 已批准',
+      REJECTED: '❌ 已拒绝',
+      PAID: '💰 已发放',
+    };
+    return config[status] || status;
+  };
+
+  const getStatusClass = (status) => {
+    return status ? status.toLowerCase() : 'pending';
+  };
 
   if (isLoading) {
     return (
       <Layout title="我的奖励申请">
-        <div style={{ textAlign: 'center', padding: '3rem' }}>
-          <div className="spinner" style={{
-            width: '40px',
-            height: '40px',
-            border: '4px solid var(--ifm-color-emphasis-200)',
-            borderTop: '4px solid var(--ifm-color-primary)',
-            borderRadius: '50%',
-            animation: 'spin 1s linear infinite',
-            margin: '0 auto 1rem'
-          }}></div>
-          <p>正在加载...</p>
+        <div className={styles.container}>
+          <div className={styles.loading}>
+            <div className={styles.spinner}></div>
+            <p>正在加载...</p>
+          </div>
         </div>
       </Layout>
     );
@@ -327,27 +245,15 @@ export default function MyRewards() {
   if (!isAuthenticated) {
     return (
       <Layout title="我的奖励申请">
-        <div style={{ textAlign: 'center', padding: '3rem' }}>
-          <div style={{ fontSize: '4rem', marginBottom: '1rem' }}>🔐</div>
-          <h2>需要登录</h2>
-          <p style={{ marginBottom: '2rem', color: 'var(--ifm-font-color-base)' }}>
-            请先登录以查看您的奖励申请
-          </p>
-          <button
-            onClick={() => window.location.href = '/console'}
-            style={{
-              padding: '0.75rem 2rem',
-              background: 'var(--ifm-color-primary)',
-              color: 'white',
-              border: 'none',
-              borderRadius: '8px',
-              fontSize: '1rem',
-              cursor: 'pointer',
-              fontWeight: '500'
-            }}
-          >
-            前往登录
-          </button>
+        <div className={styles.container}>
+          <div className={styles.notAuthenticated}>
+            <div className={styles.icon}>🔐</div>
+            <h2>需要登录</h2>
+            <p>请先登录以查看您的奖励申请</p>
+            <button onClick={() => window.location.href = '/console'} className={styles.primaryButton}>
+              前往登录
+            </button>
+          </div>
         </div>
       </Layout>
     );
@@ -355,329 +261,307 @@ export default function MyRewards() {
 
   return (
     <Layout title="我的奖励申请">
-      <div style={{
-        minHeight: '100vh',
-        background: 'var(--ifm-background-color)',
-        margin: '0 calc(-1 * var(--ifm-spacing-horizontal))',
-        width: 'calc(100% + 2 * var(--ifm-spacing-horizontal))',
-        padding: '2rem',
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'center'
-      }}>
-        <div style={{
-          width: '100%',
-          maxWidth: '1400px'
-        }}>
+      <div className={styles.pageWrapper}>
+        <div className={styles.pageContent}>
           {/* 页面标题 */}
-          <div style={{ marginBottom: '2rem' }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem', flexWrap: 'wrap', gap: '1rem' }}>
-              <h1 style={{ margin: 0, fontSize: 'clamp(1.5rem, 5vw, 2rem)' }}>🚀 我的奖励申请</h1>
-              <Space wrap>
-                <Button
-                  onClick={() => window.location.href = '/console'}
-                >
+          <div className={styles.pageHeader}>
+            <div className={styles.headerRow}>
+              <h1>🚀 我的奖励申请</h1>
+              <div className={styles.buttonGroup}>
+                <button onClick={() => window.location.href = '/console'} className={styles.button}>
                   ← 返回控制台
-                </Button>
-                <Button
-                  type="primary"
-                  onClick={() => setShowRewardModal(true)}
-                >
+                </button>
+                <button onClick={() => setShowRewardModal(true)} className={styles.primaryButton}>
                   ➕ 申请奖励
-                </Button>
-              </Space>
+                </button>
+              </div>
             </div>
-            <Text type="secondary">查看您的所有奖励申请和审核状态</Text>
+            <p className={styles.description}>查看您的所有奖励申请和审核状态</p>
           </div>
 
           {/* 奖励列表 */}
           {myRewards.length === 0 && !loadingRewards ? (
-            <Card>
-              <Empty
-                image={Empty.PRESENTED_IMAGE_SIMPLE}
-                description={
-                  <Space direction="vertical" size="small">
-                    <Text strong style={{ fontSize: '1.2rem' }}>暂无奖励申请</Text>
-                    <Text type="secondary">您还没有提交过奖励申请</Text>
-                  </Space>
-                }
-              >
-                <Button
-                  type="primary"
-                  size="large"
-                  onClick={() => setShowRewardModal(true)}
-                >
+            <div className={styles.card}>
+              <div className={styles.empty}>
+                <p className={styles.emptyTitle}>暂无奖励申请</p>
+                <p className={styles.emptySubtitle}>您还没有提交过奖励申请</p>
+                <button onClick={() => setShowRewardModal(true)} className={styles.primaryButton}>
                   提交第一笔申请
-                </Button>
-              </Empty>
-            </Card>
+                </button>
+              </div>
+            </div>
           ) : (
-            <Card bodyStyle={{ padding: 0 }}>
-              <Table
-                dataSource={myRewards}
-                columns={columns}
-                rowKey="id"
-                loading={loadingRewards}
-                pagination={{
-                  pageSize: 10,
-                  showSizeChanger: true,
-                  showTotal: (total) => `共 ${total} 条记录`,
-                }}
-                scroll={{ x: 1000 }}
-              />
-            </Card>
+            <div className={styles.card}>
+              <div className={styles.tableWrapper}>
+                <table className={styles.table}>
+                  <thead>
+                    <tr>
+                      <th style={{width: '150px'}}>贡献者</th>
+                      <th style={{width: '150px', textAlign: 'center'}}>奖励类型</th>
+                      <th>贡献描述</th>
+                      <th style={{width: '100px', textAlign: 'center'}}>自评分</th>
+                      <th style={{width: '100px', textAlign: 'center'}}>终评分</th>
+                      <th style={{width: '120px', textAlign: 'right'}}>奖励金额</th>
+                      <th style={{width: '120px', textAlign: 'center'}}>状态</th>
+                      <th style={{width: '120px', textAlign: 'center'}}>证明材料</th>
+                      <th style={{width: '100px', textAlign: 'right'}}>管理员备注</th>
+                      <th style={{width: '150px', textAlign: 'right'}}>申请时间</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {loadingRewards ? (
+                      <tr>
+                        <td colSpan="10" style={{textAlign: 'center', padding: '2rem'}}>
+                          <div className={styles.spinner}></div>
+                        </td>
+                      </tr>
+                    ) : (
+                      myRewards.map(record => (
+                        <tr key={record.id}>
+                          <td><strong>{record.contributorName}</strong></td>
+                          <td style={{textAlign: 'center'}}>
+                            <span className={`${styles.rewardTypeTag} ${styles[getRewardTypeClass(record.rewardType)]}`}>
+                              {getRewardTypeText(record.rewardType)}
+                            </span>
+                          </td>
+                          <td>{record.description}</td>
+                          <td style={{textAlign: 'center'}}>
+                            <strong>{record.selfScore}</strong>
+                          </td>
+                          <td style={{textAlign: 'center'}}>
+                            {record.finalScore ? (
+                              <strong className={styles.finalScore}>{record.finalScore}</strong>
+                            ) : (
+                              <span className={styles.muted}>-</span>
+                            )}
+                          </td>
+                          <td style={{textAlign: 'right'}}>
+                            {record.amount ? (
+                              <strong className={styles.amount}>¥{Number(record.amount).toFixed(2)}</strong>
+                            ) : (
+                              <span className={styles.muted}>-</span>
+                            )}
+                          </td>
+                          <td style={{textAlign: 'center'}}>
+                            <span className={`${styles.statusTag} ${styles[getStatusClass(record.status)]}`}>
+                              {getStatusText(record.status)}
+                            </span>
+                          </td>
+                          <td style={{textAlign: 'center'}}>
+                            {record.proofUrl ? (
+                              <button onClick={() => setViewingProof(record)} className={styles.linkButton}>
+                                📄 查看详情
+                              </button>
+                            ) : (
+                              <span className={styles.muted}>-</span>
+                            )}
+                          </td>
+                          <td style={{textAlign: 'right'}}>
+                            {record.remark || <span className={styles.muted}>-</span>}
+                          </td>
+                          <td style={{textAlign: 'right'}}>
+                            <div>{formatDate(record.applyTime)}</div>
+                            <div className={styles.time}>{formatTime(record.applyTime)}</div>
+                          </td>
+                        </tr>
+                      ))
+                    )}
+                  </tbody>
+                </table>
+              </div>
+            </div>
           )}
         </div>
       </div>
 
       {/* 申请奖励模态框 */}
-      <Modal
-        title="🚀 申请奖励"
-        open={showRewardModal}
-        onCancel={() => {
-          setShowRewardModal(false);
-          applyForm.resetFields();
-        }}
-        footer={null}
-        width={800}
-        destroyOnClose
-      >
-        <Alert
-          message="请如实填写您的贡献信息,管理员会根据实际情况评定奖励金额"
-          type="info"
-          showIcon
-          style={{ marginBottom: '1.5rem' }}
-        />
+      {showRewardModal && (
+        <div className={styles.modalOverlay} onClick={() => setShowRewardModal(false)}>
+          <div className={styles.modal} onClick={(e) => e.stopPropagation()}>
+            <div className={styles.modalHeader}>
+              <h2>🚀 申请奖励</h2>
+              <button onClick={() => setShowRewardModal(false)} className={styles.closeButton}>×</button>
+            </div>
+            <div className={styles.alert}>
+              ℹ️ 请如实填写您的贡献信息,管理员会根据实际情况评定奖励金额
+            </div>
+            <form onSubmit={handleApplyReward} className={styles.form}>
+              <div className={styles.formGroup}>
+                <label>贡献者名称</label>
+                <input
+                  type="text"
+                  value={formData.contributorName}
+                  onChange={(e) => setFormData({...formData, contributorName: e.target.value})}
+                  placeholder="请输入贡献者名称"
+                />
+                <div className={styles.hint}>留空则使用账号昵称</div>
+              </div>
 
-        <Form
-          form={applyForm}
-          layout="vertical"
-          onFinish={handleApplyReward}
-        >
-          <Form.Item
-            label="贡献者名称"
-            name="contributorName"
-            extra="留空则使用账号昵称"
-          >
-            <Input placeholder="请输入贡献者名称" />
-          </Form.Item>
+              <div className={styles.formGroup}>
+                <label>奖励类型 *</label>
+                <select
+                  value={formData.rewardType}
+                  onChange={(e) => setFormData({...formData, rewardType: e.target.value})}
+                  className={errors.rewardType ? styles.error : ''}
+                >
+                  <option value="">请选择奖励类型</option>
+                  <option value="BUG_FIX">🐛 Bug 修复</option>
+                  <option value="DOCUMENTATION">📚 文档贡献</option>
+                  <option value="PROMOTION">📢 推广贡献</option>
+                  <option value="MAJOR_CONTRIBUTION">🏆 重大贡献</option>
+                </select>
+                {errors.rewardType && <div className={styles.errorText}>{errors.rewardType}</div>}
+              </div>
 
-          <Form.Item
-            label="奖励类型"
-            name="rewardType"
-            rules={[{ required: true, message: '请选择奖励类型' }]}
-          >
-            <Select placeholder="请选择奖励类型">
-              <Select.Option value="BUG_FIX">🐛 Bug 修复</Select.Option>
-              <Select.Option value="DOCUMENTATION">📚 文档贡献</Select.Option>
-              <Select.Option value="PROMOTION">📢 推广贡献</Select.Option>
-              <Select.Option value="MAJOR_CONTRIBUTION">🏆 重大贡献</Select.Option>
-            </Select>
-          </Form.Item>
+              <div className={styles.formGroup}>
+                <label>贡献描述 *</label>
+                <textarea
+                  value={formData.description}
+                  onChange={(e) => setFormData({...formData, description: e.target.value})}
+                  placeholder="用于展示在列表里的内容"
+                  maxLength={100}
+                  rows={5}
+                  className={errors.description ? styles.error : ''}
+                />
+                <div className={styles.hint}>
+                  {formData.description.length}/100 字
+                </div>
+                {errors.description && <div className={styles.errorText}>{errors.description}</div>}
+              </div>
 
-          <Form.Item
-            label="贡献描述"
-            name="description"
-            rules={[{ required: true, message: '请输入贡献描述' }]}
-            extra="详用于展示在列表里的内容,最多 100 字"
-          >
-            <TextArea
-              placeholder="用于展示在列表里的内容"
-              maxLength={100}
-              rows={5}
-              showCount
-            />
-          </Form.Item>
-
-          <Form.Item
-            label="证明材料"
-            name="proofUrl"
-            rules={[
-              { required: true, message: '请输入证明材料链接' },
-              { type: 'url', message: '请输入有效的 URL 地址' }
-            ]}
-            extra={
-              <div>
-                <div style={{ marginBottom: '0.5rem' }}>
+              <div className={styles.formGroup}>
+                <label>证明材料 *</label>
+                <div className={styles.hint} style={{marginBottom: '0.5rem'}}>
                   请先在 <a href="https://github.com/FxRayHughes/taboowiki/discussions/new?category=%E8%B4%A1%E7%8C%AE%E7%94%B3%E8%AF%B7" target="_blank" rel="noopener noreferrer">GitHub Discussions</a> 创建贡献申请,然后填写讨论链接
                   <br />
                   (例如: https://github.com/FxRayHughes/taboowiki/discussions/2)
                 </div>
-                <Button
-                  size="small"
-                  onClick={copyTemplateToClipboard}
-                  icon={<span>📋</span>}
-                >
-                  复制申请格式模板
-                </Button>
+                <button type="button" onClick={copyTemplateToClipboard} className={styles.copyButton}>
+                  📋 复制申请格式模板
+                </button>
+                <input
+                  type="url"
+                  value={formData.proofUrl}
+                  onChange={(e) => setFormData({...formData, proofUrl: e.target.value})}
+                  placeholder="https://github.com/FxRayHughes/taboowiki/discussions/2"
+                  className={errors.proofUrl ? styles.error : ''}
+                  style={{marginTop: '0.5rem'}}
+                />
+                {errors.proofUrl && <div className={styles.errorText}>{errors.proofUrl}</div>}
               </div>
-            }
-          >
-            <Input placeholder="https://github.com/FxRayHughes/taboowiki/discussions/2" />
-          </Form.Item>
 
-          <Form.Item
-            label="自评分"
-            name="selfScore"
-            rules={[
-              { required: true, message: '请输入自评分' },
-              { type: 'number', min: 0, max: 100, message: '分数必须在 0-100 之间' }
-            ]}
-            extra="请根据贡献价值自评分数 (0-100)"
-          >
-            <InputNumber
-              style={{ width: '100%' }}
-              placeholder="请输入自评分"
-              min={0}
-              max={100}
-            />
-          </Form.Item>
+              <div className={styles.formGroup}>
+                <label>自评分 *</label>
+                <input
+                  type="number"
+                  min="0"
+                  max="100"
+                  value={formData.selfScore}
+                  onChange={(e) => setFormData({...formData, selfScore: e.target.value})}
+                  placeholder="请输入自评分"
+                  className={errors.selfScore ? styles.error : ''}
+                />
+                <div className={styles.hint}>请根据贡献价值自评分数 (0-100)</div>
+                {errors.selfScore && <div className={styles.errorText}>{errors.selfScore}</div>}
+              </div>
 
-          <Form.Item>
-            <Space style={{ width: '100%', justifyContent: 'flex-end' }}>
-              <Button onClick={() => {
-                setShowRewardModal(false);
-                applyForm.resetFields();
-              }}>
-                取消
-              </Button>
-              <Button type="primary" htmlType="submit">
-                提交申请
-              </Button>
-            </Space>
-          </Form.Item>
-        </Form>
-      </Modal>
+              <div className={styles.modalFooter}>
+                <button type="button" onClick={() => setShowRewardModal(false)} className={styles.button}>
+                  取消
+                </button>
+                <button type="submit" className={styles.primaryButton}>
+                  提交申请
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
 
       {/* 查看证明材料模态框 */}
-      <Modal
-        title="📄 证明材料详情"
-        open={!!viewingProof}
-        onCancel={() => setViewingProof(null)}
-        footer={[
-          <Button key="close" onClick={() => setViewingProof(null)}>
-            关闭
-          </Button>,
-          viewingProof?.proofUrl && (
-            <Button
-              key="open"
-              type="primary"
-              onClick={() => window.open(viewingProof.proofUrl, '_blank')}
-            >
-              在新窗口打开
-            </Button>
-          )
-        ]}
-        width={700}
-        destroyOnClose
-      >
-        {viewingProof && (
-          <Space direction="vertical" size="large" style={{ width: '100%' }}>
-            <div>
-              <Text type="secondary">贡献者</Text>
-              <div style={{ marginTop: '0.5rem' }}>
-                <Text strong style={{ fontSize: '1.1rem' }}>{viewingProof.contributorName}</Text>
-              </div>
+      {viewingProof && (
+        <div className={styles.modalOverlay} onClick={() => setViewingProof(null)}>
+          <div className={styles.modal} onClick={(e) => e.stopPropagation()}>
+            <div className={styles.modalHeader}>
+              <h2>📄 证明材料详情</h2>
+              <button onClick={() => setViewingProof(null)} className={styles.closeButton}>×</button>
             </div>
-
-            <div>
-              <Text type="secondary">奖励类型</Text>
-              <div style={{ marginTop: '0.5rem' }}>
-                <Tag color={rewardTypeConfig[viewingProof.rewardType]?.color}>
-                  {rewardTypeConfig[viewingProof.rewardType]?.text}
-                </Tag>
-              </div>
-            </div>
-
-            <div>
-              <Text type="secondary">贡献描述</Text>
-              <div style={{
-                marginTop: '0.5rem',
-                padding: '1rem',
-                background: 'var(--ifm-color-emphasis-100)',
-                borderRadius: '6px',
-                lineHeight: '1.6'
-              }}>
-                {viewingProof.description}
-              </div>
-            </div>
-
-            <div>
-              <Text type="secondary">证明材料</Text>
-              <div style={{ marginTop: '0.5rem' }}>
-                <Link
-                  href={viewingProof.proofUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  style={{ wordBreak: 'break-all' }}
-                >
-                  {viewingProof.proofUrl}
-                </Link>
-              </div>
-            </div>
-
-            <div style={{ display: 'flex', gap: '2rem' }}>
-              <div style={{ flex: 1 }}>
-                <Text type="secondary">自评分</Text>
-                <div style={{ marginTop: '0.5rem' }}>
-                  <Text strong style={{ fontSize: '1.5rem' }}>{viewingProof.selfScore}</Text>
-                  <Text type="secondary"> / 100</Text>
-                </div>
+            <div className={styles.proofDetails}>
+              <div className={styles.detailItem}>
+                <div className={styles.detailLabel}>贡献者</div>
+                <div className={styles.detailValue}>{viewingProof.contributorName}</div>
               </div>
 
-              {viewingProof.finalScore && (
-                <div style={{ flex: 1 }}>
-                  <Text type="secondary">终评分</Text>
-                  <div style={{ marginTop: '0.5rem' }}>
-                    <Text strong style={{ fontSize: '1.5rem', color: 'var(--ifm-color-primary)' }}>
-                      {viewingProof.finalScore}
-                    </Text>
-                    <Text type="secondary"> / 100</Text>
-                  </div>
-                </div>
-              )}
-
-              {viewingProof.amount && (
-                <div style={{ flex: 1 }}>
-                  <Text type="secondary">奖励金额</Text>
-                  <div style={{ marginTop: '0.5rem' }}>
-                    <Text strong style={{ fontSize: '1.5rem', color: 'var(--ifm-color-success)' }}>
-                      ¥{Number(viewingProof.amount).toFixed(2)}
-                    </Text>
-                  </div>
-                </div>
-              )}
-            </div>
-
-            {viewingProof.remark && (
-              <div>
-                <Text type="secondary">管理员备注</Text>
-                <Alert
-                  message={viewingProof.remark}
-                  type="info"
-                  style={{ marginTop: '0.5rem' }}
-                />
-              </div>
-            )}
-
-            <div style={{ display: 'flex', gap: '1rem', fontSize: '0.9rem', color: 'var(--ifm-color-emphasis-600)' }}>
-              <div>
-                申请时间: {formatDate(viewingProof.applyTime)} {formatTime(viewingProof.applyTime)}
-              </div>
-              {viewingProof.approveTime && (
+              <div className={styles.detailItem}>
+                <div className={styles.detailLabel}>奖励类型</div>
                 <div>
-                  审核时间: {formatDate(viewingProof.approveTime)} {formatTime(viewingProof.approveTime)}
+                  <span className={`${styles.rewardTypeTag} ${styles[getRewardTypeClass(viewingProof.rewardType)]}`}>
+                    {getRewardTypeText(viewingProof.rewardType)}
+                  </span>
                 </div>
-              )}
-              {viewingProof.rewardTime && (
+              </div>
+
+              <div className={styles.detailItem}>
+                <div className={styles.detailLabel}>贡献描述</div>
+                <div className={styles.descriptionBox}>{viewingProof.description}</div>
+              </div>
+
+              <div className={styles.detailItem}>
+                <div className={styles.detailLabel}>证明材料</div>
                 <div>
-                  发放时间: {formatDate(viewingProof.rewardTime)} {formatTime(viewingProof.rewardTime)}
+                  <a href={viewingProof.proofUrl} target="_blank" rel="noopener noreferrer" className={styles.link}>
+                    {viewingProof.proofUrl}
+                  </a>
+                </div>
+              </div>
+
+              <div className={styles.scoreRow}>
+                <div className={styles.scoreItem}>
+                  <div className={styles.detailLabel}>自评分</div>
+                  <div className={styles.scoreValue}>{viewingProof.selfScore}<span className={styles.scoreSuffix}> / 100</span></div>
+                </div>
+                {viewingProof.finalScore && (
+                  <div className={styles.scoreItem}>
+                    <div className={styles.detailLabel}>终评分</div>
+                    <div className={`${styles.scoreValue} ${styles.finalScore}`}>{viewingProof.finalScore}<span className={styles.scoreSuffix}> / 100</span></div>
+                  </div>
+                )}
+                {viewingProof.amount && (
+                  <div className={styles.scoreItem}>
+                    <div className={styles.detailLabel}>奖励金额</div>
+                    <div className={`${styles.scoreValue} ${styles.amount}`}>¥{Number(viewingProof.amount).toFixed(2)}</div>
+                  </div>
+                )}
+              </div>
+
+              {viewingProof.remark && (
+                <div className={styles.detailItem}>
+                  <div className={styles.detailLabel}>管理员备注</div>
+                  <div className={styles.alert}>{viewingProof.remark}</div>
                 </div>
               )}
+
+              <div className={styles.timeInfo}>
+                <span>申请时间: {formatDate(viewingProof.applyTime)} {formatTime(viewingProof.applyTime)}</span>
+                {viewingProof.approveTime && (
+                  <span>审核时间: {formatDate(viewingProof.approveTime)} {formatTime(viewingProof.approveTime)}</span>
+                )}
+                {viewingProof.rewardTime && (
+                  <span>发放时间: {formatDate(viewingProof.rewardTime)} {formatTime(viewingProof.rewardTime)}</span>
+                )}
+              </div>
             </div>
-          </Space>
-        )}
-      </Modal>
+            <div className={styles.modalFooter}>
+              <button onClick={() => setViewingProof(null)} className={styles.button}>
+                关闭
+              </button>
+              <button onClick={() => window.open(viewingProof.proofUrl, '_blank')} className={styles.primaryButton}>
+                在新窗口打开
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </Layout>
   );
 }

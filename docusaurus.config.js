@@ -14,11 +14,6 @@ const config = {
     tagline: 'TabooLib 官方中文文档 - 现代化的 Minecraft 插件开发框架',
     favicon: 'img/favicon.ico',
 
-    // 客户端模块 - 引入 Ant Design React 19 兼容包
-    clientModules: [
-        require.resolve('./src/client/antd-setup.js'),
-    ],
-
     // Future flags, see https://docusaurus.io/docs/api/docusaurus-config#future
     future: {
         v4: true, // Improve compatibility with the upcoming Docusaurus v4

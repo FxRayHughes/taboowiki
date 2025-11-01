@@ -252,8 +252,7 @@ export class TokenManager {
     const clientId = 'Ov23li2MIRnkuL9KBrac';
 
     // 根据当前环境自动判断回调地址
-    const baseUrl = "https://taboowiki.maplex.top"; // 例如 http://localhost:3000 或 https://your-domain.com
-    const redirectUri = `${baseUrl}/auth/oauth-callback`;
+    const redirectUri = `https://taboowiki.maplex.top/auth/oauth-callback`;
 
     const oauthUrl = `https://github.com/login/oauth/authorize?client_id=${clientId}&redirect_uri=${encodeURIComponent(redirectUri)}`;
 
