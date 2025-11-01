@@ -12,8 +12,8 @@ export const getApiBaseUrl = () => {
   // if (hostname === 'localhost' || hostname === '127.0.0.1') {
   //   return 'http://localhost:8080';
   // }
-  // return 'http://110.42.109.37:8080';
-    return 'http://110.42.109.37:8080';
+  // return 'https://taboowikiback.maplex.top';
+    return 'https://taboowikiback.maplex.top';
 };
 
 /**

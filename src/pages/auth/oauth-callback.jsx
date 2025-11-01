@@ -43,9 +43,7 @@ export default function OAuthCallback() {
       // 调用后端 API
       setMessage('正在与服务器通信...');
 
-      const apiBaseUrl = window.location.hostname === 'localhost'
-        ? 'http://localhost:8080'
-        : 'http://110.42.109.37:8080';
+      const apiBaseUrl = 'https://taboowikiback.maplex.top';
 
       const apiUrl = `${apiBaseUrl}/api/auth/oauth2/success?code=${encodeURIComponent(code)}`;
 
