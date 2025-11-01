@@ -78,7 +78,7 @@ export default function AuthGuard({ children }) {
       }
 
       // 验证 Token 是否有效
-      const response = await fetch(`${siteConfig.customFields?.apiUrl || 'http://localhost:8080'}/api/auth/me`, {
+      const response = await fetch(`${siteConfig.customFields?.apiUrl || 'https://taboowikiback.maplex.top'}/api/auth/me`, {
         method: 'GET',
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -165,7 +165,7 @@ export default function AuthGuard({ children }) {
               <summary>技术信息</summary>
               <div className="tech-details">
                 <p><strong>当前路径:</strong> {location.pathname}</p>
-                <p><strong>API 地址:</strong> {siteConfig.customFields?.apiUrl || 'http://localhost:8080'}</p>
+                <p><strong>API 地址:</strong> {siteConfig.customFields?.apiUrl || 'https://taboowikiback.maplex.top'}</p>
                 <p><strong>Token 状态:</strong> {localStorage.getItem('taboowiki_token') ? '存在但可能无效' : '未找到'}</p>
               </div>
             </details>

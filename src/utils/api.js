@@ -6,11 +6,11 @@
  * 获取 API 基础 URL
  */
 export const getApiBaseUrl = () => {
-  // if (typeof window === 'undefined') return 'http://localhost:8080';
+  // if (typeof window === 'undefined') return 'https://taboowikiback.maplex.top';
   //
   // const hostname = window.location.hostname;
   // if (hostname === 'localhost' || hostname === '127.0.0.1') {
-  //   return 'http://localhost:8080';
+  //   return 'https://taboowikiback.maplex.top';
   // }
   // return 'https://taboowikiback.maplex.top';
     return 'https://taboowikiback.maplex.top';

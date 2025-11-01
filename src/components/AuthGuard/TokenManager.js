@@ -4,7 +4,7 @@
  */
 export class TokenManager {
   static TOKEN_KEY = 'taboowiki_token';
-  static API_URL = 'http://localhost:8080'; // 可以根据环境
+  static API_URL = 'https://taboowikiback.maplex.top'; // 可以根据环境
 
   /**
    * 保存 Token
