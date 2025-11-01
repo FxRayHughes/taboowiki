@@ -26,6 +26,9 @@ Kether 是 TabooLib 内置的一套功能强大的脚本语言，专为 Minecraf
 - 内置脚本缓存机制
 - 异步执行支持
 
+## 语法列表
+
+完整的 Kether 语法列表请查看：[Kether 语法列表](https://taboo.8aka.org/kether-list)
 
 ## 核心 API
 

@@ -1,0 +1,131 @@
+/* 控制台仪表板样式 */
+
+/* 加载动画 */
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* 统计卡片悬停效果 */
+.stat-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+/* 快速操作卡片样式 */
+.quick-action-card {
+  transition: all 0.2s ease;
+}
+
+.quick-action-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+/* 模态框样式 */
+.modal-overlay {
+  backdrop-filter: blur(4px);
+}
+
+.modal-content {
+  animation: modalSlideIn 0.3s ease;
+}
+
+@keyframes modalSlideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* 表单样式 */
+.form-input {
+  transition: border-color 0.2s ease;
+}
+
+.form-input:focus {
+  border-color: var(--ifm-color-primary);
+  box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25);
+}
+
+/* 按钮样式 */
+.btn-primary {
+  transition: background-color 0.2s ease;
+}
+
+.btn-primary:hover:not(:disabled) {
+  background-color: var(--ifm-color-primary-dark);
+}
+
+.btn-secondary {
+  transition: background-color 0.2s ease, border-color 0.2s ease;
+}
+
+.btn-secondary:hover {
+  background-color: var(--ifm-color-emphasis-300);
+}
+
+/* 响应式设计 */
+@media (max-width: 768px) {
+  .console-container {
+    padding: 1rem;
+  }
+
+  .stats-grid {
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 1rem;
+  }
+
+  .quick-actions-grid {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+
+  .modal-content {
+    width: 95%;
+    margin: 1rem;
+  }
+}
+
+/* 暗色模式适配 */
+html[data-theme='dark'] .modal-overlay {
+  background-color: rgba(0, 0, 0, 0.8);
+}
+
+html[data-theme='dark'] .stat-card {
+  background: var(--ifm-card-background-color);
+}
+
+html[data-theme='dark'] .quick-action-card {
+  background: var(--ifm-card-background-color);
+}
+
+html[data-theme='dark'] .form-input {
+  background: var(--ifm-background-color);
+  color: var(--ifm-font-color-base);
+}
+
+/* 错误提示样式 */
+.error-message {
+  animation: shake 0.3s ease;
+}
+
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-5px); }
+  75% { transform: translateX(5px); }
+}
+
+/* 成功提示样式 */
+.success-message {
+  animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}

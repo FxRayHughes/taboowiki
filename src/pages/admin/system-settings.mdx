@@ -1,0 +1,246 @@
+---
+title: 系统设置
+description: 管理员系统设置页面
+---
+
+import AuthGuard from '@site/src/components/AuthGuard';
+
+<AuthGuard>
+
+# 系统设置 ⚙️
+
+此页面仅限管理员访问，用于配置和管理系统参数。
+
+## 🌐 基本设置
+
+### 网站信息
+<div style={{background: 'var(--ifm-color-emphasis-100)', padding: '1rem', borderRadius: '8px', margin: '1rem 0'}}>
+  <div style={{marginBottom: '1rem'}}>
+    <label style={{display: 'block', marginBottom: '0.5rem', fontWeight: '500'}}>网站标题</label>
+    <input
+      type="text"
+      defaultValue="TabooWiki"
+      style={{width: '100%', padding: '0.5rem', border: '1px solid var(--ifm-color-emphasis-300)', borderRadius: '4px'}}
+    />
+  </div>
+  <div style={{marginBottom: '1rem'}}>
+    <label style={{display: 'block', marginBottom: '0.5rem', fontWeight: '500'}}>网站描述</label>
+    <textarea
+      defaultValue="TabooLib 官方中文文档 - 现代化的 Minecraft 插件开发框架"
+      rows={3}
+      style={{width: '100%', padding: '0.5rem', border: '1px solid var(--ifm-color-emphasis-300)', borderRadius: '4px'}}
+    />
+  </div>
+  <button style={{padding: '0.5rem 1rem', background: 'var(--ifm-color-primary)', color: 'white', border: 'none', borderRadius: '4px', cursor: 'pointer'}}>
+    保存设置
+  </button>
+</div>
+
+### 联系信息
+<div style={{background: 'var(--ifm-color-emphasis-100)', padding: '1rem', borderRadius: '8px', margin: '1rem 0'}}>
+  <div style={{marginBottom: '1rem'}}>
+    <label style={{display: 'block', marginBottom: '0.5rem', fontWeight: '500'}}>联系邮箱</label>
+    <input
+      type="email"
+      placeholder="admin@taboowiki.org"
+      style={{width: '100%', padding: '0.5rem', border: '1px solid var(--ifm-color-emphasis-300)', borderRadius: '4px'}}
+    />
+  </div>
+  <div style={{marginBottom: '1rem'}}>
+    <label style={{display: 'block', marginBottom: '0.5rem', fontWeight: '500'}}>GitHub 链接</label>
+    <input
+      type="url"
+      defaultValue="https://github.com/TabooLib/taboolib"
+      style={{width: '100%', padding: '0.5rem', border: '1px solid var(--ifm-color-emphasis-300)', borderRadius: '4px'}}
+    />
+  </div>
+  <div style={{marginBottom: '1rem'}}>
+    <label style={{display: 'block', marginBottom: '0.5rem', fontWeight: '500'}}>QQ 群链接</label>
+    <input
+      type="url"
+      defaultValue="https://qm.qq.com/q/i4Q9SFRqq4"
+      style={{width: '100%', padding: '0.5rem', border: '1px solid var(--ifm-color-emphasis-300)', borderRadius: '4px'}}
+    />
+  </div>
+</div>
+
+## 🔐 安全设置
+
+### JWT 配置
+<div style={{background: 'var(--ifm-color-emphasis-100)', padding: '1rem', borderRadius: '8px', margin: '1rem 0'}}>
+  <div style={{marginBottom: '1rem'}}>
+    <label style={{display: 'block', marginBottom: '0.5rem', fontWeight: '500'}}>Token 过期时间（小时）</label>
+    <input
+      type="number"
+      defaultValue="24"
+      min="1"
+      max="168"
+      style={{width: '100%', padding: '0.5rem', border: '1px solid var(--ifm-color-emphasis-300)', borderRadius: '4px'}}
+    />
+  </div>
+  <div style={{marginBottom: '1rem'}}>
+    <label style={{display: 'block', marginBottom: '0.5rem', fontWeight: '500'}}>
+      <input type="checkbox" defaultChecked /> 允许用户注册
+    </label>
+  </div>
+  <div style={{marginBottom: '1rem'}}>
+    <label style={{display: 'block', marginBottom: '0.5rem', fontWeight: '500'}}>
+      <input type="checkbox" defaultChecked /> 启用邮箱验证
+    </label>
+  </div>
+</div>
+
+### 访问控制
+<div style={{background: 'var(--ifm-color-emphasis-100)', padding: '1rem', borderRadius: '8px', margin: '1rem 0'}}>
+  <div style={{marginBottom: '1rem'}}>
+    <label style={{display: 'block', marginBottom: '0.5rem', fontWeight: '500'}}>
+      <input type="checkbox" defaultChecked /> 启用 IP 限制
+    </label>
+  </div>
+  <div style={{marginBottom: '1rem'}}>
+    <label style={{display: 'block', marginBottom: '0.5rem', fontWeight: '500'}}>允许的 IP 地址（每行一个）</label>
+    <textarea
+      placeholder="192.168.1.1&#10;10.0.0.1"
+      rows={4}
+      style={{width: '100%', padding: '0.5rem', border: '1px solid var(--ifm-color-emphasis-300)', borderRadius: '4px'}}
+    />
+  </div>
+</div>
+
+## 📊 系统监控
+
+### 性能监控
+<div style={{background: 'var(--ifm-color-emphasis-100)', padding: '1rem', borderRadius: '8px', margin: '1rem 0'}}>
+  <h4>系统状态</h4>
+  <div style={{display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '1rem', marginTop: '1rem'}}>
+    <div style={{background: 'var(--ifm-card-background-color)', padding: '1rem', borderRadius: '8px', textAlign: 'center'}}>
+      <div style={{fontSize: '2rem', fontWeight: 'bold', color: 'var(--ifm-color-success)'}}>98%</div>
+      <div style={{color: 'var(--ifm-font-color-base)'}}>系统健康度</div>
+    </div>
+    <div style={{background: 'var(--ifm-card-background-color)', padding: '1rem', borderRadius: '8px', textAlign: 'center'}}>
+      <div style={{fontSize: '2rem', fontWeight: 'bold', color: 'var(--ifm-color-info)'}}>45ms</div>
+      <div style={{color: 'var(--ifm-font-color-base)'}}>响应时间</div>
+    </div>
+    <div style={{background: 'var(--ifm-card-background-color)', padding: '1rem', borderRadius: '8px', textAlign: 'center'}}>
+      <div style={{fontSize: '2rem', fontWeight: 'bold', color: 'var(--ifm-color-warning)'}}>1,234</div>
+      <div style={{color: 'var(--ifm-font-color-base)'}}>今日访问</div>
+    </div>
+  </div>
+</div>
+
+### 日志管理
+<div style={{background: 'var(--ifm-color-emphasis-100)', padding: '1rem', borderRadius: '8px', margin: '1rem 0'}}>
+  <h4>日志设置</h4>
+  <div style={{marginBottom: '1rem'}}>
+    <label style={{display: 'block', marginBottom: '0.5rem', fontWeight: '500'}}>
+      <input type="checkbox" defaultChecked /> 记录用户操作日志
+    </label>
+  </div>
+  <div style={{marginBottom: '1rem'}}>
+    <label style={{display: 'block', marginBottom: '0.5rem', fontWeight: '500'}}>
+      <input type="checkbox" defaultChecked /> 记录系统错误日志
+    </label>
+  </div>
+  <div style={{marginBottom: '1rem'}}>
+    <label style={{display: 'block', marginBottom: '0.5rem', fontWeight: '500'}}>日志保留天数</label>
+    <input
+      type="number"
+      defaultValue="30"
+      min="1"
+      max="365"
+      style={{width: '100%', padding: '0.5rem', border: '1px solid var(--ifm-color-emphasis-300)', borderRadius: '4px'}}
+    />
+  </div>
+  <button style={{padding: '0.5rem 1rem', background: 'var(--ifm-color-warning)', color: 'white', border: 'none', borderRadius: '4px', cursor: 'pointer', marginRight: '0.5rem'}}>
+    清理过期日志
+  </button>
+  <button style={{padding: '0.5rem 1rem', background: 'var(--ifm-color-info)', color: 'white', border: 'none', borderRadius: '4px', cursor: 'pointer'}}>
+    下载日志
+  </button>
+</div>
+
+## 📧 通知设置
+
+### 邮件配置
+<div style={{background: 'var(--ifm-color-emphasis-100)', padding: '1rem', borderRadius: '8px', margin: '1rem 0'}}>
+  <div style={{marginBottom: '1rem'}}>
+    <label style={{display: 'block', marginBottom: '0.5rem', fontWeight: '500'}}>SMTP 服务器</label>
+    <input
+      type="text"
+      placeholder="smtp.example.com"
+      style={{width: '100%', padding: '0.5rem', border: '1px solid var(--ifm-color-emphasis-300)', borderRadius: '4px'}}
+    />
+  </div>
+  <div style={{marginBottom: '1rem'}}>
+    <label style={{display: 'block', marginBottom: '0.5rem', fontWeight: '500'}}>端口</label>
+    <input
+      type="number"
+      defaultValue="587"
+      style={{width: '100%', padding: '0.5rem', border: '1px solid var(--ifm-color-emphasis-300)', borderRadius: '4px'}}
+    />
+  </div>
+  <div style={{marginBottom: '1rem'}}>
+    <label style={{display: 'block', marginBottom: '0.5rem', fontWeight: '500'}}>
+      <input type="checkbox" defaultChecked /> 启用 SSL/TLS
+    </label>
+  </div>
+</div>
+
+## 💾 备份设置
+
+### 自动备份
+<div style={{background: 'var(--ifm-color-emphasis-100)', padding: '1rem', borderRadius: '8px', margin: '1rem 0'}}>
+  <div style={{marginBottom: '1rem'}}>
+    <label style={{display: 'block', marginBottom: '0.5rem', fontWeight: '500'}}>
+      <input type="checkbox" defaultChecked /> 启用自动备份
+    </label>
+  </div>
+  <div style={{marginBottom: '1rem'}}>
+    <label style={{display: 'block', marginBottom: '0.5rem', fontWeight: '500'}}>备份频率</label>
+    <select style={{width: '100%', padding: '0.5rem', border: '1px solid var(--ifm-color-emphasis-300)', borderRadius: '4px'}}>
+      <option value="daily">每日</option>
+      <option value="weekly">每周</option>
+      <option value="monthly">每月</option>
+    </select>
+  </div>
+  <div style={{marginBottom: '1rem'}}>
+    <label style={{display: 'block', marginBottom: '0.5rem', fontWeight: '500'}}>保留备份数量</label>
+    <input
+      type="number"
+      defaultValue="7"
+      min="1"
+      max="30"
+      style={{width: '100%', padding: '0.5rem', border: '1px solid var(--ifm-color-emphasis-300)', borderRadius: '4px'}}
+    />
+  </div>
+  <button style={{padding: '0.5rem 1rem', background: 'var(--ifm-color-primary)', color: 'white', border: 'none', borderRadius: '4px', cursor: 'pointer'}}>
+    立即备份
+  </button>
+</div>
+
+## 🔧 操作按钮
+
+<div style={{textAlign: 'center', marginTop: '2rem'}}>
+  <button style={{padding: '0.75rem 2rem', background: 'var(--ifm-color-primary)', color: 'white', border: 'none', borderRadius: '4px', cursor: 'pointer', marginRight: '0.5rem'}}>
+    保存所有设置
+  </button>
+  <button style={{padding: '0.75rem 2rem', background: 'var(--ifm-color-secondary)', color: 'white', border: 'none', borderRadius: '4px', cursor: 'pointer', marginRight: '0.5rem'}}>
+    重置为默认
+  </button>
+  <button style={{padding: '0.75rem 2rem', background: 'var(--ifm-color-danger)', color: 'white', border: 'none', borderRadius: '4px', cursor: 'pointer'}}>
+    重启系统
+  </button>
+</div>
+
+## ⚠️ 重要提醒
+
+:::warning[操作注意]
+
+- **保存设置**: 修改设置后请点击"保存所有设置"按钮
+- **系统重启**: 重启系统会导致所有用户会话失效
+- **备份恢复**: 在进行重大更改前请先备份系统
+- **日志清理**: 清理日志后数据不可恢复
+
+:::
+
+</AuthGuard>

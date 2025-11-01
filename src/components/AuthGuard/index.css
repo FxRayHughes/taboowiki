@@ -1,0 +1,232 @@
+/* 认证守卫组件样式 */
+
+.auth-guard-loading {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 50vh;
+  padding: 2rem;
+}
+
+.loading-spinner {
+  text-align: center;
+  color: var(--ifm-color-primary);
+}
+
+.spinner {
+  width: 40px;
+  height: 40px;
+  border: 4px solid var(--ifm-color-emphasis-200);
+  border-top: 4px solid var(--ifm-color-primary);
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin: 0 auto 1rem;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.auth-guard-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 70vh;
+  padding: 2rem;
+  background: linear-gradient(135deg, var(--ifm-color-emphasis-100) 0%, var(--ifm-color-emphasis-200) 100%);
+  border-radius: 12px;
+  margin: 2rem;
+}
+
+html[data-theme='dark'] .auth-guard-container {
+  background: linear-gradient(135deg, var(--ifm-color-emphasis-900) 0%, var(--ifm-color-emphasis-800) 100%);
+}
+
+.auth-guard-content {
+  background: var(--ifm-card-background-color);
+  padding: 3rem;
+  border-radius: 12px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+  max-width: 500px;
+  width: 100%;
+  text-align: center;
+  border: 1px solid var(--ifm-color-emphasis-200);
+}
+
+.auth-icon {
+  font-size: 4rem;
+  margin-bottom: 1.5rem;
+}
+
+.auth-guard-content h2 {
+  color: var(--ifm-heading-color);
+  margin-bottom: 1rem;
+  font-size: 2rem;
+  font-weight: 600;
+}
+
+.auth-guard-content p {
+  color: var(--ifm-font-color-base);
+  margin-bottom: 2rem;
+  line-height: 1.6;
+}
+
+/* 当未认证时，确保主内容占满全宽 */
+.auth-guard-container ~ main {
+  max-width: 100% !important;
+  padding-right: 2rem !important;
+}
+
+/* 隐��导航栏中的目录链接（当未认证时） */
+.auth-guard-active .navbar__link--toc,
+.auth-guard-active .theme-doc-toc-desktop {
+  display: none !important;
+}
+
+.auth-actions {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+  margin-bottom: 2rem;
+  flex-wrap: wrap;
+}
+
+.auth-button {
+  padding: 0.75rem 2rem;
+  border: none;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  min-width: 120px;
+}
+
+.auth-button.primary {
+  background: var(--ifm-color-primary);
+  color: white;
+}
+
+.auth-button.primary:hover {
+  background: var(--ifm-color-primary-dark);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.auth-button.secondary {
+  background: var(--ifm-color-emphasis-200);
+  color: var(--ifm-font-color-base);
+  border: 1px solid var(--ifm-color-emphasis-300);
+}
+
+.auth-button.secondary:hover {
+  background: var(--ifm-color-emphasis-300);
+  transform: translateY(-2px);
+}
+
+.auth-help {
+  text-align: left;
+  background: var(--ifm-color-emphasis-100);
+  padding: 1.5rem;
+  border-radius: 8px;
+  margin-bottom: 1.5rem;
+}
+
+html[data-theme='dark'] .auth-help {
+  background: var(--ifm-color-emphasis-800);
+}
+
+.auth-help h3 {
+  color: var(--ifm-heading-color);
+  margin-bottom: 1rem;
+  font-size: 1.1rem;
+}
+
+.auth-help ul {
+  margin: 0;
+  padding-left: 1.5rem;
+}
+
+.auth-help li {
+  color: var(--ifm-font-color-base);
+  margin-bottom: 0.5rem;
+  line-height: 1.5;
+}
+
+.auth-info {
+  text-align: left;
+}
+
+.auth-info details {
+  background: var(--ifm-color-emphasis-100);
+  padding: 1rem;
+  border-radius: 8px;
+  border: 1px solid var(--ifm-color-emphasis-200);
+}
+
+html[data-theme='dark'] .auth-info details {
+  background: var(--ifm-color-emphasis-800);
+}
+
+.auth-info summary {
+  cursor: pointer;
+  font-weight: 500;
+  color: var(--ifm-color-primary);
+  margin-bottom: 0.5rem;
+}
+
+.auth-info summary:hover {
+  color: var(--ifm-color-primary-dark);
+}
+
+.tech-details {
+  margin-top: 1rem;
+}
+
+.tech-details p {
+  margin: 0.5rem 0;
+  font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+  font-size: 0.9rem;
+  color: var(--ifm-color-emphasis-700);
+  word-break: break-all;
+}
+
+.tech-details strong {
+  color: var(--ifm-color-emphasis-900);
+}
+
+html[data-theme='dark'] .tech-details strong {
+  color: var(--ifm-color-emphasis-100);
+}
+
+/* 响应式设计 */
+@media (max-width: 768px) {
+  .auth-guard-container {
+    margin: 1rem;
+    min-height: 60vh;
+  }
+
+  .auth-guard-content {
+    padding: 2rem;
+    margin: 0 1rem;
+  }
+
+  .auth-actions {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .auth-button {
+    width: 100%;
+    max-width: 200px;
+  }
+
+  .auth-icon {
+    font-size: 3rem;
+  }
+
+  .auth-guard-content h2 {
+    font-size: 1.5rem;
+  }
+}

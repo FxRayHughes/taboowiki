@@ -1,0 +1,131 @@
+---
+title: 用户管理
+description: 管理员用户管理页面
+---
+
+import AuthGuard from '@site/src/components/AuthGuard';
+
+<AuthGuard>
+
+# 用户管理 👥
+
+此页面仅限管理员访问，用于管理系统用户。
+
+## 📊 用户统计
+
+- **总用户数**: 正在加载...
+- **活跃用户**: 正在加载...
+- **管理员数量**: 正在加载...
+- **今日���册**: 正在加载...
+
+## 🔍 用户搜索
+
+<div style={{background: 'var(--ifm-color-emphasis-100)', padding: '1rem', borderRadius: '8px', margin: '1rem 0'}}>
+  <input
+    type="text"
+    placeholder="搜索用户名或邮箱..."
+    style={{width: '100%', padding: '0.5rem', border: '1px solid var(--ifm-color-emphasis-300)', borderRadius: '4px'}}
+  />
+  <button style={{marginTop: '0.5rem', padding: '0.5rem 1rem', background: 'var(--ifm-color-primary)', color: 'white', border: 'none', borderRadius: '4px', cursor: 'pointer'}}>
+    搜索用户
+  </button>
+</div>
+
+## 📋 用户列表
+
+<table style={{width: '100%', borderCollapse: 'collapse', marginTop: '1rem'}}>
+  <thead>
+    <tr style={{background: 'var(--ifm-color-emphasis-200)'}}>
+      <th style={{padding: '0.75rem', textAlign: 'left', borderBottom: '1px solid var(--ifm-color-emphasis-300)'}}>ID</th>
+      <th style={{padding: '0.75rem', textAlign: 'left', borderBottom: '1px solid var(--ifm-color-emphasis-300)'}}>用户名</th>
+      <th style={{padding: '0.75rem', textAlign: 'left', borderBottom: '1px solid var(--ifm-color-emphasis-300)'}}>邮箱</th>
+      <th style={{padding: '0.75rem', textAlign: 'left', borderBottom: '1px solid var(--ifm-color-emphasis-300)'}}>状态</th>
+      <th style={{padding: '0.75rem', textAlign: 'left', borderBottom: '1px solid var(--ifm-color-emphasis-300)'}}>管理员</th>
+      <th style={{padding: '0.75rem', textAlign: 'left', borderBottom: '1px solid var(--ifm-color-emphasis-300)'}}>最后登录</th>
+      <th style={{padding: '0.75rem', textAlign: 'left', borderBottom: '1px solid var(--ifm-color-emphasis-300)'}}>操作</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td colSpan="7" style={{padding: '2rem', textAlign: 'center', color: 'var(--ifm-color-emphasis-600)'}}>
+        正在加载用户数据...
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+## ⚙️ 快速操作
+
+### 批量操作
+- [ ] 全选
+- 启用选中用户
+- 禁用选中用户
+- 设置管理员权限
+
+### 用户操作
+- **查看详情**: 点击用户名查看详细信息
+- **编辑用户**: 修改用户基本信息
+- **重置密码**: 为用户重置密码
+- **删除用户**: 永久删除用户账户
+
+## 📈 用户趋势
+
+<div style={{background: 'var(--ifm-color-emphasis-100)', padding: '1rem', borderRadius: '8px', margin: '1rem 0'}}>
+  <h4>用户增长趋势</h4>
+  <p style={{color: 'var(--ifm-color-emphasis-600)', fontStyle: 'italic'}}>
+    此处将显示用户增长图表（需要集成图表库）
+  </p>
+</div>
+
+## 🔧 API 接口
+
+### 获取所有用户
+```bash
+GET /admin-api/users
+Authorization: Bearer <token>
+```
+
+### 获取用户详情
+```bash
+GET /admin-api/users/{id}
+Authorization: Bearer <token>
+```
+
+### 更新用户状态
+```bash
+PUT /admin-api/users/{id}/status
+Authorization: Bearer <token>
+Content-Type: application/json
+
+{
+  "status": 1
+}
+```
+
+### 设置管理员权限
+```bash
+PUT /admin-api/users/{id}/admin
+Authorization: Bearer <token>
+Content-Type: application/json
+
+{
+  "isAdmin": 1
+}
+```
+
+## 📝 使用说明
+
+1. **搜索功能**: ��持按用户名或邮箱搜索
+2. **状态管理**: 可以启用/禁用用户账户
+3. **权限设置**: 可以为用户设置或取消管理员权限
+4. **批量操作**: 支持批量处理多个用户
+5. **数据导出**: 可以导出用户数据为 CSV 格式
+
+## ⚠️ 注意事项
+
+- 删除用户操作不可恢复，请谨慎操作
+- 修改管理员权限需要重新登录生效
+- 系统会记录所有管理操作日志
+- 建议定期备份用户数据
+
+</AuthGuard>

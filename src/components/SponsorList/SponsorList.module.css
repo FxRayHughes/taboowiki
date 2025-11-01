@@ -1,0 +1,473 @@
+.sponsorContainer {
+  margin: 2rem 0;
+}
+
+.loading {
+  text-align: center;
+  padding: 3rem;
+  font-size: 1.1rem;
+}
+
+.error {
+  background-color: var(--ifm-color-danger-contrast-background);
+  border-left: 4px solid var(--ifm-color-danger);
+  padding: 1rem;
+  margin-bottom: 1.5rem;
+  border-radius: 8px;
+}
+
+/* 赞助区块 */
+.sponsorSection {
+  margin-bottom: 3rem;
+}
+
+.sectionHeader {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 1.5rem;
+}
+
+.sectionIcon {
+  font-size: 2rem;
+  line-height: 1;
+}
+
+.sectionTitle {
+  font-size: 1.75rem;
+  font-weight: 700;
+  margin: 0;
+  color: var(--ifm-heading-color);
+}
+
+/* 表格容器 */
+.tableContainer {
+  background: var(--ifm-card-background-color);
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  border: 1px solid var(--ifm-color-emphasis-200);
+}
+
+html[data-theme='dark'] .tableContainer {
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+/* 表头 */
+.tableHeader {
+  display: flex;
+  background: linear-gradient(135deg, var(--ifm-color-primary-lighter) 0%, var(--ifm-color-primary-light) 100%);
+  padding: 1rem 1.5rem;
+  font-weight: 600;
+  font-size: 0.95rem;
+  letter-spacing: 0.5px;
+}
+
+html[data-theme='dark'] .tableHeader {
+  background: linear-gradient(135deg, var(--ifm-color-primary-dark) 0%, var(--ifm-color-primary-darker) 100%);
+}
+
+.headerCell {
+  color: white;
+  text-transform: uppercase;
+  font-size: 0.85rem;
+}
+
+/* 表格主体 */
+.tableBody {
+  display: flex;
+  flex-direction: column;
+}
+
+.tableRow {
+  display: flex;
+  padding: 1.25rem 1.5rem;
+  border-bottom: 1px solid var(--ifm-color-emphasis-200);
+  transition: all 0.2s ease;
+  position: relative;
+}
+
+.tableRow:last-child {
+  border-bottom: none;
+}
+
+.tableRow::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  height: 100%;
+  width: 3px;
+  background: var(--ifm-color-primary);
+  transform: scaleY(0);
+  transition: transform 0.2s ease;
+}
+
+.tableRow:hover::before {
+  transform: scaleY(1);
+}
+
+/* 高亮行样式 (300元以上赞助) */
+.tableRow.highlighted {
+  background: linear-gradient(
+    90deg,
+    rgba(255, 215, 0, 0.08) 0%,
+    rgba(255, 215, 0, 0.03) 50%,
+    transparent 100%
+  );
+  border-left: 4px solid #ffd700;
+}
+
+.tableRow.highlighted::before {
+  background: linear-gradient(180deg, #ffd700 0%, #ff9800 100%);
+  width: 4px;
+  transform: scaleY(1);
+}
+
+.tableRow.highlighted:hover {
+  background: linear-gradient(
+    90deg,
+    rgba(255, 215, 0, 0.12) 0%,
+    rgba(255, 215, 0, 0.05) 50%,
+    transparent 100%
+  );
+}
+
+html[data-theme='dark'] .tableRow.highlighted {
+  background: linear-gradient(
+    90deg,
+    rgba(255, 215, 0, 0.15) 0%,
+    rgba(255, 215, 0, 0.08) 50%,
+    transparent 100%
+  );
+}
+
+html[data-theme='dark'] .tableRow.highlighted:hover {
+  background: linear-gradient(
+    90deg,
+    rgba(255, 215, 0, 0.2) 0%,
+    rgba(255, 215, 0, 0.1) 50%,
+    transparent 100%
+  );
+}
+
+/* 单元格 */
+.nameCell {
+  font-size: 1.05rem;
+  font-weight: 500;
+  color: var(--ifm-font-color-base);
+  display: flex;
+  align-items: center;
+}
+
+.amountCell {
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: var(--ifm-color-primary);
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+}
+
+.dateCell {
+  font-size: 0.95rem;
+  font-weight: 500;
+  color: var(--ifm-font-color-base);
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+}
+
+.descriptionCell {
+  font-size: 0.95rem;
+  color: var(--ifm-font-color-base);
+  display: flex;
+  align-items: center;
+  line-height: 1.5;
+  opacity: 0.85;
+}
+
+.messageCell {
+  font-size: 0.95rem;
+  color: var(--ifm-font-color-base);
+  display: flex;
+  align-items: center;
+  line-height: 1.5;
+  font-style: italic;
+  opacity: 0.8;
+}
+
+/* 统计信息 */
+.statistics {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 1.5rem;
+  margin-bottom: 3rem;
+}
+
+.statCard {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 2rem 2.5rem;
+  background: var(--ifm-card-background-color);
+  border-radius: 12px;
+  border: 2px solid var(--ifm-color-emphasis-200);
+  transition: all 0.3s ease;
+}
+
+html[data-theme='dark'] .statCard {
+  border-color: var(--ifm-color-emphasis-300);
+}
+
+.statCard:nth-child(1) {
+  border-left: 4px solid #f093fb;
+}
+
+.statCard:nth-child(2) {
+  border-left: 4px solid #4facfe;
+}
+
+.statCard:nth-child(3) {
+  border-left: 4px solid #43e97b;
+}
+
+.statCard:nth-child(4) {
+  border-left: 4px solid #ffa726;
+}
+
+.statIcon {
+  font-size: 3.5rem;
+  line-height: 1;
+  flex-shrink: 0;
+}
+
+.statContent {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  align-items: flex-end;
+  text-align: right;
+}
+
+.statValue {
+  font-size: 2.25rem;
+  font-weight: 700;
+  color: var(--ifm-heading-color);
+  line-height: 1.2;
+}
+
+.statCard:nth-child(1) .statValue {
+  color: #f5576c;
+}
+
+html[data-theme='dark'] .statCard:nth-child(1) .statValue {
+  color: #f093fb;
+}
+
+.statCard:nth-child(2) .statValue {
+  color: #00b4d8;
+}
+
+html[data-theme='dark'] .statCard:nth-child(2) .statValue {
+  color: #4facfe;
+}
+
+.statCard:nth-child(3) .statValue {
+  color: #2d9d5e;
+}
+
+html[data-theme='dark'] .statCard:nth-child(3) .statValue {
+  color: #43e97b;
+}
+
+.statCard:nth-child(4) .statValue {
+  color: #f57c00;
+}
+
+html[data-theme='dark'] .statCard:nth-child(4) .statValue {
+  color: #ffa726;
+}
+
+.statLabel {
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: var(--ifm-font-color-base);
+  opacity: 0.75;
+}
+
+/* 响应式 */
+@media (max-width: 768px) {
+  .sectionIcon {
+    font-size: 1.5rem;
+  }
+
+  .sectionTitle {
+    font-size: 1.5rem;
+  }
+
+  /* 移动端隐藏表头 */
+  .tableHeader {
+    display: none;
+  }
+
+  /* 移动端表格容器 */
+  .tableContainer {
+    background: transparent;
+    border: none;
+    box-shadow: none;
+  }
+
+  .tableBody {
+    gap: 1rem;
+  }
+
+  /* 移动端表格行改为独立卡片 */
+  .tableRow {
+    flex-direction: column;
+    padding: 1.5rem;
+    gap: 0;
+    border: 1px solid var(--ifm-color-emphasis-200);
+    border-radius: 12px;
+    background: var(--ifm-card-background-color);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    margin-bottom: 0;
+  }
+
+  html[data-theme='dark'] .tableRow {
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+  }
+
+  .tableRow:last-child {
+    border-bottom: 1px solid var(--ifm-color-emphasis-200);
+  }
+
+  .tableRow::before {
+    display: none;
+  }
+
+  /* 卡片顶部：姓名和金额 */
+  .nameCell,
+  .amountCell {
+    width: 100% !important;
+    flex: none !important;
+    padding: 0;
+    margin: 0;
+  }
+
+  .nameCell {
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: var(--ifm-heading-color);
+    margin-bottom: 0.5rem;
+    justify-content: flex-start !important;
+  }
+
+  .nameCell::before {
+    display: none;
+  }
+
+  .amountCell {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--ifm-color-primary);
+    margin-bottom: 1rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid var(--ifm-color-emphasis-200);
+    justify-content: flex-start !important;
+    text-align: left !important;
+  }
+
+  .amountCell::before {
+    display: none;
+  }
+
+  /* 卡片中部：留言/描述 */
+  .descriptionCell,
+  .messageCell {
+    width: 100% !important;
+    flex: none !important;
+    padding: 0;
+    margin: 1rem 0;
+    font-size: 1rem;
+    line-height: 1.6;
+    justify-content: flex-start !important;
+    text-align: left !important;
+  }
+
+  .descriptionCell::before,
+  .messageCell::before {
+    content: attr(data-label);
+    font-weight: 600;
+    font-size: 0.75rem;
+    color: var(--ifm-color-emphasis-600);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    display: block;
+    margin-bottom: 0.5rem;
+    opacity: 0.8;
+  }
+
+  /* 卡片底部：时间 */
+  .dateCell {
+    width: 100% !important;
+    flex: none !important;
+    padding: 0;
+    margin: 0;
+    font-size: 0.85rem;
+    color: var(--ifm-color-emphasis-600);
+    justify-content: flex-start !important;
+    text-align: left !important;
+    opacity: 0.8;
+  }
+
+  .dateCell::before {
+    content: '📅 ';
+    font-size: 0.9rem;
+    margin-right: 0.25rem;
+  }
+
+  /* 统计卡片 */
+  .statistics {
+    grid-template-columns: 1fr;
+  }
+
+  .statCard {
+    padding: 1.5rem;
+  }
+
+  .statIcon {
+    font-size: 2.5rem;
+  }
+
+  .statValue {
+    font-size: 1.75rem;
+  }
+
+  .statLabel {
+    font-size: 0.9rem;
+  }
+}
+
+/* 动画 */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.tableRow {
+  animation: fadeIn 0.3s ease backwards;
+}
+
+.tableRow:nth-child(1) { animation-delay: 0.05s; }
+.tableRow:nth-child(2) { animation-delay: 0.1s; }
+.tableRow:nth-child(3) { animation-delay: 0.15s; }
+.tableRow:nth-child(4) { animation-delay: 0.2s; }
+.tableRow:nth-child(5) { animation-delay: 0.25s; }
+.tableRow:nth-child(n+6) { animation-delay: 0.3s; }

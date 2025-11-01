@@ -258,14 +258,28 @@ fun updateHome(home: PlayerHome, serverName: String) {
 ### 删除数据
 
 ```kotlin
-// 根据 @Id 删除
+// 1. 根据 @Id 删除
 container.get<PlayerHome>().delete<PlayerHome>(playerUUID)
 
-// 根据 @Id + 条件删除
+// 2. 根据 @Id + 条件删除
 container.get<PlayerHome>().delete<PlayerHome>(playerUUID) {
     "server_name" eq "survival"
 }
+
+// 3. 根据某个数据值删除（直接操作底层表）
+fun delete(name: String) {
+    val containerx = container[PlayerHome::class.java]
+    containerx.table.delete(containerx.dataSource) {
+        "player_name" eq name or ("proxy_id" eq name)
+    }
+}
 ```
+
+**代码说明：**
+- `container[PlayerHome::class.java]`：获取指定类型的 ContainerOperator
+- `containerx.table.delete()`：直接操作底层表进行删除
+- 支持使用 `or`、`and` 等逻辑运算符组合多个条件
+- 适用于不依赖 `@Id` 主键的灵活删除场景
 
 ### 检查数据是否存在
 
