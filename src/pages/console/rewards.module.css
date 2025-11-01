@@ -456,3 +456,152 @@
     border-radius: 0;
   }
 }
+
+/* Rewards 特定样式 */
+
+/* 奖励类型标签 */
+.rewardTypeTag {
+  display: inline-block;
+  padding: 0.25rem 0.75rem;
+  border-radius: 12px;
+  font-size: 0.85rem;
+  font-weight: 500;
+}
+
+.rewardTypeTag.bug_fix {
+  background: #ffebee;
+  color: #c62828;
+}
+
+.rewardTypeTag.documentation {
+  background: #e3f2fd;
+  color: #1565c0;
+}
+
+.rewardTypeTag.promotion {
+  background: #e8f5e9;
+  color: #2e7d32;
+}
+
+.rewardTypeTag.major_contribution {
+  background: #fff9c4;
+  color: #f57f17;
+}
+
+/* 终评分样式 */
+.finalScore {
+  color: var(--ifm-color-primary);
+}
+
+/* 链接按钮 */
+.linkButton {
+  background: none;
+  border: none;
+  color: var(--ifm-color-primary);
+  cursor: pointer;
+  font-size: 0.9rem;
+  padding: 0;
+  text-decoration: none;
+}
+
+.linkButton:hover {
+  text-decoration: underline;
+}
+
+/* 复制按钮 */
+.copyButton {
+  padding: 0.5rem 1rem;
+  background: var(--ifm-color-primary-lightest);
+  color: var(--ifm-color-primary);
+  border: 1px solid var(--ifm-color-primary-light);
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  transition: all 0.2s;
+}
+
+.copyButton:hover {
+  background: var(--ifm-color-primary-light);
+}
+
+/* 证明材料详情 */
+.proofDetails {
+  padding: 1.5rem;
+}
+
+.detailItem {
+  margin-bottom: 1.5rem;
+}
+
+.detailLabel {
+  font-size: 0.85rem;
+  color: var(--ifm-color-emphasis-600);
+  margin-bottom: 0.5rem;
+}
+
+.detailValue {
+  font-size: 1.1rem;
+  font-weight: 600;
+}
+
+.descriptionBox {
+  padding: 1rem;
+  background: var(--ifm-color-emphasis-100);
+  border-radius: 6px;
+  line-height: 1.6;
+}
+
+/* 分数行 */
+.scoreRow {
+  display: flex;
+  gap: 2rem;
+  margin-bottom: 1.5rem;
+  flex-wrap: wrap;
+}
+
+.scoreItem {
+  flex: 1;
+  min-width: 150px;
+}
+
+.scoreValue {
+  font-size: 1.5rem;
+  font-weight: 600;
+  margin-top: 0.5rem;
+}
+
+.scoreSuffix {
+  font-size: 1rem;
+  color: var(--ifm-color-emphasis-600);
+  font-weight: normal;
+}
+
+/* 时间信息 */
+.timeInfo {
+  display: flex;
+  gap: 1rem;
+  font-size: 0.9rem;
+  color: var(--ifm-color-emphasis-600);
+  flex-wrap: wrap;
+}
+
+/* select 样式 */
+.formGroup select {
+  width: 100%;
+  padding: 0.5rem 0.75rem;
+  border: 1px solid var(--ifm-color-emphasis-300);
+  border-radius: 4px;
+  font-size: 0.9rem;
+  background: var(--ifm-background-color);
+  color: var(--ifm-font-color-base);
+}
+
+.formGroup select:focus {
+  outline: none;
+  border-color: var(--ifm-color-primary);
+  box-shadow: 0 0 0 2px var(--ifm-color-primary-lightest);
+}
+
+.formGroup select.error {
+  border-color: #c62828;
+}
