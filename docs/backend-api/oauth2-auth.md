@@ -309,10 +309,4 @@ jwt:
 
 ### Q3: JWT Token 过期怎么办？
 
-前端应该监听 401 错误，提示用户重新登录。或者使用 Token 刷新机制（见 [JWT Token 文档](./jwt-token.md)）。
-
-## 相关文档
-
-- [JWT Token 认证](./jwt-token.md)
-- [用户权限管理](./user-permissions.md)
-- [GitHub API 调用](./github-api.md)
+前端应该监听 401 错误，提示用户重新登录。或者实现 Token 刷新机制。
