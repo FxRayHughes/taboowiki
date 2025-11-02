@@ -44,12 +44,16 @@
 
 /* 表单样式 */
 .form-input {
+  background: #ffffff;
+  color: #1c1e21;
+  border: 1px solid #dadde1;
   transition: border-color 0.2s ease;
 }
 
 .form-input:focus {
   border-color: var(--ifm-color-primary);
   box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25);
+  outline: none;
 }
 
 /* 按钮样式 */
@@ -105,8 +109,9 @@ html[data-theme='dark'] .quick-action-card {
 }
 
 html[data-theme='dark'] .form-input {
-  background: var(--ifm-background-color);
-  color: var(--ifm-font-color-base);
+  background: #242526;
+  color: #e3e3e3;
+  border: 1px solid #444950;
 }
 
 /* 错误提示样式 */

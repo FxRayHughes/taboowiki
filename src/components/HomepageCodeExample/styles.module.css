@@ -51,9 +51,17 @@
   gap: 0.5rem;
   font-size: 1rem;
   font-weight: 600;
-  color: var(--ifm-color-emphasis-700);
+  color: var(--ifm-font-color-base);
   animation: fadeIn 0.5s ease-out backwards;
   animation-delay: calc(var(--tab-index) * 0.1s);
+}
+
+[data-theme='light'] .tab {
+  color: #1c1e21;
+}
+
+[data-theme='dark'] .tab {
+  color: #e3e3e3;
 }
 
 @keyframes fadeIn {
@@ -76,12 +84,18 @@
 .tabActive {
   background: var(--ifm-color-primary);
   border-color: var(--ifm-color-primary);
-  color: white;
+  color: #ffffff !important;
   box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
 }
 
 [data-theme='dark'] .tabActive {
   background: var(--ifm-color-primary);
+  color: #ffffff !important;
+}
+
+[data-theme='light'] .tabActive {
+  background: var(--ifm-color-primary);
+  color: #ffffff !important;
 }
 
 .tabIcon {
