@@ -384,6 +384,15 @@ export default function MyRewards() {
             </div>
             <div className={styles.alert}>
               ℹ️ 请如实填写您的贡献信息,管理员会根据实际情况评定奖励金额
+              <br />
+              <br />
+              📅 <strong>审核流程说明：</strong>
+              <br />
+              1. 提交申请后等待管理员审核
+              <br />
+              2. 审核通过后进入 <strong>3 天公示期</strong>
+              <br />
+              3. 公示期结束后管理员将发放奖励
             </div>
             <form onSubmit={handleApplyReward} className={styles.form}>
               <div className={styles.formGroup}>

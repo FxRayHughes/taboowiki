@@ -54,6 +54,13 @@ export default function RewardsReview({
 
   return (
     <div className={styles.container}>
+      {/* 公示期提示 */}
+      {statusFilter === 'APPROVED' && (
+        <div className={styles.infoBox}>
+          📅 <strong>公示期说明：</strong> 奖励申请通过后需要 <strong>3 天公示期</strong>，公示期结束后请点击"标记已发放"按钮完成发放流程。
+        </div>
+      )}
+
       {/* 筛选器 */}
       <div className={styles.filters}>
         <label>

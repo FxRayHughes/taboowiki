@@ -7,6 +7,22 @@
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
+.infoBox {
+  background: #e7f3ff;
+  border-left: 4px solid #2e8ade;
+  padding: 1rem 1.5rem;
+  margin-bottom: 1.5rem;
+  border-radius: 6px;
+  color: #1c1e21;
+  line-height: 1.6;
+}
+
+[data-theme='dark'] .infoBox {
+  background: #1a3a52;
+  border-left-color: #4a9eff;
+  color: #e3e3e3;
+}
+
 .loading {
   display: flex;
   flex-direction: column;
