@@ -211,6 +211,22 @@
   font-size: 0.9rem;
 }
 
+.btnView {
+  padding: 0.5rem 1rem;
+  background: var(--ifm-color-primary);
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-size: 0.9rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.btnView:hover {
+  background: var(--ifm-color-primary-dark);
+}
+
 .pagination {
   display: flex;
   align-items: center;

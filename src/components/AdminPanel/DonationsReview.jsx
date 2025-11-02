@@ -1,5 +1,6 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { formatDate, getStatusText } from './utils';
+import ProofModal from './ProofModal';
 import styles from './DonationsReview.module.css';
 
 /**
@@ -16,6 +17,9 @@ export default function DonationsReview({
   onApprove,
   onReject,
 }) {
+  const [showProofModal, setShowProofModal] = useState(false);
+  const [currentProof, setCurrentProof] = useState(null);
+
   const getStatusClass = (status) => {
     const classMap = {
       'PENDING': styles.statusPending,
@@ -23,6 +27,16 @@ export default function DonationsReview({
       'REJECTED': styles.statusRejected,
     };
     return classMap[status] || '';
+  };
+
+  const handleViewProof = (proofUrl) => {
+    setCurrentProof(proofUrl);
+    setShowProofModal(true);
+  };
+
+  const closeProofModal = () => {
+    setShowProofModal(false);
+    setCurrentProof(null);
   };
 
   if (loading) {
@@ -86,14 +100,12 @@ export default function DonationsReview({
                       {donation.message || '-'}
                     </td>
                     <td>
-                      <a
-                        href={donation.paymentProof}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className={styles.link}
+                      <button
+                        onClick={() => handleViewProof(donation.paymentProof)}
+                        className={styles.btnView}
                       >
                         查看凭证
-                      </a>
+                      </button>
                     </td>
                     <td>
                       <span
@@ -157,6 +169,14 @@ export default function DonationsReview({
           )}
         </>
       )}
+
+      {/* 凭证查看弹窗 */}
+      <ProofModal
+        show={showProofModal}
+        url={currentProof}
+        type="donation"
+        onClose={closeProofModal}
+      />
     </div>
   );
 }

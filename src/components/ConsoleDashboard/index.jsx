@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import ExecutionEnvironment from '@docusaurus/ExecutionEnvironment';
 import { TokenManager } from '@site/src/components/AuthGuard/TokenManager';
+import { SponsorAPI } from '@site/src/utils/api';
 
 /**
  * 控制台仪表板组件
@@ -9,7 +10,7 @@ export default function ConsoleDashboard() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [user, setUser] = useState(null);
-  const [systemStats, setSystemStats] = useState(null);
+  const [userStats, setUserStats] = useState(null);
   const [showLoginModal, setShowLoginModal] = useState(false);
 
   useEffect(() => {
@@ -37,10 +38,8 @@ export default function ConsoleDashboard() {
         setIsAuthenticated(true);
         setUser(currentUser);
 
-        // 管理员可以看到系统统计信息
-        if (currentUser.isAdmin) {
-          fetchSystemStats();
-        }
+        // 获取用户个人统计信息
+        fetchUserStats();
       } else {
         setIsAuthenticated(false);
       }
@@ -52,20 +51,51 @@ export default function ConsoleDashboard() {
     }
   };
 
-  const fetchSystemStats = async () => {
+  const fetchUserStats = async () => {
     try {
-      // 模拟系统统计数据
-      setSystemStats({
-        totalUsers: 1234,
-        activeUsers: 567,
-        todayRegistrations: 23,
-        totalDocuments: 456,
-        systemHealth: 98.5,
-        lastBackup: new Date().toLocaleDateString(),
-        uptime: '15天 8小时'
+      // 获取用户的赞助和奖励统计
+      const [donationsData, rewardsData] = await Promise.all([
+        SponsorAPI.getMyDonations(),
+        SponsorAPI.getMyRewardApplications()
+      ]);
+
+      // 统计数据
+      const donations = donationsData.success ? donationsData.data : [];
+      const rewards = rewardsData.success ? rewardsData.data : [];
+
+      // 计算总赞助金额
+      const totalDonated = donations.reduce((sum, d) => sum + (d.amount || 0), 0);
+
+      // 计算总获得奖励金额
+      const totalRewarded = rewards
+        .filter(r => r.status === 'PAID')
+        .reduce((sum, r) => sum + (r.amount || 0), 0);
+
+      // 赞助次数
+      const donationCount = donations.length;
+
+      // 贡献次数
+      const contributionCount = rewards.length;
+
+      // 已发放的奖励数
+      const rewardedCount = rewards.filter(r => r.status === 'PAID').length;
+
+      setUserStats({
+        totalDonated,
+        totalRewarded,
+        donationCount,
+        contributionCount,
+        rewardedCount
       });
     } catch (error) {
-      console.error('获取系统统计失败:', error);
+      console.error('获取用户统计失败:', error);
+      setUserStats({
+        totalDonated: 0,
+        totalRewarded: 0,
+        donationCount: 0,
+        contributionCount: 0,
+        rewardedCount: 0
+      });
     }
   };
 
@@ -78,7 +108,7 @@ export default function ConsoleDashboard() {
         setIsAuthenticated(true);
         setUser(result.user);
         setShowLoginModal(false);
-        fetchSystemStats();
+        fetchUserStats();
         return { success: true };
       } else {
         return { success: false, message: result.message || '登录失败' };
@@ -93,11 +123,11 @@ export default function ConsoleDashboard() {
     TokenManager.logout();
     setIsAuthenticated(false);
     setUser(null);
-    setSystemStats(null);
+    setUserStats(null);
   };
 
   const handleRefreshStats = () => {
-    fetchSystemStats();
+    fetchUserStats();
   };
 
   if (isLoading) {
@@ -282,7 +312,7 @@ export default function ConsoleDashboard() {
           </div>
         </div>
 
-        {/* 系统信息卡片 */}
+        {/* 用户贡献统计卡片 */}
         <div style={{
           background: 'var(--ifm-card-background-color)',
           padding: '1.5rem',
@@ -291,19 +321,31 @@ export default function ConsoleDashboard() {
           boxShadow: '0 2px 8px rgba(0, 0, 0, 0.08)',
           gridColumn: 'span 1'
         }}>
-          <h3 style={{ margin: '0 0 1rem 0', fontSize: '1.1rem' }}>🔧 系统信息</h3>
+          <h3 style={{ margin: '0 0 1rem 0', fontSize: '1.1rem' }}>💰 我的贡献</h3>
           <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
             <div>
-              <span style={{ color: 'var(--ifm-color-emphasis-600)', fontSize: '0.85rem' }}>系统运行时间</span>
-              <p style={{ margin: '0.25rem 0 0 0', fontWeight: '500' }}>{systemStats?.uptime || '未知'}</p>
+              <span style={{ color: 'var(--ifm-color-emphasis-600)', fontSize: '0.85rem' }}>赞助次数</span>
+              <p style={{ margin: '0.25rem 0 0 0', fontWeight: '500' }}>
+                {userStats?.donationCount !== undefined ? `${userStats.donationCount} 次` : '加载中...'}
+              </p>
             </div>
             <div>
-              <span style={{ color: 'var(--ifm-color-emphasis-600)', fontSize: '0.85rem' }}>API 状态</span>
-              <p style={{ margin: '0.25rem 0 0 0', fontWeight: '500', color: 'var(--ifm-color-success)' }}>✅ 正常运行</p>
+              <span style={{ color: 'var(--ifm-color-emphasis-600)', fontSize: '0.85rem' }}>累计赞助金额</span>
+              <p style={{ margin: '0.25rem 0 0 0', fontWeight: '500', color: 'var(--ifm-color-primary)' }}>
+                {userStats?.totalDonated !== undefined ? `¥${userStats.totalDonated.toFixed(2)}` : '加载中...'}
+              </p>
             </div>
             <div>
-              <span style={{ color: 'var(--ifm-color-emphasis-600)', fontSize: '0.85rem' }}>Token 状态</span>
-              <p style={{ margin: '0.25rem 0 0 0', fontWeight: '500', color: 'var(--ifm-color-success)' }}>✅ 有效</p>
+              <span style={{ color: 'var(--ifm-color-emphasis-600)', fontSize: '0.85rem' }}>贡献申请次数</span>
+              <p style={{ margin: '0.25rem 0 0 0', fontWeight: '500' }}>
+                {userStats?.contributionCount !== undefined ? `${userStats.contributionCount} 次` : '加载中...'}
+              </p>
+            </div>
+            <div>
+              <span style={{ color: 'var(--ifm-color-emphasis-600)', fontSize: '0.85rem' }}>累计获得奖励</span>
+              <p style={{ margin: '0.25rem 0 0 0', fontWeight: '500', color: 'var(--ifm-color-success)' }}>
+                {userStats?.totalRewarded !== undefined ? `¥${userStats.totalRewarded.toFixed(2)}` : '加载中...'}
+              </p>
             </div>
           </div>
         </div>

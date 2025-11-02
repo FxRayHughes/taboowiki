@@ -1,5 +1,6 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { formatDate, getStatusText, getRewardTypeText } from './utils';
+import ProofModal from './ProofModal';
 import styles from './RewardsReview.module.css';
 
 /**
@@ -19,6 +20,9 @@ export default function RewardsReview({
   onReject,
   onMarkPaid,
 }) {
+  const [showProofModal, setShowProofModal] = useState(false);
+  const [currentProof, setCurrentProof] = useState(null);
+
   const getStatusClass = (status) => {
     const classMap = {
       'PENDING': styles.statusPending,
@@ -27,6 +31,16 @@ export default function RewardsReview({
       'PAID': styles.statusPaid,
     };
     return classMap[status] || '';
+  };
+
+  const handleViewProof = (proofUrl) => {
+    setCurrentProof(proofUrl);
+    setShowProofModal(true);
+  };
+
+  const closeProofModal = () => {
+    setShowProofModal(false);
+    setCurrentProof(null);
   };
 
   if (loading) {
@@ -107,14 +121,12 @@ export default function RewardsReview({
                       {reward.description}
                     </td>
                     <td>
-                      <a
-                        href={reward.proofUrl}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className={styles.link}
+                      <button
+                        onClick={() => handleViewProof(reward.proofUrl)}
+                        className={styles.btnView}
                       >
                         查看证明
-                      </a>
+                      </button>
                     </td>
                     <td>{reward.selfScore || '-'}</td>
                     <td>{reward.finalScore || '-'}</td>
@@ -192,6 +204,14 @@ export default function RewardsReview({
           )}
         </>
       )}
+
+      {/* 证明材料查看弹窗 */}
+      <ProofModal
+        show={showProofModal}
+        url={currentProof}
+        type="reward"
+        onClose={closeProofModal}
+      />
     </div>
   );
 }

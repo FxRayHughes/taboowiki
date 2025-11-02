@@ -89,8 +89,6 @@
   padding: 0.75rem;
   border: 1px solid var(--ifm-color-emphasis-300);
   border-radius: 6px;
-  background: var(--ifm-background-color);
-  color: var(--ifm-font-color-base);
   font-size: 1rem;
   transition: border-color 0.2s;
 }
@@ -99,12 +97,14 @@
 [data-theme='light'] .textarea {
   background: #ffffff;
   color: #1c1e21;
+  border: 1px solid #dadde1;
 }
 
 [data-theme='dark'] .input,
 [data-theme='dark'] .textarea {
   background: #242526;
   color: #e3e3e3;
+  border: 1px solid #444950;
 }
 
 .input:focus,
