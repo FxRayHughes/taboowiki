@@ -348,6 +348,12 @@ export default function ConsoleDashboard() {
             {user?.isAdmin && (
               <>
                 <QuickActionCard
+                  title="审批管理"
+                  description="审批赞助和奖励申请"
+                  icon="✅"
+                  href="/console/admin"
+                />
+                <QuickActionCard
                   title="用户管理"
                   description="管理系统用户、权限和设置"
                   icon="🔑"
@@ -457,8 +463,8 @@ function LoginModal({ onClose }) {
       setError(result.message || '无法跳转到 GitHub 登录，请检查网络连接');
       setIsLoading(false);
     } else {
-      // 登录成功，关闭模态框（由父组件处理）
-      onClose();
+      // 登录成功，刷新页面
+      window.location.reload();
     }
   };
 

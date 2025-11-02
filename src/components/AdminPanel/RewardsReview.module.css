@@ -1,0 +1,315 @@
+/* 奖励审批组件样式 (与赞助审批样式相同,额外增加了部分样式) */
+
+.container {
+  background: var(--ifm-card-background-color);
+  border-radius: 12px;
+  padding: 2rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 4rem 0;
+}
+
+.spinner {
+  width: 40px;
+  height: 40px;
+  border: 4px solid var(--ifm-color-emphasis-300);
+  border-top-color: var(--ifm-color-primary);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.empty {
+  text-align: center;
+  padding: 3rem 0;
+  color: var(--ifm-color-emphasis-600);
+}
+
+.filters {
+  display: flex;
+  gap: 2rem;
+  margin-bottom: 2rem;
+  flex-wrap: wrap;
+}
+
+.filters label {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-weight: 600;
+  color: var(--ifm-font-color-base);
+}
+
+.select {
+  padding: 0.5rem 1rem;
+  border: 1px solid var(--ifm-color-emphasis-300);
+  border-radius: 6px;
+  background: var(--ifm-background-color);
+  color: var(--ifm-font-color-base);
+  font-size: 1rem;
+  cursor: pointer;
+  transition: border-color 0.2s;
+}
+
+.select:focus {
+  outline: none;
+  border-color: var(--ifm-color-primary);
+}
+
+.table {
+  overflow-x: auto;
+  margin-bottom: 2rem;
+}
+
+.table table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.95rem;
+}
+
+.table thead {
+  background: var(--ifm-color-emphasis-100);
+}
+
+.table th {
+  padding: 1rem;
+  text-align: left;
+  font-weight: 600;
+  color: var(--ifm-font-color-base);
+  border-bottom: 2px solid var(--ifm-color-emphasis-300);
+  white-space: nowrap;
+}
+
+.table td {
+  padding: 1rem;
+  border-bottom: 1px solid var(--ifm-color-emphasis-200);
+  color: var(--ifm-font-color-base);
+}
+
+.table tr:hover {
+  background: var(--ifm-color-emphasis-100);
+}
+
+.amount {
+  font-weight: 600;
+  color: var(--ifm-color-primary);
+}
+
+.description {
+  max-width: 200px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.dateTime {
+  font-size: 0.9rem;
+  color: var(--ifm-color-emphasis-600);
+  white-space: nowrap;
+}
+
+.link {
+  color: var(--ifm-color-primary);
+  text-decoration: none;
+  font-weight: 500;
+}
+
+.link:hover {
+  text-decoration: underline;
+}
+
+.status {
+  display: inline-block;
+  padding: 0.25rem 0.75rem;
+  border-radius: 12px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.statusPending {
+  background: #fff3cd;
+  color: #856404;
+}
+
+.statusApproved {
+  background: #d4edda;
+  color: #155724;
+}
+
+.statusRejected {
+  background: #f8d7da;
+  color: #721c24;
+}
+
+.statusPaid {
+  background: #d1ecf1;
+  color: #0c5460;
+}
+
+[data-theme='dark'] .statusPending {
+  background: #664d03;
+  color: #ffe69c;
+}
+
+[data-theme='dark'] .statusApproved {
+  background: #0f5132;
+  color: #badbcc;
+}
+
+[data-theme='dark'] .statusRejected {
+  background: #58151c;
+  color: #f1aeb5;
+}
+
+[data-theme='dark'] .statusPaid {
+  background: #055160;
+  color: #b6e3f0;
+}
+
+.actions {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.btnApprove {
+  padding: 0.5rem 1rem;
+  background: #28a745;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-size: 0.9rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.btnApprove:hover {
+  background: #218838;
+}
+
+.btnReject {
+  padding: 0.5rem 1rem;
+  background: #dc3545;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-size: 0.9rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.btnReject:hover {
+  background: #c82333;
+}
+
+.btnPay {
+  padding: 0.5rem 1rem;
+  background: #17a2b8;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-size: 0.9rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.btnPay:hover {
+  background: #138496;
+}
+
+.textMuted {
+  color: var(--ifm-color-emphasis-600);
+  font-size: 0.9rem;
+}
+
+.pagination {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  margin-top: 2rem;
+}
+
+.btnPage {
+  padding: 0.5rem 1.5rem;
+  background: var(--ifm-color-primary);
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-size: 0.95rem;
+  cursor: pointer;
+  transition: opacity 0.2s;
+}
+
+.btnPage:hover:not(:disabled) {
+  opacity: 0.9;
+}
+
+.btnPage:disabled {
+  background: var(--ifm-color-emphasis-300);
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.pageInfo {
+  font-weight: 500;
+  color: var(--ifm-font-color-base);
+}
+
+@media (max-width: 768px) {
+  .container {
+    padding: 1rem;
+  }
+
+  .filters {
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  .filters label {
+    width: 100%;
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .select {
+    width: 100%;
+  }
+
+  .table {
+    font-size: 0.85rem;
+  }
+
+  .table th,
+  .table td {
+    padding: 0.75rem 0.5rem;
+  }
+
+  .actions {
+    flex-direction: column;
+    gap: 0.25rem;
+  }
+
+  .btnApprove,
+  .btnReject,
+  .btnPay {
+    width: 100%;
+    padding: 0.4rem 0.8rem;
+    font-size: 0.85rem;
+  }
+}
