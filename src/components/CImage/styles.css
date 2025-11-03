@@ -1,0 +1,194 @@
+/* CImage 缩略图样式 */
+.cimage-thumbnail {
+  display: block;
+  margin: 1rem auto;
+}
+
+/*.cimage-thumbnail:hover {*/
+/*  transform: scale(1.02);*/
+/*  box-shadow: 1px 4px 12px rgba(0, 0, 0, 0.15) !important;*/
+/*}*/
+
+/* 模态框背景 */
+.cimage-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: rgba(0, 0, 0, 0.9);
+  z-index: 9999;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  animation: fadeIn 0.2s ease-in-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* 模态框内容容器 */
+.cimage-modal-content {
+  position: relative;
+  width: 90vw;
+  height: 90vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+/* 控制按钮组 */
+.cimage-controls {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  display: flex;
+  gap: 10px;
+  z-index: 10000;
+  background-color: rgba(0, 0, 0, 0.6);
+  padding: 8px;
+  border-radius: 8px;
+  backdrop-filter: blur(10px);
+}
+
+/* 按钮基础样式 */
+.cimage-btn {
+  width: 40px;
+  height: 40px;
+  border: none;
+  border-radius: 6px;
+  background-color: rgba(255, 255, 255, 0.1);
+  color: #ffffff;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.cimage-btn:hover {
+  background-color: rgba(255, 255, 255, 0.2);
+  transform: scale(1.05);
+}
+
+.cimage-btn:active {
+  transform: scale(0.95);
+}
+
+/* 按钮禁用状态 */
+.cimage-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.cimage-btn:disabled:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+  transform: none;
+}
+
+/* 关闭按钮特殊样式 */
+.cimage-btn-close {
+  background-color: rgba(220, 53, 69, 0.8);
+}
+
+.cimage-btn-close:hover {
+  background-color: rgba(220, 53, 69, 1);
+}
+
+/* 重置按钮 */
+.cimage-btn-reset {
+  min-width: 60px;
+  width: auto;
+  padding: 0 12px;
+}
+
+/* 图片容器 */
+.cimage-image-container {
+  width: 100%;
+  height: calc(100% - 80px);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  overflow: hidden; /* 隐藏滚动条 */
+  padding: 20px;
+  position: relative;
+}
+
+/* 模态框中的图片 */
+.cimage-modal-image {
+  max-width: none;
+  max-height: none;
+  width: auto;
+  height: auto;
+  object-fit: contain;
+  border-radius: 8px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+  user-select: none;
+  -webkit-user-drag: none;
+}
+
+/* 图片说明 */
+.cimage-caption {
+  position: absolute;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: rgba(0, 0, 0, 0.7);
+  color: #ffffff;
+  padding: 10px 20px;
+  border-radius: 20px;
+  font-size: 14px;
+  max-width: 80%;
+  text-align: center;
+  backdrop-filter: blur(10px);
+}
+
+/* 响应式设计 */
+@media (max-width: 768px) {
+  .cimage-controls {
+    top: 10px;
+    right: 10px;
+    gap: 6px;
+    padding: 6px;
+  }
+
+  .cimage-btn {
+    width: 36px;
+    height: 36px;
+  }
+
+  .cimage-btn-reset {
+    min-width: 50px;
+    padding: 0 8px;
+    font-size: 12px;
+  }
+
+  .cimage-caption {
+    bottom: 10px;
+    font-size: 12px;
+    padding: 8px 16px;
+  }
+}
+
+/* 暗色主题适配 */
+[data-theme='dark'] .cimage-thumbnail {
+  box-shadow: 1px 2px 8px rgba(255, 255, 255, 0.1) !important;
+}
+
+[data-theme='dark'] .cimage-thumbnail:hover {
+  box-shadow: 1px 4px 12px rgba(255, 255, 255, 0.15) !important;
+}
+
+/* 禁用页面滚动时的样式 */
+body.cimage-modal-open {
+  overflow: hidden;
+}

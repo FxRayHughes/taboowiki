@@ -24,7 +24,8 @@ const sidebars = {
             collapsed: false,
             items: [
                 'start-hand/create-manually/index',
-                'start-hand/taboostart/index'
+                'start-hand/taboostart/index',
+                'start-hand/taboo-plugin/index'
             ]
         },
         {

@@ -149,6 +149,11 @@ const config = {
                     position: 'right',
                 },
                 {
+                    href: 'https://github.com/FxRayHughes/taboowiki',
+                    label: '文档仓库',
+                    position: 'right',
+                },
+                {
                     href: 'https://qm.qq.com/q/i4Q9SFRqq4',
                     label: 'QQ群',
                     position: 'right',
