@@ -124,6 +124,327 @@ class PacketImpl(override var source: Any) : Packet() {
 - Spigot 服务器使用混淆映射（如 `a`, `b`, `c`）
 - `remap = true` 会自动处理映射转换
 
+#### 4. 访问原始 NMS 对象
+
+虽然 TabooLib 提供了统一的 `Packet` 接口，但在某些高级场景下，你可能需要直接访问底层的 NMS 数据包对象。这时可以通过 `source` 字段获取原始对象。
+
+##### source 字段详解
+
+`Packet` 类的 `source` 字段存储了原始的 NMS 数据包对象：
+
+```kotlin
+abstract class Packet {
+    /** 原始数据包 */
+    abstract val source: Any
+
+    // 其他字段...
+}
+```
+
+**类型定义：**
+- `source` 的类型是 `Any`，意味着它可以是任何 NMS 数据包类型
+- 实际运行时，它是一个原始的 NMS 数据包实例（如 `PacketPlayOutChat`、`PacketPlayOutEntityEquipment` 等）
+
+##### 转换为原始 NMS 类型
+
+当你需要使用 NMS 特有的方法或访问 TabooLib 未封装的功能时，可以将 `source` 强制转换为原始类型：
+
+**基础转换示例：**
+
+```kotlin
+import net.minecraft.network.protocol.game.PacketPlayOutChat
+
+@SubscribeEvent
+fun onPacket(event: PacketSendEvent) {
+    if (event.packet.name == "PacketPlayOutChat") {
+        // 将 source 转换为原始 NMS 类型
+        val nmsPacket = event.packet.source as PacketPlayOutChat
+
+        // 现在可以直接调用 NMS 方法
+        val message = nmsPacket.message  // 直接访问字段
+        val chatType = nmsPacket.type    // 访问聊天类型
+
+        // 或调用 NMS 特有的方法
+        nmsPacket.someNMSMethod()
+    }
+}
+```
+
+**安全转换示例：**
+
+使用 Kotlin 的安全转换操作符避免类型转换异常：
+
+```kotlin
+@SubscribeEvent
+fun onPacket(event: PacketSendEvent) {
+    // 使用 as? 进行安全转换
+    val chatPacket = event.packet.source as? PacketPlayOutChat
+
+    if (chatPacket != null) {
+        // 转换成功，可以安全使用
+        val message = chatPacket.message
+        println("Chat message: $message")
+    } else {
+        // 转换失败，不是目标类型
+        println("Not a chat packet")
+    }
+}
+```
+
+**泛型转换示例：**
+
+对于需要处理多种数据包类型的场景：
+
+```kotlin
+@SubscribeEvent
+fun onPacket(event: PacketSendEvent) {
+    when (event.packet.name) {
+        "PacketPlayOutChat" -> {
+            val packet = event.packet.source as PacketPlayOutChat
+            handleChatPacket(packet)
+        }
+        "PacketPlayOutEntityEquipment" -> {
+            val packet = event.packet.source as PacketPlayOutEntityEquipment
+            handleEquipmentPacket(packet)
+        }
+        "PacketPlayOutSpawnEntity" -> {
+            val packet = event.packet.source as PacketPlayOutSpawnEntity
+            handleSpawnPacket(packet)
+        }
+    }
+}
+
+private fun handleChatPacket(packet: PacketPlayOutChat) {
+    // 处理聊天数据包的 NMS 特有逻辑
+}
+```
+
+##### 使用场景
+
+**场景 1：调用 NMS 特有的方法**
+
+某些 NMS 类提供了特殊的方法，这些方法无法通过 TabooLib 的通用 API 访问：
+
+```kotlin
+@SubscribeEvent
+fun onPacket(event: PacketSendEvent) {
+    if (event.packet.name == "PacketPlayOutTitle") {
+        val titlePacket = event.packet.source as PacketPlayOutTitle
+
+        // 调用 NMS 特有的方法（假设存在）
+        titlePacket.resetTimes()  // TabooLib API 无法访问的方法
+    }
+}
+```
+
+**场景 2：性能优化（避免反射）**
+
+使用 `read()` 和 `write()` 方法时，TabooLib 内部使用反射来访问字段。如果你已知确切的字段名和类型，直接访问 NMS 对象可以避免反射开销：
+
+```kotlin
+@SubscribeEvent
+fun onPacket(event: PacketSendEvent) {
+    if (event.packet.name == "PacketPlayOutEntityEquipment") {
+        // 方法 1：使用 TabooLib API（内部使用反射）
+        val slots1 = event.packet.read<List<*>>("slots")
+
+        // 方法 2：直接访问 NMS 对象（更快）
+        val nmsPacket = event.packet.source as PacketPlayOutEntityEquipment
+        val slots2 = nmsPacket.slots  // 直接字段访问，无反射开销
+
+        // 在高频数据包处理中，方法 2 性能更好
+    }
+}
+```
+
+**性能对比：**
+
+```mermaid
+graph TB
+    A[TabooLib API] --> B[read&lt;T&gt; 方法]
+    B --> C[反射查找字段]
+    C --> D[反射读取值]
+    D --> E[返回结果]
+
+    F[直接访问 NMS] --> G[source as NMSPacket]
+    G --> H[直接访问字段]
+    H --> I[返回结果]
+
+    style A fill:#fff3e0,color:#000000
+    style B fill:#ffcdd2,color:#000000
+    style C fill:#ffcdd2,color:#000000
+    style D fill:#ffcdd2,color:#000000
+
+    style F fill:#e8f5e9,color:#000000
+    style G fill:#c8e6c9,color:#000000
+    style H fill:#c8e6c9,color:#000000
+```
+
+**场景 3：传递给其他 NMS API**
+
+当你需要将数据包对象传递给其他 NMS 代码或第三方库时：
+
+```kotlin
+@SubscribeEvent
+fun onPacket(event: PacketSendEvent) {
+    if (event.packet.name == "PacketPlayOutSpawnEntity") {
+        // 获取原始 NMS 对象
+        val nmsPacket = event.packet.source as PacketPlayOutSpawnEntity
+
+        // 传递给自定义的 NMS 工具类
+        MyNMSUtil.processSpawnPacket(nmsPacket)
+
+        // 或传递给第三方 NMS 库
+        ThirdPartyLib.handlePacket(nmsPacket)
+    }
+}
+```
+
+**场景 4：实现复杂的 NMS 操作**
+
+有时需要执行复杂的 NMS 操作，直接使用原始对象更清晰：
+
+```kotlin
+@SubscribeEvent
+fun onPacket(event: PacketSendEvent) {
+    if (event.packet.name == "PacketPlayOutEntityMetadata") {
+        val metadataPacket = event.packet.source as PacketPlayOutEntityMetadata
+
+        // 复杂的 DataWatcher 操作
+        val dataWatcher = metadataPacket.dataWatcher
+        dataWatcher.set(
+            DataWatcherObject(0, DataWatcherRegistry.BYTE),
+            0x20.toByte()  // 隐身标志
+        )
+
+        // 这种操作用 TabooLib API 很难实现
+    }
+}
+```
+
+##### 注意事项
+
+:::warning[版本兼容性风险]
+
+直接使用 NMS 对象会失去 TabooLib 提供的版本兼容层：
+
+```kotlin
+// ❌ 不推荐：版本兼容性差
+val nmsPacket = event.packet.source as PacketPlayOutChat
+val message = nmsPacket.message  // 字段名在不同版本可能不同
+
+// ✅ 推荐：使用 TabooLib API（版本兼容）
+val message = event.packet.read<String>("message", remap = true)
+```
+
+:::
+
+:::danger[类型转换异常]
+
+错误的类型转换会导致 `ClassCastException`：
+
+```kotlin
+// ❌ 错误：类型不匹配
+if (event.packet.name == "PacketPlayOutChat") {
+    val packet = event.packet.source as PacketPlayOutEntityEquipment  // 崩溃！
+}
+
+// ✅ 正确：使用安全转换
+if (event.packet.name == "PacketPlayOutChat") {
+    val packet = event.packet.source as? PacketPlayOutChat
+    if (packet != null) {
+        // 安全使用
+    }
+}
+```
+
+:::
+
+:::tip[最佳实践]
+
+**何时使用 `source` 字段：**
+- ✅ 需要调用 NMS 特有的方法
+- ✅ 高频操作需要性能优化（避免反射）
+- ✅ 与其他 NMS 代码集成
+- ✅ TabooLib API 无法满足需求
+
+**何时使用 TabooLib API：**
+- ✅ 需要版本兼容性
+- ✅ 简单的字段读写
+- ✅ 不确定 NMS 类结构
+- ✅ 跨服务端核心兼容（Paper/Spigot）
+
+:::
+
+##### 完整示例：混合使用
+
+在实际开发中，通常会混合使用 TabooLib API 和原始 NMS 对象：
+
+```kotlin
+import net.minecraft.network.protocol.game.PacketPlayOutEntityEquipment
+import net.minecraft.world.entity.EnumItemSlot
+import org.bukkit.inventory.ItemStack
+
+@SubscribeEvent
+fun onEquipmentPacket(event: PacketSendEvent) {
+    // 过滤数据包类型
+    if (event.packet.name != "PacketPlayOutEntityEquipment") return
+
+    // 方法 1：使用 TabooLib API（版本兼容）
+    val entityId = event.packet.read<Int>("entityId", remap = true) ?: return
+
+    // 只处理特定实体
+    if (entityId != targetEntityId) return
+
+    // 方法 2：转换为 NMS 对象（性能优化）
+    val nmsPacket = event.packet.source as? PacketPlayOutEntityEquipment ?: return
+
+    // 方法 3：直接访问 NMS 字段（避免反射）
+    val slots = nmsPacket.slots  // 比 read<List<*>>("slots") 更快
+
+    // 方法 4：使用 NMS 特有的方法
+    val modifiedSlots = slots.map { (slot, item) ->
+        // 自定义处理逻辑
+        EnumItemSlot.MAINHAND to enhanceItem(item)
+    }
+
+    // 方法 5：使用 TabooLib API 写回（安全）
+    event.packet.write("slots", modifiedSlots, remap = true)
+}
+
+private fun enhanceItem(item: ItemStack): ItemStack {
+    // 物品处理逻辑
+    return item
+}
+```
+
+**工作流程图：**
+
+```mermaid
+graph TB
+    A[接收数据包事件] --> B{使用场景判断}
+
+    B -->|简单字段读写| C[TabooLib API<br/>read/write]
+    B -->|高频操作| D[转换为 NMS 对象<br/>source as NMSPacket]
+    B -->|NMS 特有方法| D
+    B -->|版本兼容| C
+
+    C --> E[反射访问字段]
+    D --> F[直接访问字段]
+
+    E --> G[修改数据]
+    F --> G
+
+    G --> H{如何写回?}
+    H -->|推荐| I[TabooLib write<br/>版本兼容]
+    H -->|性能要求高| J[直接修改 NMS 对象]
+
+    style C fill:#e3f2fd,color:#000000
+    style D fill:#e8f5e9,color:#000000
+    style I fill:#e3f2fd,color:#000000
+    style J fill:#e8f5e9,color:#000000
+```
+
 ### 数据包类型概览
 
 Minecraft 中常用的数据包类型：

@@ -49,6 +49,7 @@ const sidebars = {
                 'basic-tech/utilities/index',
                 'basic-tech/reflex/index',
                 'basic-tech/nms-proxy/index',
+                'basic-tech/demand/index',
             ],
         },
         {
