@@ -50,6 +50,12 @@ const sidebars = {
                 'basic-tech/reflex/index',
                 'basic-tech/nms-proxy/index',
                 'basic-tech/demand/index',
+                'basic-tech/ai/index',
+                'basic-tech/vault/index',
+                'basic-tech/effect/index',
+                'basic-tech/navigation/index',
+                'basic-tech/fake-op/index',
+                'basic-tech/bukkit-util/index'
             ],
         },
         {
