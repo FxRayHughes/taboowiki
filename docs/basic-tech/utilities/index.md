@@ -695,6 +695,29 @@ val readable = configText.decodeUnicode()
 - 处理编码后的配置
 - JSON 字符串解码
 
+### 进度条工具
+
+生成文本形式的进度条：
+
+```kotlin
+import taboolib.common5.util.createBar
+
+val bar = createBar(
+    empty: "◻︎"     // 空部分符号
+    fill: "◼︎"      // 填充部分符号
+    length: 10     // 进度条总长度
+    percent: 0.65  // 完成百分比 (0.0 - 1.0)
+)
+// 结果: ◼◼◼◼◼◼◻◻◻◻
+```
+
+**代码说明：**
+- `createBar(empty, fill, length, percent)`：生成进度条字符串
+- 常用于显示进度信息
+
+**适用场景：**
+- 任务进度, 制作进度等显示
+
 ## 集合操作工具
 
 ### 对象转列表
