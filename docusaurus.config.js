@@ -41,7 +41,19 @@ const config = {
         },
     },
 
-    themes: ['@docusaurus/theme-mermaid'],
+    //'@easyops-cn/docusaurus-search-local'
+    themes: [
+        '@docusaurus/theme-mermaid',
+        [
+            "@easyops-cn/docusaurus-search-local",
+            ({
+                hashed: true,
+                language: ["zh","en"],
+                highlightSearchTermsOnTargetPage: true,
+                explicitSearchResultPath: true,
+            }),
+        ],
+    ],
 
     // 中文语言支持
     i18n: {
@@ -227,6 +239,7 @@ const config = {
                 },
             ],
         },
+
     },
 };
 
