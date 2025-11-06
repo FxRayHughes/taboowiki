@@ -14,6 +14,10 @@ const config = {
     tagline: 'TabooLib 官方中文文档 - 现代化的 Minecraft 插件开发框架',
     favicon: 'img/favicon.ico',
 
+    clientModules: [
+        require.resolve('./src/client/antd-setup.js'),
+    ],
+
     // Future flags, see https://docusaurus.io/docs/api/docusaurus-config#future
     future: {
         v4: true, // Improve compatibility with the upcoming Docusaurus v4
@@ -40,6 +44,7 @@ const config = {
             onBrokenMarkdownLinks: 'warn',
         },
     },
+    plugins: ['docusaurus-plugin-sass'],
 
     //'@easyops-cn/docusaurus-search-local'
     themes: [
@@ -48,7 +53,7 @@ const config = {
             "@easyops-cn/docusaurus-search-local",
             ({
                 hashed: true,
-                language: ["zh","en"],
+                language: ["zh", "en"],
                 highlightSearchTermsOnTargetPage: true,
                 explicitSearchResultPath: true,
             }),
