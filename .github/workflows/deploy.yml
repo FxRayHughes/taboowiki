@@ -30,25 +30,75 @@ jobs:
             echo "Server time: $(date)"
             echo "Disk space: $(df -h / | tail -1)"
 
-      - name: Install dependencies
-        run: npm install
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
 
-      - name: Build project
-        run: npm run build
+      - name: Check for changes
+        id: check_changes
+        run: |
+          import os
+          import sys
+          import subprocess
+          from pathlib import Path
 
-      - name: Package build output
-        run: tar -czf taboowiki.tar.gz -C build .
+          # 文件路径
+          tar_file = Path('push/taboowiki.tar.gz')
+
+          # 检查 tar.gz 文件是否存在
+          if not tar_file.exists():
+              print("❌ taboowiki.tar.gz not found!")
+              with open(os.environ['GITHUB_OUTPUT'], 'a', encoding='utf-8') as f:
+                  f.write('has_changes=false\n')
+              sys.exit(0)
+
+          # 检查本次提交是否包含 push/taboowiki.tar.gz 的变更
+          try:
+              # 获取本次提交中修改的文件列表
+              result = subprocess.run(
+                  ['git', 'diff', '--name-only', 'HEAD~1', 'HEAD'],
+                  capture_output=True,
+                  text=True,
+                  check=True
+              )
+              changed_files = result.stdout.strip().split('\n')
+
+              print(f"Changed files in this commit:")
+              for file in changed_files:
+                  print(f"  - {file}")
+
+              # 检查是否包含 push/taboowiki.tar.gz
+              if 'push/taboowiki.tar.gz' in changed_files:
+                  print("✅ push/taboowiki.tar.gz has changes, will deploy")
+                  has_changes = True
+              else:
+                  print("ℹ️ push/taboowiki.tar.gz not changed in this commit, skipping deployment")
+                  has_changes = False
+
+          except subprocess.CalledProcessError as e:
+              print(f"⚠️ Git command failed: {e}")
+              print("Assuming this is the first commit, will deploy")
+              has_changes = True
+
+          # 输出结果
+          with open(os.environ['GITHUB_OUTPUT'], 'a', encoding='utf-8') as f:
+              f.write(f'has_changes={str(has_changes).lower()}\n')
+        shell: python
 
       - name: Upload to server and deploy
+        if: steps.check_changes.outputs.has_changes == 'true'
         uses: appleboy/scp-action@v0.1.7
         with:
           host: ${{ secrets.SERVER_IP }}
           username: ${{ secrets.SERVER_USER }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
-          source: "taboowiki.tar.gz"
+          source: "push/taboowiki.tar.gz"
           target: "/tmp"
+          strip_components: 1
 
       - name: Execute deployment script
+        if: steps.check_changes.outputs.has_changes == 'true'
         uses: appleboy/ssh-action@v1.0.0
         with:
           host: ${{ secrets.SERVER_IP }}
