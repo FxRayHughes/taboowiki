@@ -1,10 +1,14 @@
+import { getApiBaseUrl, getFrontendBaseUrl, getGitHubOAuthKey } from '@site/src/utils/api';
+
 /**
  * Token 管理工具类
  * 用于处理 JWT Token 的存储、验证和管理
  */
 export class TokenManager {
   static TOKEN_KEY = 'taboowiki_token';
-  static API_URL = 'https://taboowikiback.maplex.top'; // 可以根据环境
+  static get API_URL() {
+    return getApiBaseUrl();
+  }
 
   /**
    * 保存 Token
@@ -249,10 +253,10 @@ export class TokenManager {
    */
   static async getGitHubOAuthUrl() {
     // 直接构建 GitHub OAuth URL，redirect_uri 指向前端回调页面
-    const clientId = 'Ov23li2MIRnkuL9KBrac';
+    const clientId = getGitHubOAuthKey();
 
     // 根据当前环境自动判断回调地址
-    const redirectUri = `https://taboowiki.maplex.top/auth/oauth-callback`;
+    const redirectUri = `${getFrontendBaseUrl()}/auth/oauth-callback`;
 
     const oauthUrl = `https://github.com/login/oauth/authorize?client_id=${clientId}&redirect_uri=${encodeURIComponent(redirectUri)}`;
 

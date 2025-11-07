@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useHistory, useLocation } from '@docusaurus/router';
 import useDocusaurusContext from '@docusaurus/useDocusaurusContext';
 import ExecutionEnvironment from '@docusaurus/ExecutionEnvironment';
+import { getApiBaseUrl } from '@site/src/utils/api';
 
 /**
  * 认证守卫组件 - 保护需要登录才能访问的页面
@@ -78,7 +79,7 @@ export default function AuthGuard({ children }) {
       }
 
       // 验证 Token 是否有效
-      const response = await fetch(`${siteConfig.customFields?.apiUrl || 'https://taboowikiback.maplex.top'}/api/auth/me`, {
+      const response = await fetch(`${getApiBaseUrl()}/api/auth/me`, {
         method: 'GET',
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -165,7 +166,7 @@ export default function AuthGuard({ children }) {
               <summary>技术信息</summary>
               <div className="tech-details">
                 <p><strong>当前路径:</strong> {location.pathname}</p>
-                <p><strong>API 地址:</strong> {siteConfig.customFields?.apiUrl || 'https://taboowikiback.maplex.top'}</p>
+                <p><strong>API 地址:</strong> {getApiBaseUrl()}</p>
                 <p><strong>Token 状态:</strong> {localStorage.getItem('taboowiki_token') ? '存在但可能无效' : '未找到'}</p>
               </div>
             </details>

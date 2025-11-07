@@ -3,6 +3,7 @@ import Layout from '@theme/Layout';
 import ExecutionEnvironment from '@docusaurus/ExecutionEnvironment';
 import { TokenManager } from '@site/src/components/AuthGuard/TokenManager';
 import { SponsorAPI } from '@site/src/utils/api';
+import { AntdThemeProvider } from '@site/src/components/AntdThemeProvider';
 import DonationsReview from '@site/src/components/AdminPanel/DonationsReview';
 import RewardsReview from '@site/src/components/AdminPanel/RewardsReview';
 import ReviewModal from '@site/src/components/AdminPanel/ReviewModal';
@@ -191,12 +192,14 @@ export default function AdminPanel() {
   if (isLoading) {
     return (
       <Layout title="管理员控制台" description="赞助与奖励审批管理">
-        <div className={styles.container}>
-          <div className={styles.loading}>
-            <div className={styles.spinner}></div>
-            <p>加载中...</p>
+        <AntdThemeProvider>
+          <div className={styles.container}>
+            <div className={styles.loading}>
+              <div className={styles.spinner}></div>
+              <p>加载中...</p>
+            </div>
           </div>
-        </div>
+        </AntdThemeProvider>
       </Layout>
     );
   }
@@ -204,18 +207,20 @@ export default function AdminPanel() {
   if (!isAuthenticated) {
     return (
       <Layout title="管理员控制台" description="赞助与奖励审批管理">
-        <div className={styles.container}>
-          <div className={styles.authPrompt}>
-            <h2>需要登录</h2>
-            <p>请先登录后访问管理员控制台</p>
-            <button
-              className={styles.btnPrimary}
-              onClick={() => window.location.href = '/console'}
-            >
-              前往登录
-            </button>
+        <AntdThemeProvider>
+          <div className={styles.container}>
+            <div className={styles.authPrompt}>
+              <h2>需要登录</h2>
+              <p>请先登录后访问管理员控制台</p>
+              <button
+                className={styles.btnPrimary}
+                onClick={() => window.location.href = '/console'}
+              >
+                前往登录
+              </button>
+            </div>
           </div>
-        </div>
+        </AntdThemeProvider>
       </Layout>
     );
   }
@@ -223,25 +228,28 @@ export default function AdminPanel() {
   if (!isAdmin) {
     return (
       <Layout title="管理员控制台" description="赞助与奖励审批管理">
-        <div className={styles.container}>
-          <div className={styles.authPrompt}>
-            <h2>权限不足</h2>
-            <p>此页面仅限管理员访问</p>
-            <button
-              className={styles.btnPrimary}
-              onClick={() => window.location.href = '/console'}
-            >
-              返回控制台
-            </button>
+        <AntdThemeProvider>
+          <div className={styles.container}>
+            <div className={styles.authPrompt}>
+              <h2>权限不足</h2>
+              <p>此页面仅限管理员访问</p>
+              <button
+                className={styles.btnPrimary}
+                onClick={() => window.location.href = '/console'}
+              >
+                返回控制台
+              </button>
+            </div>
           </div>
-        </div>
+        </AntdThemeProvider>
       </Layout>
     );
   }
 
   return (
     <Layout title="管理员控制台" description="赞助与奖励审批管理">
-      <div className={styles.container}>
+      <AntdThemeProvider>
+        <div className={styles.container}>
         <div className={styles.header}>
           <h1>管理员控制台</h1>
           <p className={styles.subtitle}>赞助与奖励审批管理</p>
@@ -321,6 +329,7 @@ export default function AdminPanel() {
           onClose={closeReviewModal}
         />
       </div>
+      </AntdThemeProvider>
     </Layout>
   );
 }

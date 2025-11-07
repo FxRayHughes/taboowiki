@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import Layout from '@theme/Layout';
 import { TokenManager } from '@site/src/components/AuthGuard/TokenManager';
+import { getApiBaseUrl } from '@site/src/utils/api';
 
 /**
  * GitHub OAuth2 回调处理页面
@@ -43,9 +44,7 @@ export default function OAuthCallback() {
       // 调用后端 API
       setMessage('正在与服务器通信...');
 
-      const apiBaseUrl = 'https://taboowikiback.maplex.top';
-
-      const apiUrl = `${apiBaseUrl}/api/auth/oauth2/success?code=${encodeURIComponent(code)}`;
+      const apiUrl = `${getApiBaseUrl()}/api/auth/oauth2/success?code=${encodeURIComponent(code)}`;
 
       const response = await fetch(apiUrl, {
         method: 'GET',

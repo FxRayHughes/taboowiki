@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import './styles.css';
+import { getFileBedUrl } from '@site/src/utils/api';
 
 /**
  * CImage - 自定义图片组件
@@ -31,7 +32,7 @@ function CImage({ id, alt = '图片', title, zoom = '100%' }) {
   const imageRef = useRef(null);
 
   // 图片基础 URL
-  const baseUrl = 'https://openlist.maplex.top/p/image/';
+  const baseUrl = `${getFileBedUrl()}/p/image/`;
   const imageUrl = `${baseUrl}${id}.png`;
   const imageTitle = title || alt;
 

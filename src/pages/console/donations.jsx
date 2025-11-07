@@ -1,469 +1,578 @@
-import React, { useState, useEffect } from 'react';
+import React, {useEffect, useState} from 'react';
 import Layout from '@theme/Layout';
 import ExecutionEnvironment from '@docusaurus/ExecutionEnvironment';
-import { TokenManager } from '@site/src/components/AuthGuard/TokenManager';
-import { SponsorAPI } from '@site/src/utils/api';
-import styles from './donations.module.css';
+import {TokenManager} from '@site/src/components/AuthGuard/TokenManager';
+import {SponsorAPI} from '@site/src/utils/api';
+import {AntdThemeProvider} from '@site/src/components/AntdThemeProvider';
+import {
+    Alert,
+    Button,
+    Card,
+    Empty,
+    Form,
+    Input,
+    InputNumber,
+    message,
+    Modal,
+    Space,
+    Spin,
+    Table,
+    Tag,
+    Tooltip,
+    Typography
+} from 'antd';
+import {
+    ArrowLeftOutlined,
+    CheckCircleOutlined,
+    ClockCircleOutlined,
+    CloseCircleOutlined,
+    DollarOutlined,
+    EditOutlined,
+    LinkOutlined,
+    LockOutlined,
+    PlusOutlined,
+    StarFilled
+} from '@ant-design/icons';
+import {SimpleEditor} from '@site/src/components/tiptap-templates/simple/simple-editor'
+
+const {Title, Text, Paragraph} = Typography;
+const {TextArea} = Input;
 
 export default function MyDonations() {
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [isLoading, setIsLoading] = useState(true);
-  const [myDonations, setMyDonations] = useState([]);
-  const [loadingDonations, setLoadingDonations] = useState(false);
-  const [showDonationModal, setShowDonationModal] = useState(false);
-  const [editingDonation, setEditingDonation] = useState(null);
-  const [formData, setFormData] = useState({
-    donorName: '',
-    amount: '',
-    message: '',
-    paymentProof: '',
-    contactInfo: ''
-  });
-  const [editMessage, setEditMessage] = useState('');
-  const [errors, setErrors] = useState({});
+    const [isAuthenticated, setIsAuthenticated] = useState(false);
+    const [isLoading, setIsLoading] = useState(true);
+    const [myDonations, setMyDonations] = useState([]);
+    const [loadingDonations, setLoadingDonations] = useState(false);
+    const [showDonationModal, setShowDonationModal] = useState(false);
+    const [editingDonation, setEditingDonation] = useState(null);
+    const [form] = Form.useForm();
+    const [editForm] = Form.useForm();
 
-  useEffect(() => {
-    checkAuthAndFetchData();
-  }, []);
+    useEffect(() => {
+        checkAuthAndFetchData();
+    }, []);
 
-  const checkAuthAndFetchData = async () => {
-    if (!ExecutionEnvironment.canUseDOM) return;
+    const checkAuthAndFetchData = async () => {
+        if (!ExecutionEnvironment.canUseDOM) return;
 
-    try {
-      const hasToken = TokenManager.hasToken();
-      if (!hasToken) {
-        setIsAuthenticated(false);
-        setIsLoading(false);
-        return;
-      }
+        try {
+            const hasToken = TokenManager.hasToken();
+            if (!hasToken) {
+                setIsAuthenticated(false);
+                setIsLoading(false);
+                return;
+            }
 
-      const currentUser = await TokenManager.getCurrentUser();
-      if (currentUser) {
-        setIsAuthenticated(true);
-        fetchDonations();
-      } else {
-        setIsAuthenticated(false);
-      }
-    } catch (error) {
-      console.error('认证检查失败:', error);
-      setIsAuthenticated(false);
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const fetchDonations = async () => {
-    setLoadingDonations(true);
-    try {
-      const data = await SponsorAPI.getMyDonations();
-      if (data.success) {
-        setMyDonations(data.data || []);
-      }
-    } catch (error) {
-      console.error('获取赞助数据失败:', error);
-      showMessage('获取赞助数据失败', 'error');
-    } finally {
-      setLoadingDonations(false);
-    }
-  };
-
-  const validateForm = () => {
-    const newErrors = {};
-
-    if (!formData.amount || formData.amount <= 0) {
-      newErrors.amount = '请输入有效的赞助金额';
-    }
-
-    if (!formData.paymentProof || formData.paymentProof.trim() === '') {
-      newErrors.paymentProof = '请输入支付凭证';
-    }
-
-    if (formData.message && formData.message.length > 200) {
-      newErrors.message = '留言不能超过 200 字';
-    }
-
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
-  };
-
-  const handleSubmitDonation = async (e) => {
-    e.preventDefault();
-
-    if (!validateForm()) {
-      return;
-    }
-
-    try {
-      const data = await SponsorAPI.submitDonation({
-        donorName: formData.donorName || null,
-        amount: parseFloat(formData.amount),
-        message: formData.message || null,
-        paymentProof: formData.paymentProof,
-        contactInfo: formData.contactInfo || null,
-        donationTime: Date.now()
-      });
-
-      if (data.success) {
-        showMessage('提交成功!您的赞助记录已提交,等待管理员审核', 'success');
-        setShowDonationModal(false);
-        setFormData({ donorName: '', amount: '', message: '', paymentProof: '', contactInfo: '' });
-        setErrors({});
-        fetchDonations();
-      } else {
-        showMessage(data.message || '提交失败', 'error');
-      }
-    } catch (err) {
-      showMessage(err.message || '提交失败,请重试', 'error');
-    }
-  };
-
-  const handleEditMessage = async (e) => {
-    e.preventDefault();
-
-    if (editMessage.length > 200) {
-      showMessage('留言不能超过 200 字', 'error');
-      return;
-    }
-
-    try {
-      const data = await SponsorAPI.editDonationMessage(editingDonation.id, editMessage);
-
-      if (data.success) {
-        showMessage('更新成功!您的留言已更新,编辑权限已用完', 'success');
-        setEditingDonation(null);
-        setEditMessage('');
-        fetchDonations();
-      } else {
-        showMessage(data.message || '更新失败', 'error');
-      }
-    } catch (err) {
-      showMessage(err.message || '更新失败,请重试', 'error');
-    }
-  };
-
-  const showMessage = (text, type = 'info') => {
-    const messageEl = document.createElement('div');
-    messageEl.className = `${styles.message} ${styles[type]}`;
-    messageEl.textContent = text;
-    document.body.appendChild(messageEl);
-    setTimeout(() => {
-      messageEl.classList.add(styles.show);
-    }, 10);
-    setTimeout(() => {
-      messageEl.classList.remove(styles.show);
-      setTimeout(() => document.body.removeChild(messageEl), 300);
-    }, 3000);
-  };
-
-  const formatDate = (timestamp) => {
-    const date = new Date(timestamp);
-    return date.toLocaleDateString('zh-CN');
-  };
-
-  const formatTime = (timestamp) => {
-    const date = new Date(timestamp);
-    return date.toLocaleTimeString('zh-CN', { hour: '2-digit', minute: '2-digit' });
-  };
-
-  const getStatusText = (status) => {
-    const config = {
-      PENDING: '⏳ 待审核',
-      APPROVED: '✅ 已通过',
-      REJECTED: '❌ 已拒绝',
+            const currentUser = await TokenManager.getCurrentUser();
+            if (currentUser) {
+                setIsAuthenticated(true);
+                fetchDonations();
+            } else {
+                setIsAuthenticated(false);
+            }
+        } catch (error) {
+            console.error('认证检查失败:', error);
+            setIsAuthenticated(false);
+        } finally {
+            setIsLoading(false);
+        }
     };
-    return config[status] || status;
-  };
 
-  const getStatusClass = (status) => {
-    return status ? status.toLowerCase() : 'pending';
-  };
+    const fetchDonations = async () => {
+        setLoadingDonations(true);
+        try {
+            const data = await SponsorAPI.getMyDonations();
+            if (data.success) {
+                setMyDonations(data.data || []);
+            }
+        } catch (error) {
+            console.error('获取赞助数据失败:', error);
+            message.error('获取赞助数据失败');
+        } finally {
+            setLoadingDonations(false);
+        }
+    };
 
-  if (isLoading) {
-    return (
-      <Layout title="我的赞助记录">
-        <div className={styles.container}>
-          <div className={styles.loading}>
-            <div className={styles.spinner}></div>
-            <p>正在加载...</p>
-          </div>
-        </div>
-      </Layout>
-    );
-  }
+    const handleSubmitDonation = async (values) => {
+        try {
+            const data = await SponsorAPI.submitDonation({
+                donorName: values.donorName || null,
+                amount: values.amount,
+                message: values.message || null,
+                paymentProof: values.paymentProof,
+                contactInfo: values.contactInfo || null,
+                donationTime: Date.now()
+            });
 
-  if (!isAuthenticated) {
-    return (
-      <Layout title="我的赞助记录">
-        <div className={styles.container}>
-          <div className={styles.notAuthenticated}>
-            <div className={styles.icon}>🔐</div>
-            <h2>需要登录</h2>
-            <p>请先登录以查看您的赞助记录</p>
-            <button onClick={() => window.location.href = '/console'} className={styles.primaryButton}>
-              前往登录
-            </button>
-          </div>
-        </div>
-      </Layout>
-    );
-  }
+            if (data.success) {
+                message.success('提交成功！您的赞助记录已提交，等待管理员审核');
+                setShowDonationModal(false);
+                form.resetFields();
+                fetchDonations();
+            } else {
+                message.error(data.message || '提交失败');
+            }
+        } catch (err) {
+            message.error(err.message || '提交失败，请重试');
+        }
+    };
 
-  return (
-    <Layout title="我的赞助记录">
-      <div className={styles.pageWrapper}>
-        <div className={styles.pageContent}>
-          {/* 页面标题 */}
-          <div className={styles.pageHeader}>
-            <div className={styles.headerRow}>
-              <h1>💰 我的赞助记录</h1>
-              <div className={styles.buttonGroup}>
-                <button onClick={() => window.location.href = '/console'} className={styles.button}>
-                  ← 返回控制台
-                </button>
-                <button onClick={() => setShowDonationModal(true)} className={styles.primaryButton}>
-                  ➕ 提交赞助
-                </button>
-              </div>
-            </div>
-            <p className={styles.description}>查看您的所有赞助记录和审核状态</p>
-          </div>
+    const handleEditMessage = async (values) => {
+        try {
+            const data = await SponsorAPI.editDonationMessage(editingDonation.id, values.message);
 
-          {/* 赞助列表 */}
-          {myDonations.length === 0 && !loadingDonations ? (
-            <div className={styles.card}>
-              <div className={styles.empty}>
-                <p className={styles.emptyTitle}>暂无赞助记录</p>
-                <p className={styles.emptySubtitle}>您还没有提交过赞助记录</p>
-                <button onClick={() => setShowDonationModal(true)} className={styles.primaryButton}>
-                  提交第一笔赞助
-                </button>
-              </div>
-            </div>
-          ) : (
-            <div className={styles.card}>
-              <div className={styles.tableWrapper}>
-                <table className={styles.table}>
-                  <thead>
-                    <tr>
-                      <th style={{width: '150px'}}>赞助者</th>
-                      <th style={{width: '120px', textAlign: 'right'}}>金额</th>
-                      <th>留言</th>
-                      <th style={{width: '120px', textAlign: 'center'}}>状态</th>
-                      <th style={{width: '120px', textAlign: 'center'}}>支付凭证</th>
-                      <th style={{width: '100px', textAlign: 'right'}}>管理员备注</th>
-                      <th style={{width: '150px', textAlign: 'right'}}>赞助时间</th>
-                      <th style={{width: '120px', textAlign: 'right'}}>操作</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {loadingDonations ? (
-                      <tr>
-                        <td colSpan="8" style={{textAlign: 'center', padding: '2rem'}}>
-                          <div className={styles.spinner}></div>
-                        </td>
-                      </tr>
-                    ) : (
-                      myDonations.map(record => (
-                        <tr key={record.id}>
-                          <td>
-                            <div className={styles.donorCell}>
-                              <strong>{record.donorName}</strong>
-                              {record.isHighlighted && <span className={styles.highlight}>🌟</span>}
-                              {record.contactInfo && (
-                                <div className={styles.contact}>📞 {record.contactInfo}</div>
-                              )}
-                            </div>
-                          </td>
-                          <td style={{textAlign: 'right'}}>
-                            <strong className={styles.amount}>¥{Number(record.amount).toFixed(2)}</strong>
-                          </td>
-                          <td>
-                            {record.message ? (
-                              <div>
-                                <div className={styles.message}>"{record.message}"</div>
-                                {record.messageEditedAt && (
-                                  <div className={styles.editedTag}>
-                                    已编辑于 {formatDate(record.messageEditedAt)}
-                                  </div>
-                                )}
-                              </div>
-                            ) : (
-                              <span className={styles.muted}>无留言</span>
-                            )}
-                          </td>
-                          <td style={{textAlign: 'center'}}>
-                            <span className={`${styles.statusTag} ${styles[getStatusClass(record.status)]}`}>
-                              {getStatusText(record.status)}
-                            </span>
-                          </td>
-                          <td style={{textAlign: 'center'}}>
-                            {record.paymentProof ? (
-                              record.paymentProof.startsWith('http') ? (
-                                <a href={record.paymentProof} target="_blank" rel="noopener noreferrer" className={styles.link}>
-                                  🔗 查看
-                                </a>
-                              ) : (
-                                <span className={styles.muted}>{record.paymentProof}</span>
-                              )
-                            ) : (
-                              <span className={styles.muted}>-</span>
-                            )}
-                          </td>
-                          <td style={{textAlign: 'right'}}>
-                            {record.remark || <span className={styles.muted}>-</span>}
-                          </td>
-                          <td style={{textAlign: 'right'}}>
-                            <div>{formatDate(record.donationTime)}</div>
-                            <div className={styles.time}>{formatTime(record.donationTime)}</div>
-                          </td>
-                          <td style={{textAlign: 'right'}}>
-                            {record.status === 'PENDING' ? (
-                              <button
-                                onClick={() => {
-                                  setEditingDonation(record);
-                                  setEditMessage(record.message || '');
-                                }}
-                                className={styles.primaryButton}
-                              >
-                                ✏️ 编辑留言
-                              </button>
-                            ) : (
-                              <span className={styles.muted}>🔒 已锁定</span>
-                            )}
-                          </td>
-                        </tr>
-                      ))
+            if (data.success) {
+                message.success('更新成功！您的留言已更新，编辑权限已用完');
+                setEditingDonation(null);
+                editForm.resetFields();
+                fetchDonations();
+            } else {
+                message.error(data.message || '更新失败');
+            }
+        } catch (err) {
+            message.error(err.message || '更新失败，请重试');
+        }
+    };
+
+    const getStatusTag = (status) => {
+        const config = {
+            PENDING: {color: 'processing', icon: <ClockCircleOutlined/>, text: '待审核'},
+            APPROVED: {color: 'success', icon: <CheckCircleOutlined/>, text: '已通过'},
+            REJECTED: {color: 'error', icon: <CloseCircleOutlined/>, text: '已拒绝'},
+        };
+        const statusConfig = config[status] || config.PENDING;
+        return (
+            <Tag icon={statusConfig.icon} color={statusConfig.color}>
+                {statusConfig.text}
+            </Tag>
+        );
+    };
+
+    const columns = [
+        {
+            title: '赞助者',
+            dataIndex: 'donorName',
+            key: 'donorName',
+            width: 180,
+            align: 'center',
+            render: (text, record) => (
+                <Space direction="vertical" size={0}>
+                    <Space>
+                        <Text strong>{text}</Text>
+                        {record.isHighlighted && (
+                            <Tooltip title="精选赞助">
+                                <StarFilled style={{color: '#faad14'}}/>
+                            </Tooltip>
+                        )}
+                    </Space>
+                    {record.contactInfo && (
+                        <Text type="secondary" style={{fontSize: '12px'}}>
+                            📞 {record.contactInfo}
+                        </Text>
                     )}
-                  </tbody>
-                </table>
-              </div>
-            </div>
-          )}
-        </div>
-      </div>
-
-      {/* 提交赞助模态框 */}
-      {showDonationModal && (
-        <div className={styles.modalOverlay} onClick={() => setShowDonationModal(false)}>
-          <div className={styles.modal} onClick={(e) => e.stopPropagation()}>
-            <div className={styles.modalHeader}>
-              <h2>💰 提交赞助记录</h2>
-              <button onClick={() => setShowDonationModal(false)} className={styles.closeButton}>×</button>
-            </div>
-            <form onSubmit={handleSubmitDonation} className={styles.form}>
-              <div className={styles.formGroup}>
-                <label>显示名称</label>
-                <input
-                  type="text"
-                  value={formData.donorName}
-                  onChange={(e) => setFormData({...formData, donorName: e.target.value})}
-                  placeholder="请输入显示名称"
-                />
-                <div className={styles.hint}>留空则使用账号昵称</div>
-              </div>
-
-              <div className={styles.formGroup}>
-                <label>赞助金额 *</label>
-                <input
-                  type="number"
-                  step="0.01"
-                  min="0.01"
-                  value={formData.amount}
-                  onChange={(e) => setFormData({...formData, amount: e.target.value})}
-                  placeholder="请输入金额（元）"
-                  className={errors.amount ? styles.error : ''}
-                />
-                {errors.amount && <div className={styles.errorText}>{errors.amount}</div>}
-              </div>
-
-              <div className={styles.formGroup}>
-                <label>留言</label>
-                <textarea
-                  value={formData.message}
-                  onChange={(e) => setFormData({...formData, message: e.target.value})}
-                  placeholder="写下您的留言..."
-                  maxLength={200}
-                  rows={3}
-                  className={errors.message ? styles.error : ''}
-                />
-                <div className={styles.hint}>
-                  {formData.message.length}/200 字
+                </Space>
+            ),
+        },
+        {
+            title: '金额',
+            dataIndex: 'amount',
+            key: 'amount',
+            width: 120,
+            align: 'center',
+            render: (amount) => (
+                <Text strong style={{color: '#52c41a', fontSize: '16px'}}>
+                    ¥{Number(amount).toFixed(2)}
+                </Text>
+            ),
+        },
+        {
+            title: '留言',
+            dataIndex: 'message',
+            key: 'message',
+            align: 'center',
+            render: (message, record) => (
+                <div style={{textAlign: 'left'}}>
+                    <Space direction="vertical" size={4}>
+                        {message ? (
+                            <>
+                                <Paragraph ellipsis={{rows: 2, expandable: true}} style={{marginBottom: 0}}>
+                                    "{message}"
+                                </Paragraph>
+                                {record.messageEditedAt && (
+                                    <Text type="secondary" style={{fontSize: '12px'}}>
+                                        已编辑于 {new Date(record.messageEditedAt).toLocaleDateString('zh-CN')}
+                                    </Text>
+                                )}
+                            </>
+                        ) : (
+                            <Text type="secondary">无留言</Text>
+                        )}
+                    </Space>
                 </div>
-                {errors.message && <div className={styles.errorText}>{errors.message}</div>}
-              </div>
+            ),
+        },
+        {
+            title: '状态',
+            dataIndex: 'status',
+            key: 'status',
+            width: 120,
+            align: 'center',
+            render: (status) => getStatusTag(status),
+        },
+        {
+            title: '支付凭证',
+            dataIndex: 'paymentProof',
+            key: 'paymentProof',
+            width: 120,
+            align: 'center',
+            render: (proof) => {
+                if (!proof) return <Text type="secondary">-</Text>;
+                if (proof.startsWith('http')) {
+                    return (
+                        <Button
+                            type="link"
+                            icon={<LinkOutlined/>}
+                            href={proof}
+                            target="_blank"
+                            size="small"
+                        >
+                            查看
+                        </Button>
+                    );
+                }
+                return <Text type="secondary">{proof}</Text>;
+            },
+        },
+        {
+            title: '管理员备注',
+            dataIndex: 'remark',
+            key: 'remark',
+            width: 150,
+            align: 'center',
+            render: (remark) => remark || <Text type="secondary">-</Text>,
+        },
+        {
+            title: '赞助时间',
+            dataIndex: 'donationTime',
+            key: 'donationTime',
+            width: 150,
+            align: 'center',
+            render: (time) => (
+                <Space direction="vertical" size={0}>
+                    <Text>{new Date(time).toLocaleDateString('zh-CN')}</Text>
+                    <Text type="secondary" style={{fontSize: '12px'}}>
+                        {new Date(time).toLocaleTimeString('zh-CN', {hour: '2-digit', minute: '2-digit'})}
+                    </Text>
+                </Space>
+            ),
+        },
+        {
+            title: '操作',
+            key: 'action',
+            width: 120,
+            align: 'center',
+            render: (_, record) => {
+                if (record.status === 'PENDING') {
+                    return (
+                        <Button
+                            type="primary"
+                            icon={<EditOutlined/>}
+                            size="small"
+                            onClick={() => {
+                                setEditingDonation(record);
+                                editForm.setFieldsValue({message: record.message || ''});
+                            }}
+                        >
+                            编辑留言
+                        </Button>
+                    );
+                }
+                return (
+                    <Tooltip title="审核后无法编辑">
+                        <Tag icon={<LockOutlined/>} color="default">
+                            已锁定
+                        </Tag>
+                    </Tooltip>
+                );
+            },
+        },
+    ];
 
-              <div className={styles.formGroup}>
-                <label>支付凭证 *</label>
-                <input
-                  type="text"
-                  value={formData.paymentProof}
-                  onChange={(e) => setFormData({...formData, paymentProof: e.target.value})}
-                  placeholder="支付截图链接或订单号"
-                  className={errors.paymentProof ? styles.error : ''}
-                />
-                {errors.paymentProof && <div className={styles.errorText}>{errors.paymentProof}</div>}
-              </div>
+    if (isLoading) {
+        return (
+            <Layout title="我的赞助记录">
+                <div className="console-page-wrapper">
+                    <AntdThemeProvider>
+                        <div className="console-page-container" style={{
+                            display: 'flex',
+                            justifyContent: 'center',
+                            alignItems: 'center',
+                            minHeight: '60vh'
+                        }}>
+                            <Spin size="large" tip="正在加载..."/>
+                        </div>
+                    </AntdThemeProvider>
+                </div>
+            </Layout>
+        );
+    }
 
-              <div className={styles.formGroup}>
-                <label>联系方式</label>
-                <input
-                  type="text"
-                  value={formData.contactInfo}
-                  onChange={(e) => setFormData({...formData, contactInfo: e.target.value})}
-                  placeholder="请输入联系方式"
-                />
-                <div className={styles.hint}>QQ、微信等</div>
-              </div>
+    if (!isAuthenticated) {
+        return (
+            <Layout title="我的赞助记录">
+                <div className="console-page-wrapper">
+                    <AntdThemeProvider>
+                        <div className="console-page-container" style={{
+                            display: 'flex',
+                            justifyContent: 'center',
+                            alignItems: 'center',
+                            minHeight: '60vh'
+                        }}>
+                            <Card style={{maxWidth: 500, textAlign: 'center'}}>
+                                <Space direction="vertical" size="large">
+                                    <div style={{fontSize: '64px'}}>🔐</div>
+                                    <Title level={2}>需要登录</Title>
+                                    <Paragraph>请先登录以查看您的赞助记录</Paragraph>
+                                    <Button
+                                        type="primary"
+                                        size="large"
+                                        onClick={() => window.location.href = '/console'}
+                                    >
+                                        前往登录
+                                    </Button>
+                                </Space>
+                            </Card>
+                        </div>
+                    </AntdThemeProvider>
+                </div>
+            </Layout>
+        );
+    }
 
-              <div className={styles.modalFooter}>
-                <button type="button" onClick={() => setShowDonationModal(false)} className={styles.button}>
-                  取消
-                </button>
-                <button type="submit" className={styles.primaryButton}>
-                  提交
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
-      )}
+    return (
+        <Layout title="我的赞助记录">
+            <div className="console-page-wrapper">
+                <AntdThemeProvider>
+                    <div className="console-page-container"
+                         style={{padding: '24px', maxWidth: '1250px', margin: '0 auto'}}>
+                        {/* 页面标题 */}
+                        <div style={{marginBottom: 24}}>
+                            <Space direction="vertical" size="middle" style={{width: '100%'}}>
+                                <div style={{display: 'flex', justifyContent: 'space-between', alignItems: 'center'}}>
+                                    <Space>
+                                        <DollarOutlined style={{fontSize: '32px', color: '#52c41a'}}/>
+                                        <Title level={2} style={{margin: 0}}>我的赞助记录</Title>
+                                    </Space>
+                                    <Space>
+                                        <Button
+                                            icon={<ArrowLeftOutlined/>}
+                                            onClick={() => window.location.href = '/console'}
+                                        >
+                                            返回控制台
+                                        </Button>
+                                        <Button
+                                            type="primary"
+                                            icon={<PlusOutlined/>}
+                                            onClick={() => setShowDonationModal(true)}
+                                        >
+                                            提交赞助
+                                        </Button>
+                                    </Space>
+                                </div>
+                                <Text type="secondary">查看您的所有赞助记录和审核状态</Text>
+                            </Space>
+                        </div>
 
-      {/* 编辑留言模态框 */}
-      {editingDonation && (
-        <div className={styles.modalOverlay} onClick={() => setEditingDonation(null)}>
-          <div className={styles.modal} onClick={(e) => e.stopPropagation()}>
-            <div className={styles.modalHeader}>
-              <h2>📝 编辑留言</h2>
-              <button onClick={() => setEditingDonation(null)} className={styles.closeButton}>×</button>
+                        {/* 赞助列表 */}
+                        <Table
+                            columns={columns}
+                            dataSource={myDonations}
+                            rowKey="id"
+                            loading={loadingDonations}
+                            locale={{
+                                emptyText: (
+                                    <Empty
+                                        description="暂无赞助记录"
+                                        image={Empty.PRESENTED_IMAGE_SIMPLE}
+                                    >
+                                        <Button
+                                            type="primary"
+                                            icon={<PlusOutlined/>}
+                                            onClick={() => setShowDonationModal(true)}
+                                        >
+                                            提交第一笔赞助
+                                        </Button>
+                                    </Empty>
+                                ),
+                            }}
+                            pagination={{
+                                pageSize: 50,
+                                showSizeChanger: true,
+                                pageSizeOptions: ['10', '20', '50', '100'],
+                                showTotal: (total) => `共 ${total} 条记录`,
+                            }}
+                            scroll={{x: 1200}}
+                        />
+                    </div>
+
+                    {/* 提交赞助模态框 */}
+                    <Modal
+                        title={
+                            <Space>
+                                <DollarOutlined style={{color: '#52c41a'}}/>
+                                <span>提交赞助记录</span>
+                            </Space>
+                        }
+                        open={showDonationModal}
+                        onCancel={() => {
+                            setShowDonationModal(false);
+                            form.resetFields();
+                        }}
+                        footer={null}
+                        width={600}
+                    >
+                        <Form
+                            form={form}
+                            layout="vertical"
+                            onFinish={handleSubmitDonation}
+                            autoComplete="off"
+                        >
+                            <Form.Item
+                                label="显示名称"
+                                name="donorName"
+                                tooltip="留空则使用账号昵称"
+                            >
+                                <Input placeholder="请输入显示名称"/>
+                            </Form.Item>
+
+                            <Form.Item
+                                label="赞助金额"
+                                name="amount"
+                                rules={[
+                                    {required: true, message: '请输入赞助金额'},
+                                    {type: 'number', min: 0.01, message: '金额必须大于 0'},
+                                ]}
+                            >
+                                <InputNumber
+                                    style={{width: '100%'}}
+                                    prefix="¥"
+                                    min={0.01}
+                                    step={0.01}
+                                    precision={2}
+                                    placeholder="请输入金额（元）"
+                                />
+                            </Form.Item>
+
+                            <Form.Item
+                                label="留言"
+                                name="message"
+                                rules={[
+                                    {max: 200, message: '留言不能超过 200 字'},
+                                ]}
+                            >
+                                <TextArea
+                                    placeholder="写下您的留言，这里的内容用于在列表中对外展示。"
+                                    maxLength={200}
+                                    showCount
+                                    rows={4}
+                                />
+                            </Form.Item>
+
+                            <Form.Item
+                                label="支付凭证"
+                                name="paymentProof"
+                                rules={[
+                                    {required: true, message: '请输入支付凭证'},
+                                ]}
+                            >
+                                <SimpleEditor placeholder="支付截图链接或订单号"/>
+                            </Form.Item>
+
+                            <Form.Item
+                                label="联系方式"
+                                name="contactInfo"
+                                tooltip="QQ、微信等"
+                            >
+                                <Input placeholder="请输入联系方式"/>
+                            </Form.Item>
+
+                            <Form.Item style={{marginBottom: 0, textAlign: 'right'}}>
+                                <Space>
+                                    <Button onClick={() => {
+                                        setShowDonationModal(false);
+                                        form.resetFields();
+                                    }}>
+                                        取消
+                                    </Button>
+                                    <Button type="primary" htmlType="submit">
+                                        提交
+                                    </Button>
+                                </Space>
+                            </Form.Item>
+                        </Form>
+                    </Modal>
+
+                    {/* 编辑留言模态框 */}
+                    <Modal
+                        title={
+                            <Space>
+                                <EditOutlined style={{color: '#1890ff'}}/>
+                                <span>编辑留言</span>
+                            </Space>
+                        }
+                        open={!!editingDonation}
+                        onCancel={() => {
+                            setEditingDonation(null);
+                            editForm.resetFields();
+                        }}
+                        footer={null}
+                        width={600}
+                    >
+                        <Alert
+                            message="注意"
+                            description="您只有一次编辑留言的机会，编辑后将无法再次修改"
+                            type="warning"
+                            showIcon
+                            style={{marginBottom: 16}}
+                        />
+                        <Form
+                            form={editForm}
+                            layout="vertical"
+                            onFinish={handleEditMessage}
+                            autoComplete="off"
+                        >
+                            <Form.Item
+                                label="留言内容"
+                                name="message"
+                                rules={[
+                                    {max: 200, message: '留言不能超过 200 字'},
+                                ]}
+                            >
+                                <TextArea
+                                    placeholder="写下您的留言..."
+                                    maxLength={200}
+                                    showCount
+                                    rows={6}
+                                />
+                            </Form.Item>
+
+                            <Form.Item style={{marginBottom: 0, textAlign: 'right'}}>
+                                <Space>
+                                    <Button onClick={() => {
+                                        setEditingDonation(null);
+                                        editForm.resetFields();
+                                    }}>
+                                        取消
+                                    </Button>
+                                    <Button type="primary" htmlType="submit">
+                                        确认修改
+                                    </Button>
+                                </Space>
+                            </Form.Item>
+                        </Form>
+                    </Modal>
+                </AntdThemeProvider>
             </div>
-            <div className={styles.alert}>
-              ⚠️ 您只有一次编辑留言的机会,编辑后将无法再次修改
-            </div>
-            <form onSubmit={handleEditMessage} className={styles.form}>
-              <div className={styles.formGroup}>
-                <label>留言内容</label>
-                <textarea
-                  value={editMessage}
-                  onChange={(e) => setEditMessage(e.target.value)}
-                  placeholder="写下您的留言..."
-                  maxLength={200}
-                  rows={5}
-                />
-                <div className={styles.hint}>{editMessage.length}/200 字</div>
-              </div>
-
-              <div className={styles.modalFooter}>
-                <button type="button" onClick={() => setEditingDonation(null)} className={styles.button}>
-                  取消
-                </button>
-                <button type="submit" className={styles.primaryButton}>
-                  确认修改
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
-      )}
-    </Layout>
-  );
+        </Layout>
+    );
 }

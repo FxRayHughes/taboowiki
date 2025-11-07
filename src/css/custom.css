@@ -3,7 +3,8 @@
  * bundles Infima by default. Infima is a CSS framework designed to
  * work well for content-centric websites.
  */
-
+@import '../styles/_variables.scss';
+@import '../styles/_keyframe-animations.scss';
 /* You can override the default Infima variables here. */
 :root {
   --ifm-color-primary: #2e59a7;
@@ -37,4 +38,34 @@
   stroke: #fff !important;
 }
 
+/* Console 页面主题支持 - 使用强制设置避免冲突 */
+.console-page-container {
+  background-color: var(--ifm-background-color) !important;
+  min-height: calc(100vh - var(--ifm-navbar-height)) !important;
+  transition: background-color var(--ifm-transition-fast) ease !important;
+}
+
+/* 确保页面内容区域使用主题背景色 */
+[data-theme='light'] .console-page-container {
+  background-color: #f5f7fa !important;
+}
+
+[data-theme='dark'] .console-page-container {
+  background-color: #1b1b1d !important;
+}
+
+/* Console 页面包装器 - 填充整个可视区域 */
+.console-page-wrapper {
+  background-color: var(--ifm-background-color) !important;
+  min-height: calc(100vh - var(--ifm-navbar-height)) !important;
+  transition: background-color var(--ifm-transition-fast) ease !important;
+}
+
+[data-theme='light'] .console-page-wrapper {
+  background-color: #f5f7fa !important;
+}
+
+[data-theme='dark'] .console-page-wrapper {
+  background-color: #1b1b1d !important;
+}
 
