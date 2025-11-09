@@ -156,6 +156,7 @@ const sidebars = {
                 'expanding-technology/persistent-container/index',
                 'expanding-technology/universal-mythic/index',
                 'expanding-technology/alkaid-redis/index',
+                'expanding-technology/lettuce-redis/index',
             ],
         },
     ],

@@ -153,6 +153,46 @@ val item = buildItem(XMaterial.DIAMOND_SWORD) {
 - `flags`：ItemFlag 用于隐藏特定信息（如附魔、属性等）
 - `colored()`：解析 `&` 颜色代码，必须在设置 name/lore 后调用
 
+#### ItemName vs DisplayName
+
+Minecraft 1.20.5+ 引入了新的物品名称系统。ItemBuilder 同时支持两种命名方式：
+
+```kotlin
+val item = buildItem(XMaterial.DIAMOND_SWORD) {
+    // ItemName（1.20.5+ 新特性）
+    // - 原始 JSON 文本组件
+    // - 不会应用斜体等默认格式
+    // - 无法在铁砧中重命名
+    itemName = """{"text":"Epic Sword","color":"gold","bold":true}"""
+
+    // DisplayName（传统方式）
+    // - 会应用默认的斜体格式
+    // - 可以在铁砧中重命名
+    name = "&6&lEpic Sword"
+
+    colored()
+}
+```
+
+**两者区别：**
+
+| 特性 | ItemName | DisplayName (name) |
+|------|----------|--------------------|
+| 版本要求 | 1.20.5+ | 所有版本 |
+| 格式类型 | JSON 文本组件 | 字符串（支持颜色代码） |
+| 默认格式 | 无默认格式 | 自动应用斜体 |
+| 铁砧重命名 | 不可重命名 | 可以重命名 |
+| 优先级 | 优先显示 | 其次显示 |
+
+**使用建议：**
+- 对于不希望玩家重命名的特殊物品（如商城物品、任务物品），使用 `itemName`
+- 对于普通物品或希望保持兼容性，使用 `name`
+- 如果同时设置两者，ItemName 会优先显示
+
+:::note
+`itemName` 属性在 Minecraft 1.20.5 以下版本会被忽略，不会影响游戏运行。
+:::
+
 ### 特殊属性
 
 除了基础属性，ItemBuilder 还支持各种特殊类型物品的专属属性：

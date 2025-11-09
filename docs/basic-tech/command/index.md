@@ -179,6 +179,94 @@ bool("选项") {
 
 **适用场景：** 开关选项、模式切换等
 
+### 枚举类型 (Enum)
+
+自动从枚举类获取所有可用值，提供自动补全和约束验证。
+
+```kotlin
+enum class GameMode {
+    SURVIVAL, CREATIVE, ADVENTURE, SPECTATOR
+}
+
+@CommandBody
+val gamemode = subCommand {
+    enum(GameMode.entries, "mode") {
+        execute<Player> { sender, context, _ ->
+            // 获取枚举字符串值
+            val mode = context["mode"]
+
+            // 或者转换为枚举对象
+            val gameMode = GameMode.valueOf(mode)
+
+            sender.sendMessage("游戏模式已切换为: $mode")
+        }
+    }
+}
+```
+
+**特性：**
+- 自动从枚举类提取所有可用值作为补全建议
+- 自动约束输入必须为枚举值之一
+- 支持额外的自定义建议（通过 `suggest` 参数）
+- 使用 `context["参数名"]` 获取字符串值
+
+**使用示例：**
+
+```kotlin
+enum class Difficulty {
+    PEACEFUL, EASY, NORMAL, HARD
+}
+
+@CommandBody
+val difficulty = subCommand {
+    enum(Difficulty.entries, "level") {
+        execute<CommandSender> { sender, context, _ ->
+            val level = Difficulty.valueOf(context["level"])
+
+            when (level) {
+                Difficulty.PEACEFUL -> sender.sendMessage("难度设置为：和平")
+                Difficulty.EASY -> sender.sendMessage("难度设置为：简单")
+                Difficulty.NORMAL -> sender.sendMessage("难度设置为：普通")
+                Difficulty.HARD -> sender.sendMessage("难度设置为：困难")
+            }
+        }
+    }
+}
+```
+
+**高级用法：添加额外建议**
+
+```kotlin
+enum class WeatherType {
+    CLEAR, RAIN, THUNDER
+}
+
+@CommandBody
+val weather = subCommand {
+    // 除了枚举值外，还会补全 "sunny" 和 "storm"
+    enum(
+        enums = WeatherType.entries,
+        comment = "weather",
+        suggest = listOf("sunny", "storm")
+    ) {
+        execute<CommandSender> { sender, context, _ ->
+            val weather = context["weather"]
+
+            // 处理额外建议值
+            val actualWeather = when (weather) {
+                "sunny" -> WeatherType.CLEAR
+                "storm" -> WeatherType.THUNDER
+                else -> WeatherType.valueOf(weather)
+            }
+
+            sender.sendMessage("天气已设置为: $actualWeather")
+        }
+    }
+}
+```
+
+**适用场景：** 模式选择、难度设置、类型筛选等固定选项
+
 ### 字面量类型 (Literal)
 
 Literal 类型用于定义固定的子命令节点，类似于 `@CommandBody` 定义的子命令，但可以在参数层级中灵活使用。

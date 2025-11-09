@@ -389,6 +389,7 @@ fun Player.openClickMenu() {
 **ClickEvent 可用属性：**
 - `clicker: Player`：点击玩家
 - `inventory: Inventory`：当前箱子的 Inventory
+- `view: InventoryView`：完整的 InventoryView 对象
 - `rawSlot: Int`：点击的槽位索引（**2025-10-28 增强**）
 - `slot: Char`：点击位置对应的字符
 - `isCancelled: Boolean`：是否取消事件
@@ -425,6 +426,42 @@ onClick(13) {
 - 使用 `clickEvent()` 获取 Bukkit 原始事件
 - 只有 `ClickType.CLICK` 时才能调用 `clickEvent()`，否则会抛出异常
 - 使用 `clickEventOrNull()` 进行安全的类型转换
+
+### 使用 InventoryView
+
+`view` 属性提供了完整的 InventoryView 对象，可用于访问上下界面和标题等信息：
+
+```kotlin
+onClick { event ->
+    // 获取 InventoryView
+    val view = event.view
+
+    // 访问上下界面
+    val topInventory = view.topInventory      // 菜单界面
+    val bottomInventory = view.bottomInventory // 玩家背包
+
+    // 获取标题
+    val title = view.title
+    clicker.sendMessage("当前菜单标题: $title")
+
+    // 获取界面类型
+    val type = view.type  // InventoryType
+    clicker.sendMessage("界面类型: ${type.name}")
+
+    // 判断点击位置
+    val rawSlot = event.rawSlot
+    if (rawSlot < view.topInventory.size) {
+        clicker.sendMessage("§a点击了菜单界面")
+    } else {
+        clicker.sendMessage("§e点击了背包界面")
+    }
+}
+```
+
+**适用场景：**
+- 需要区分玩家点击的是菜单还是背包
+- 需要在运行时获取菜单标题或类型
+- 需要访问完整的界面信息
 
 ### 拖拽交互处理
 
