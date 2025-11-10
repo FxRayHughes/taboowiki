@@ -146,7 +146,8 @@ player.sendLang("transfer-success", targetPlayer.name, 100)
 
 ```yaml
 colored-text: '&a绿色文本 &b蓝色文本 &c红色文本'
-gradient-text: '&x&f&f&0&0&0&0渐变色文本'
+hex-color-text: '&x&f&f&0&0&0&0Hex颜色文本'
+hex-color-text-2: '&{#ff0000}Hex颜色文本'
 formatted-text: '&l&n加粗下划线'
 ```
 
@@ -156,8 +157,9 @@ formatted-text: '&l&n加粗下划线'
 - `&m`：删除线
 - `&n`：下划线
 - `&o`：斜体
-- `&k`：模糊
+- `&k`：乱码
 - `&r`：重置格式
+- `&{#Hex-code}`: 十六进制颜色 (minecraft 1.16+)
 
 ### 基础使用示例
 
@@ -276,6 +278,49 @@ fun onSelectLocale(event: SystemSelectLocaleEvent) {
 - 强制所有玩家使用指定语言
 - 根据玩家数据库设置个性化语言
 - 提供语言切换命令
+
+### 在配置文件中使用多语言
+
+除了可以通过 `sendLang` 发送语言信息外, 还可以在配置文件中引用语言节点:
+
+#### 配置文件设定
+```yaml
+nb_sword:
+  item:
+    material: DIAMOND_SWORD
+    # @lang:nb_sword_name
+    name: '牛逼的剑' # 带有 @lang 注释的键会被解析为对应语言的文本, 并且定义了默认值
+    # @lang:nb_sword_lore
+    lore: |-
+      '这把剑削铁如泥,'
+      '非常的牛逼!'
+```
+
+#### 语言文件设定
+这里提供 `zh_CN` 和 `en_US` 两种语言的示例:
+
+##### zh_CN.yml
+```yaml
+nb_sword_name: '牛逼的剑'
+nb_sword_lore:
+  - '这把剑削铁如泥,'
+  - '非常的牛逼!'
+```
+
+##### en_US.yml
+```yaml
+nb_sword_name: 'Awesome Sword'
+nb_sword_lore:
+  - 'This sword cuts through iron,'
+  - 'It's really awesome!'
+```
+
+#### 代码中使用
+```kotlin
+val display = section.getTranslatedString("item.name")?.get(player.locale) // 获取 player 对应的语言文本
+val displayWithDefault = section.getTranslatedString("item.name", "牛逼的剑").get(player.locale) // 获取 player 对应的语言文本, 如果没有找到语言节点则使用默认值
+val lore = section.getTranslatedStringList("item.lore").get(player.locale) // 获取 player 对应的语言文本列表
+```
 
 ## 富文本与交互
 
@@ -1658,6 +1703,19 @@ val summary = Components.text("查看详情")
         "详细信息第二行",
         "详细信息第三行"
     ))
+```
+
+#### Q6: 配置文件中使用语言节点, 无法获取到对应语言节点？
+
+**解决方案：**
+```yaml
+# 请确保注释格式正确
+# @lang:welcome
+welcome: "欢迎!"
+
+# 错误的格式(注意空格)
+# @lang: welcome
+welcome: "欢迎!"
 ```
 
 ### 调试技巧
