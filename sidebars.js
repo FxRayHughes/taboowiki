@@ -97,6 +97,7 @@ const sidebars = {
                         'basic-tech/navigation/index',          // 寻路导航系统
                         'basic-tech/fake-op/index',             // 假 OP 系统
                         'basic-tech/bukkit-util/index',         // Bukkit 工具集
+                        'basic-tech/player-session-map/index',  // 玩家会话管理
                     ]
                 },
             ],
