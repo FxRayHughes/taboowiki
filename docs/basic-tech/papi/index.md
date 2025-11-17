@@ -302,6 +302,42 @@ fun sendWelcome(player: Player) {
 - 支持所有已注册的 PAPI 变量（包括 TabooLib 和其他插件注册的）
 - 如果 PlaceholderAPI 未安装，返回原始文本
 
+### 无玩家参数替换
+
+适用于替换不依赖玩家数据的全局占位符，如服务器统计信息、在线人数等：
+
+```kotlin
+import taboolib.platform.compat.replacePlaceholder
+
+fun getServerInfo(): String {
+    // 替换全局占位符（不需要玩家对象）
+    val info = "当前在线: %server_online%".replacePlaceholder()
+    return info
+}
+
+fun displayGlobalStats() {
+    // 批量替换全局占位符
+    val messages = listOf(
+        "服务器 TPS: %server_tps%",
+        "在线玩家: %server_online%",
+        "内存使用: %server_ram_used%/%server_ram_max% MB"
+    ).replacePlaceholder()
+
+    messages.forEach { println(it) }
+}
+```
+
+**代码说明：**
+- `replacePlaceholder()` 无参数版本内部调用 `PlaceholderAPI.setPlaceholders(null, ...)`
+- 只能替换不依赖特定玩家的全局变量
+- 如果 PlaceholderAPI 不存在，返回原始文本（容错处理）
+
+**适用场景：**
+- 服务器公告板
+- 全局统计信息显示
+- 记分板标题（非玩家相关部分）
+- 配置文件中的全局变量
+
 ### 多行文本替换
 
 ```kotlin

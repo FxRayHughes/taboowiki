@@ -365,6 +365,327 @@ submitChain {
 }
 ```
 
+## Folia 区域调度器
+
+:::tip[什么是 Folia？]
+Folia 是 Paper 的多线程分支，采用区域化线程模型。在 Folia 环境下，传统的调度器无法安全地操作特定位置的游戏对象，必须使用 RegionScheduler 在正确的区域线程中执行任务。
+:::
+
+TabooLib 为常见的游戏对象提供了 Folia 安全的调度器扩展函数，自动检测运行环境并选择合适的调度器。
+
+### 支持的对象类型
+
+- **Location**：在指定位置执行任务
+- **Entity**：在实体所在位置执行任务
+- **Block**：在方块所在位置执行任务
+- **Chunk**：在区块中心位置执行任务
+- **World**：在指定世界坐标执行任务
+
+### 基础用法
+
+#### 在实体位置执行任务
+
+```kotlin title="EntityTask.kt" showLineNumbers
+import org.bukkit.entity.Entity
+import taboolib.platform.util.runTask
+import taboolib.platform.util.submit
+
+fun teleportEntity(entity: Entity, target: Location) {
+    // highlight-start
+    // 立即在实体位置执行任务（Folia 安全）
+    entity.runTask(Runnable {
+        entity.teleport(target)
+    })
+    // highlight-end
+}
+
+fun delayedRemove(entity: Entity) {
+    // highlight-start
+    // 延迟 20 tick 后执行
+    entity.submit(delay = 20) {
+        entity.remove()
+    }
+    // highlight-end
+}
+
+fun periodicParticle(entity: Entity) {
+    // highlight-start
+    // 每 20 tick 重复执行
+    entity.submit(period = 20) {
+        entity.world.spawnParticle(
+            Particle.FLAME,
+            entity.location,
+            10
+        )
+    }
+    // highlight-end
+}
+```
+
+**代码说明：**
+- `runTask(Runnable)`：执行一次性任务
+- `submit(delay, period)`：支持延迟和周期执行
+- 自动适配 Folia 和传统服务端
+
+#### 在方块位置执行任务
+
+```kotlin title="BlockTask.kt" showLineNumbers
+import org.bukkit.block.Block
+import taboolib.platform.util.submit
+
+fun breakBlockLater(block: Block) {
+    // highlight-start
+    // 在方块位置执行任务
+    block.submit(delay = 10) {
+        block.type = Material.AIR
+    }
+    // highlight-end
+}
+
+fun regenerateBlock(block: Block, originalType: Material) {
+    // 10 秒后恢复方块
+    block.submit(delay = 200) {
+        block.type = originalType
+    }
+}
+```
+
+#### 在世界坐标执行任务
+
+```kotlin title="WorldTask.kt" showLineNumbers
+import org.bukkit.World
+import taboolib.platform.util.runTask
+
+fun createExplosion(world: World, x: Double, z: Double) {
+    // highlight-start
+    // 在指定世界坐标执行任务
+    world.runTask(x, z, Runnable {
+        world.createExplosion(x, 64.0, z, 4.0f)
+    })
+    // highlight-end
+}
+
+fun spawnMobAtLocation(world: World, x: Double, z: Double) {
+    world.submit(x, z, delay = 20) {
+        world.spawnEntity(
+            Location(world, x, 64.0, z),
+            EntityType.ZOMBIE
+        )
+    }
+}
+```
+
+#### 在区块执行任务
+
+```kotlin title="ChunkTask.kt" showLineNumbers
+import org.bukkit.Chunk
+import taboolib.platform.util.submit
+
+fun processChunk(chunk: Chunk) {
+    // highlight-start
+    // 在区块中心位置执行任务
+    chunk.submit(delay = 0) {
+        // 处理区块数据...
+        chunk.entities.forEach { entity ->
+            // 安全地操作区块内的实体
+            entity.remove()
+        }
+    }
+    // highlight-end
+}
+```
+
+### 参数说明
+
+所有扩展函数都支持以下参数：
+
+```kotlin
+fun Location.submit(
+    now: Boolean = false,          // 是否立即执行
+    async: Boolean = false,         // 是否异步执行
+    delay: Long = 0,                // 延迟执行时间（tick）
+    period: Long = 0,               // 重复执行时间（tick，0 表示不重复）
+    useScheduler: Boolean = true,   // 在非 Folia 环境下是否使用调度器
+    executor: PlatformExecutor.PlatformTask.() -> Unit
+): PlatformExecutor.PlatformTask
+```
+
+**参数说明：**
+- `now = true`：立即在当前线程执行（忽略 delay 参数）
+- `async = true`：异步执行，使用全局调度器（不受 Folia 区域限制）
+- `useScheduler = false`：在非 Folia 环境下直接执行而不使用调度器
+- `period > 0`：任务将按指定间隔重复执行
+
+### 工作原理
+
+```mermaid
+graph TB
+    A[调用调度器函数] --> B{是否为 Folia 环境?}
+
+    B -->|是| C[使用 RegionScheduler]
+    B -->|否| D{useScheduler 参数}
+
+    D -->|true| E[使用标准调度器]
+    D -->|false| F[立即执行任务]
+
+    C --> G[在正确的区域线程执行]
+    E --> H[在主线程执行]
+    F --> I[当前线程执行]
+
+    style A fill:#e3f2fd,color:#000000
+    style B fill:#fff3e0,color:#000000
+    style C fill:#e8f5e9,color:#000000
+    style D fill:#fff3e0,color:#000000
+    style G fill:#e8f5e9,color:#000000
+    style H fill:#e8f5e9,color:#000000
+    style I fill:#e8f5e9,color:#000000
+```
+
+### 实战示例
+
+#### 技能系统
+
+```kotlin title="SkillSystem.kt" showLineNumbers
+import org.bukkit.entity.Player
+import org.bukkit.entity.LivingEntity
+import taboolib.platform.util.submit
+
+object SkillSystem {
+
+    fun fireballSkill(player: Player, target: LivingEntity) {
+        // highlight-start
+        // 在玩家位置生成火球
+        player.submit {
+            val fireball = player.world.spawn(
+                player.eyeLocation,
+                Fireball::class.java
+            )
+            fireball.direction = player.location.direction
+        }
+        // highlight-end
+
+        // highlight-start
+        // 在目标位置创建爆炸效果
+        target.submit(delay = 20) {
+            target.world.createExplosion(
+                target.location,
+                2.0f,
+                false
+            )
+        }
+        // highlight-end
+    }
+
+    fun aoeHeal(center: Location, radius: Double) {
+        // highlight-start
+        center.submit {
+            // 在中心位置执行 AOE 治疗
+            center.world.getNearbyEntities(center, radius, radius, radius)
+                .filterIsInstance<Player>()
+                .forEach { player ->
+                    player.health = (player.health + 5.0).coerceAtMost(player.maxHealth)
+                }
+        }
+        // highlight-end
+    }
+}
+```
+
+#### 方块再生系统
+
+```kotlin title="BlockRegenSystem.kt" showLineNumbers
+import org.bukkit.block.Block
+import org.bukkit.Material
+import taboolib.platform.util.submit
+
+object BlockRegenSystem {
+
+    fun breakWithRegen(block: Block, regenSeconds: Int) {
+        val originalType = block.type
+        val originalData = block.blockData.clone()
+
+        // 立即破坏方块
+        block.type = Material.AIR
+
+        // highlight-start
+        // 在方块位置执行再生任务
+        block.submit(delay = regenSeconds * 20L) {
+            block.type = originalType
+            block.blockData = originalData
+        }
+        // highlight-end
+    }
+
+    fun temporaryBlock(location: Location, material: Material, seconds: Int) {
+        // highlight-start
+        location.submit {
+            // 放置临时方块
+            location.block.type = material
+        }
+
+        // 延迟移除
+        location.submit(delay = seconds * 20L) {
+            location.block.type = Material.AIR
+        }
+        // highlight-end
+    }
+}
+```
+
+#### 区域效果系统
+
+```kotlin title="AreaEffectSystem.kt" showLineNumbers
+import org.bukkit.World
+import org.bukkit.Particle
+import taboolib.platform.util.submit
+
+object AreaEffectSystem {
+
+    fun createProtectionZone(world: World, x: Double, z: Double, duration: Int) {
+        val task = world.submit(x, z, period = 20) {
+            // 每秒显示粒子效果
+            for (i in 0..360 step 10) {
+                val angle = Math.toRadians(i.toDouble())
+                val offsetX = Math.cos(angle) * 5.0
+                val offsetZ = Math.sin(angle) * 5.0
+
+                world.spawnParticle(
+                    Particle.BARRIER,
+                    x + offsetX,
+                    64.0,
+                    z + offsetZ,
+                    1
+                )
+            }
+        }
+
+        // 持续时间后取消任务
+        world.submit(x, z, delay = duration * 20L) {
+            task.cancel()
+        }
+    }
+}
+```
+
+### 兼容性说明
+
+:::info[环境检测]
+这些扩展函数会自动检测当前服务端环境：
+- **Folia 环境**：使用 `RegionScheduler` 在正确的区域线程执行
+- **传统环境**：使用标准调度器或立即执行（取决于 `useScheduler` 参数）
+:::
+
+:::tip[最佳实践]
+在操作游戏世界中的对象（实体、方块、区块）时，优先使用这些扩展函数而不是全局 `submit`。这样可以确保你的插件在 Folia 和传统服务端都能正常工作。
+:::
+
+:::warning[注意事项]
+- 异步任务（`async = true`）不受 Folia 区域限制，但不能直接操作游戏世界
+- `now = true` 会在当前线程立即执行，Folia 环境下可能不安全
+- 尽量避免在异步任务中操作实体、方块等游戏对象
+:::
+
+
 ## 常见问题
 
 ### 何时使用传统调度器，何时使用协程调度器？

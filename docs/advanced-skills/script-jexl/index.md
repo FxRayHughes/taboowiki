@@ -554,8 +554,8 @@ import kotlin.math.sqrt
 
 val compiler = JexlCompiler.new()
     .namespace(mapOf(
-        "Math" to java.lang.Math,
-        "System" to java.lang.System
+        "Math" to Math, // 这里是伪代码，应该传入对象或者是class类
+        "System" to System // 这里是伪代码，应该传入对象或者是class类
     ))
 
 val script = "Math:max(a, b)".compileToScript(compiler)
