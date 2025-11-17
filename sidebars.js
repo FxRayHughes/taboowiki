@@ -27,9 +27,10 @@ const sidebars = {
             label: '👋🏻 快速上手',
             collapsed: false,
             items: [
+                'start-hand/taboo-plugin/index',
                 'start-hand/create-manually/index',
-                'start-hand/taboostart/index',
-                'start-hand/taboo-plugin/index'
+                'start-hand/paper-compat/index',
+                'start-hand/taboostart/index'
             ]
         },
 
