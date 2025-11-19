@@ -90,6 +90,7 @@ const sidebars = {
                     items: [
                         'basic-tech/database/index',            // 数据库
                         'basic-tech/utilities/index',           // 工具集
+                        'basic-tech/supplier-lazy/index',       // SupplierLazy 延迟加载
                         'basic-tech/demand/index',              // 条件判断
                         'basic-tech/self-awake/index',          // 自唤醒机制
                         'basic-tech/vault/index',               // Vault 经济
