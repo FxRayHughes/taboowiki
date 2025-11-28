@@ -46,6 +46,15 @@ const config = {
     },
     plugins: ['docusaurus-plugin-sass'],
 
+    // 51.la 统计脚本 <script charset="UTF-8" id="LA_COLLECT" src="//sdk.51.la/js-sdk-pro.min.js?id=3OD2GD3OQ8IQFXzH&ck=3OD2GD3OQ8IQFXzH"></script>
+    scripts: [
+        {
+            src: 'https://sdk.51.la/js-sdk-pro.min.js?id=3OD2GD3OQ8IQFXzH&ck=3OD2GD3OQ8IQFXzH',
+            charset: 'UTF-8',
+            id: 'LA_COLLECT',
+        },
+    ],
+
     //'@easyops-cn/docusaurus-search-local'
     themes: [
         '@docusaurus/theme-mermaid',
