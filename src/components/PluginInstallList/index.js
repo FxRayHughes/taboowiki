@@ -527,7 +527,9 @@ const PluginInstallList = () => {
         if (buildType === 'kts') {
             // Kotlin DSL
             return `taboolib {
-    install(${sortedModules.join(', ')})
+            env {
+        install(${sortedModules.join(', ')})
+    }
 
     version {
         taboolib = "${versionString}"${!versionString ? ' // 手动填入最新版本或点击更新按钮' : ''}

@@ -58,7 +58,9 @@ plugins {
 
 taboolib {
     // 选择需要的模块
-    install(Basic, Bukkit, BukkitHook, BukkitNMSUtil)
+    env {
+        install(Basic, Bukkit, BukkitHook, BukkitNMSUtil)
+    }
 
     // 设置 TabooLib 版本
     version {
@@ -84,8 +86,9 @@ plugins {
 // highlight-start
 taboolib {
     // 选择需要的模块
-    install Basic, Bukkit, BukkitHook, BukkitNMSUtil
-
+    env {
+        install(Basic, Bukkit, BukkitHook, BukkitNMSUtil)
+    }
     // 设置 TabooLib 版本
     version {
         taboolib = '6.2.3-664550e' // 上方的 构建版本

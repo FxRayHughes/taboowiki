@@ -54,7 +54,7 @@ TabooLib 默认的解决方案是通过 **relocate 重定向**改变依赖的包
 taboolib {
     env {
         // 开启隔离类加载器（沙盒模式）
-        install("enable-isolated-classloader")
+        enableIsolatedClassLoader = true
     }
     version {
         // 跳过 kotlin 重定向
@@ -64,7 +64,7 @@ taboolib {
 ```
 
 :::info 配置说明
-- `install("enable-isolated-classloader")` - 启用沙盒模式
+- `enableIsolatedClassLoader = true` - 启用沙盒模式
 - `skipKotlinRelocate = true` - 跳过 Kotlin 标准库的重定向
 :::
 

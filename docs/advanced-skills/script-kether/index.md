@@ -709,17 +709,16 @@ val result = KetherShell.eval(
 通过变量传入对象：
 
 ```kotlin
-data class PlayerData(val name: String, val coins: Int)
-
-val playerData = PlayerData("Steve", 100)
-
-KetherShell.eval(
-    "tell 'Name: ' + data.name + ', Coins: ' + data.coins",
-    ScriptOptions.new {
-        sender(player)
-        set("data", playerData)
-    }
-).join()
+fun String.toShow(session: Session): String {
+    val str = this.replace(
+        "title" to session.conversation.option.title.replace(
+            "name" to session.source.name
+        ),
+        "[通用称呼]" to GenderManager.getGender(uuid),
+        "[称呼]" to manager.player.name,
+    ).colored()
+    return parse(str, ScriptOptions.builder().namespace(listOf("gujian")).vars(session.variables).sender(sender = adaptPlayer(session.player)).build())
+}
 ```
 
 ### 如何优化脚本性能？
