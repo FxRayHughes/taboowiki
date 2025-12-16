@@ -61,7 +61,7 @@ redis:
   # 基础连接配置
   host: localhost
   port: 6379
-  password: your_password  # 可选
+  password: your_password  # 可选，仅密码认证
   ssl: false
   timeout: PT15S           # 超时时间 (Duration 格式)
   database: 0              # 数据库编号 0-15
@@ -99,6 +99,17 @@ redis:
 - `PT10H` - 10 小时
 - `P2D` - 2 天
 - `P2DT3H4M` - 2 天 3 小时 4 分钟
+:::
+
+:::warning[Redis 认证说明]
+**当前版本仅支持密码认证**，不支持 Redis 6+ ACL 的用户名 + 密码认证。
+
+如果你的 Redis 使用了 ACL 功能，请使用 [AlkaidRedis 模块](/docs/expanding-technology/alkaid-redis)，它完整支持：
+- 用户名 + 密码认证（Redis 6+ ACL）
+- 仅密码认证（Redis 5.x 及以下）
+- 仅用户名认证（特殊场景）
+
+**Lettuce Redis 用户名支持正在开发中**，未来版本将添加 `withAuthentication(username, password)` 支持。
 :::
 
 #### 创建客户端

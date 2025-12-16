@@ -28,14 +28,30 @@ taboolib {
 
 #### 创建连接
 
+**仅密码认证（Redis 5.x 及以下）：**
+
 ```kotlin
 val redis = AlkaidRedis.create()
     .host("localhost")
     .port(6379)
-    .pass("password")
+    .pass("password")         // 仅密码
     .connect(32)              // 连接池大小，默认32
     .timeout(1000)            // 超时时间(ms)，默认1000
     .reconnectDelay(1000L)    // 重连延迟(ms)，默认1000
+    .connection()
+```
+
+**用户名 + 密码认证（Redis 6+ ACL）：**
+
+```kotlin
+val redis = AlkaidRedis.create()
+    .host("localhost")
+    .port(6379)
+    .auth("default")          // 用户名（Redis 6+ ACL）
+    .pass("password")         // 密码
+    .connect(32)
+    .timeout(1000)
+    .reconnectDelay(1000L)
     .connection()
 ```
 
@@ -54,10 +70,22 @@ val redis = AlkaidRedis.create()
 redis:
   host: localhost
   port: 6379
-  password: your_password
+  # Redis 6+ ACL 认证（用户名 + 密码）
+  user: default              # 可选，用户名（别名：auth）
+  password: your_password    # 密码（别名：pass）
   connect: 32
   timeout: 1000
 ```
+
+:::tip[Redis 认证模式]
+AlkaidRedis 支持多种认证模式：
+- **用户名 + 密码**：同时配置 `user` 和 `password`（Redis 6+ ACL）
+- **仅密码**：只配置 `password`（Redis 5.x 及以下）
+- **仅用户名**：只配置 `user`（特殊场景）
+- **无认证**：不配置任何认证字段（本地开发环境）
+
+配置字段支持别名：`user`/`auth` 和 `password`/`pass` 可互换使用。
+:::
 
 #### 便捷创建方式
 
