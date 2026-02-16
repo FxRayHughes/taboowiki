@@ -1058,14 +1058,88 @@ entity.setPathfindingMalus(PathType.DAMAGE_CACTUS, 8.0f) // 避开仙人掌
 
 :::
 
+## 路径平滑
+
+:::info[版本要求]
+路径平滑功能在 TabooLib 6.2.4+ 可用。
+:::
+
+`PathSmoothing` 使用 String Pulling（拉绳法）算法，将 A* 生成的网格路径转换为平滑路径，去除多余拐点，让路径尽可能走直线。
+
+```kotlin title="路径平滑" showLineNumbers
+val entity = NodeEntity(
+    location = npc.location,
+    height = 2.0,
+    width = 0.6
+)
+
+val pathFinder = PathFinder(NodeReader(entity))
+val path = pathFinder.findPath(target, distance = 50f)
+
+if (path != null) {
+    // highlight-start
+    // 对路径进行平滑处理
+    val smoothed = PathSmoothing.smooth(path, entity)
+    // highlight-end
+
+    // 使用平滑后的路径
+    smoothed.forEach { point ->
+        println("平滑节点: ${point.x}, ${point.y}, ${point.z}")
+    }
+}
+```
+
+**工作原理：**
+- 从起点开始，尝试直接连接尽可能远的节点
+- 通过 `hasLineOfSight()` 检测两点之间是否有视线
+- 通过 `isStandable()` 检查实体是否可以站立在目标位置
+- 去除所有不必要的中间拐点
+
+## 自定义方块类型处理器
+
+:::info[版本要求]
+方块类型处理器在 TabooLib 6.2.4+ 可用。
+:::
+
+`BlockTypeHandler` 接口允许自定义方块的寻路类型判断，支持优先级系统：
+
+```kotlin title="自定义方块处理器" showLineNumbers
+class MyBlockHandler : BlockTypeHandler {
+
+    override val priority: Int = 100  // 优先级，越高越先执行
+
+    override fun handle(block: Block): PathType? {
+        // 返回 null 表示不处理，交给下一个处理器
+        return when (block.type) {
+            Material.DIAMOND_BLOCK -> PathType.WALKABLE  // 钻石块可行走
+            Material.BEDROCK -> null  // 不处理，使用默认逻辑
+            else -> null
+        }
+    }
+}
+```
+
+**内置处理器：**
+
+| 处理器 | 处理的方块 |
+|--------|-----------|
+| `DefaultHandler` | 水、岩浆、火焰、仙人掌、树叶、栅栏等常见方块 |
+| `DoorHandler` | 木门、铁门 |
+| `FenceGateHandler` | 栅栏门 |
+| `SlabHandler` | 台阶 |
+| `StairsHandler` | 楼梯 |
+| `TrapdoorHandler` | 活板门 |
+| `LilyPadHandler` | 睡莲 |
+| `CampfireHandler` | 营火 |
+
 ## 总结
 
 TabooLib Navigation 模块提供了：
 
-✅ **智能寻路**：基于 A* 算法的高效路径查找
-✅ **地形感知**：支持门、水、悬崖等复杂地形
-✅ **随机生成**：多种随机位置生成策略
-✅ **高度定制**：可自定义实体属性和路径代价
-✅ **性能优化**：缓存机制、可控搜索深度
+- 基于 A* 算法的高效路径查找
+- 路径平滑算法，去除多余拐点
+- 可扩展的方块类型处理器系统
+- 多种随机位置生成策略
+- 可自定义实体属性和路径代价
 
-适用于 NPC 巡逻、怪物追逐、宠物跟随、AI 游荡等各种场景！
+适用于 NPC 巡逻、怪物追逐、宠物跟随、AI 游荡等各种场景。

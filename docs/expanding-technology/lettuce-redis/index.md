@@ -133,6 +133,9 @@ object RedisManager {
             warning("Redis 客户端启动失败: ${it.message}")
             null
         }
+
+        // 或使用同步启动
+        // client.startSync()
     }
 }
 ```
@@ -798,8 +801,15 @@ client.useCommands { commands ->
    - 超时时间使用 Duration 格式
 
 4. **依赖版本升级**
-   - Lettuce Core 升级至 6.6.0
-   - Apache Commons Pool2 升级至 2.12.1
+   - Lettuce Core 升级至 7.2.1
+   - Netty 升级至 4.2.5.Final
+   - 新增 redis-authx-core 0.1.1-beta2 支持
+
+5. **生命周期管理**
+   - 新增 `startSync()` 同步启动方法
+   - 新增 `stop()` 方法手动关闭客户端
+   - 新增 `autoRelease` 参数，控制关服时是否自动释放连接
+   - 在 `LifeCycle.DISABLE` 阶段自动关闭所有客户端
 
 #### 配置文件迁移
 

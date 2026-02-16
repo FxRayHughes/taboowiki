@@ -14,6 +14,7 @@
     "build:pack": "node build-and-pack.js"
   },
   "dependencies": {
+    "@ant-design/icons": "^6.1.0",
     "@ant-design/v5-patch-for-react-19": "^1.0.3",
     "@docusaurus/core": "3.9.2",
     "@docusaurus/preset-classic": "3.9.2",
@@ -37,6 +38,7 @@
     "@tiptap/pm": "^3.10.2",
     "@tiptap/react": "^3.10.2",
     "@tiptap/starter-kit": "^3.10.2",
+    "antd": "^6.3.0",
     "clsx": "^2.0.0",
     "docusaurus-plugin-sass": "^0.2.6",
     "lodash.throttle": "^4.1.1",
