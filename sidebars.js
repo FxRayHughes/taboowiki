@@ -20,7 +20,7 @@ const sidebars = {
         'intro',
 
         // ========================================
-        // 👋🏻 快速上手
+        // 快速上手
         // ========================================
         {
             type: 'category',
@@ -30,36 +30,45 @@ const sidebars = {
                 'start-hand/taboo-plugin/index',
                 'start-hand/create-manually/index',
                 'start-hand/paper-compat/index',
-                'start-hand/taboostart/index'
+                'start-hand/taboostart/index',
             ]
         },
 
         // ========================================
-        // 📚 基础技术 - 按功能域分层
+        // 基础技术 - 按功能域分层
         // ========================================
         {
             type: 'category',
             label: '📚 基础技术',
             collapsed: true,
             items: [
-                // 🔥 核心基础 - 必学模块
+                // 配置与国际化
                 {
                     type: 'category',
-                    label: '🔥 核心基础',
+                    label: '📝 配置与国际化',
                     collapsed: true,
                     items: [
                         'basic-tech/config/index',              // 配置文件
                         'basic-tech/language/index',            // 语言文件
-                        'basic-tech/scheduler/index',           // 调度器 & 协程
-                        'basic-tech/event-manager/index',       // 事件管理
-                        'basic-tech/command/index',             // 命令系统
                     ]
                 },
 
-                // 🎨 UI & 交互 - 界面相关
+                // 命令与事件
                 {
                     type: 'category',
-                    label: '🎨 UI & 交互',
+                    label: '⚡ 命令与事件',
+                    collapsed: true,
+                    items: [
+                        'basic-tech/command/index',             // 命令系统
+                        'basic-tech/event-manager/index',       // 事件管理
+                        'basic-tech/scheduler/index',           // 调度器 & 协程
+                    ]
+                },
+
+                // 界面与交互
+                {
+                    type: 'category',
+                    label: '🎨 界面与交互',
                     collapsed: true,
                     items: [
                         'basic-tech/chest-menu/index',          // 箱子菜单
@@ -69,10 +78,10 @@ const sidebars = {
                     ]
                 },
 
-                // ⚡ 底层技术 - 跨版本 & NMS
+                // NMS 与跨版本
                 {
                     type: 'category',
-                    label: '⚡ 底层技术',
+                    label: '🔧 NMS 与跨版本',
                     collapsed: true,
                     items: [
                         'basic-tech/nms-proxy/index',           // NMS 代理系统
@@ -82,23 +91,32 @@ const sidebars = {
                     ]
                 },
 
-                // 🛠️ 专用工具 - 特定场景
+                // 游戏功能
                 {
                     type: 'category',
-                    label: '🛠️ 专用工具',
+                    label: '🎮 游戏功能',
                     collapsed: true,
                     items: [
                         'basic-tech/database/index',            // 数据库
-                        'basic-tech/utilities/index',           // 工具集
-                        'basic-tech/supplier-lazy/index',       // SupplierLazy 延迟加载
-                        'basic-tech/demand/index',              // 条件判断
-                        'basic-tech/self-awake/index',          // 自唤醒机制
                         'basic-tech/vault/index',               // Vault 经济
                         'basic-tech/effect/index',              // 药水效果管理
                         'basic-tech/ai/index',                  // 实体 AI 控制
                         'basic-tech/navigation/index',          // 寻路导航系统
                         'basic-tech/fake-op/index',             // 假 OP 系统
+                    ]
+                },
+
+                // 通用工具
+                {
+                    type: 'category',
+                    label: '🛠️ 通用工具',
+                    collapsed: true,
+                    items: [
                         'basic-tech/bukkit-util/index',         // Bukkit 工具集
+                        'basic-tech/utilities/index',           // 工具集
+                        'basic-tech/supplier-lazy/index',       // SupplierLazy 延迟加载
+                        'basic-tech/demand/index',              // 条件判断
+                        'basic-tech/self-awake/index',          // 自唤醒机制
                         'basic-tech/player-session-map/index',  // 玩家会话管理
                     ]
                 },
@@ -106,23 +124,54 @@ const sidebars = {
         },
 
         // ========================================
-        // ✨ 进阶技术
+        // 进阶技术
         // ========================================
         {
             type: 'category',
             label: '✨ 进阶技术',
             collapsed: true,
             items: [
-                'advanced-skills/isolated-classloader/index',
-                'advanced-skills/script-javascript/index',
-                'advanced-skills/script-jexl/index',
-                'advanced-skills/script-kether/index',
-                'advanced-skills/kotlinx-serialization/index'
+                // 数据存储
+                {
+                    type: 'category',
+                    label: '💾 数据存储',
+                    collapsed: true,
+                    items: [
+                        'expanding-technology/player-database/index',        // 简单数据库
+                        'expanding-technology/persistent-container/index',   // PTC Object ORM
+                        'expanding-technology/database-ioc/index',          // Database IOC
+                        'expanding-technology/alkaid-redis/index',          // Alkaid Redis
+                        'expanding-technology/lettuce-redis/index',         // Lettuce Redis
+                    ]
+                },
+
+                // 脚本引擎
+                {
+                    type: 'category',
+                    label: '📜 脚本引擎',
+                    collapsed: true,
+                    items: [
+                        'advanced-skills/script-kether/index',              // Kether 脚本
+                        'advanced-skills/script-javascript/index',          // JavaScript 脚本
+                        'advanced-skills/script-jexl/index',               // JEXL 表达式
+                    ]
+                },
+
+                // 类加载与序列化
+                {
+                    type: 'category',
+                    label: '🔗 类加载与序列化',
+                    collapsed: true,
+                    items: [
+                        'advanced-skills/isolated-classloader/index',       // 隔离类加载器
+                        'advanced-skills/kotlinx-serialization/index',     // Kotlinx 序列化
+                    ]
+                },
             ],
         },
 
         // ========================================
-        // 🎠 拓展技术
+        // 拓展技术
         // ========================================
         {
             type: 'category',
@@ -130,7 +179,6 @@ const sidebars = {
             collapsed: true,
             items: [
                 'expanding-technology/create-expansion/index',
-                // Arim 工具箱 - 默认折叠减少干扰
                 {
                     type: 'category',
                     label: '🏙️ Arim 工具箱',
@@ -154,12 +202,7 @@ const sidebars = {
                         'expanding-technology/arim/gson-utils/index',
                     ],
                 },
-                // 其他扩展技术
-                'expanding-technology/player-database/index',
-                'expanding-technology/persistent-container/index',
                 'expanding-technology/universal-mythic/index',
-                'expanding-technology/alkaid-redis/index',
-                'expanding-technology/lettuce-redis/index',
             ],
         },
     ],
