@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import styles from './SponsorList.module.css';
 import { SponsorAPI } from '@site/src/utils/api';
 
-const GITHUB_TOKEN = atob('Z2hwX1pjSElZejBIMEJkWHpqdXdpeU0yTFNBQnM2NG5VdDF0MVhYZw==');
+const GITHUB_TOKEN = atob('Z2l0aHViX3BhdF8xMUFHQUdOVFEwZHJSR0JUek9WSXJ1X1dESE1VNWpKazJrWkZNb0lYZ0dYTXo0NjNscDJGUUtxOTRKSUR3RGRoNVFRTVRCRklOWndRcEkyWGI3');
 
 const SponsorList = () => {
   const [donations, setDonations] = useState([]);

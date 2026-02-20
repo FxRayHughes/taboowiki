@@ -78,7 +78,7 @@ export default function Approvals() {
         error: null,
         rawValue: null,
     });
-    const GITHUB_TOKEN = atob('Z2hwX1pjSElZejBIMEJkWHpqdXdpeU0yTFNBQnM2NG5VdDF0MVhYZw==');
+    const GITHUB_TOKEN = atob('Z2l0aHViX3BhdF8xMUFHQUdOVFEwZHJSR0JUek9WSXJ1X1dESE1VNWpKazJrWkZNb0lYZ0dYTXo0NjNscDJGUUtxOTRKSUR3RGRoNVFRTVRCRklOWndRcEkyWGI3');
 
     useEffect(() => {
         checkAuthAndFetchData();
