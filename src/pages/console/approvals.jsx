@@ -78,15 +78,10 @@ export default function Approvals() {
         error: null,
         rawValue: null,
     });
-    const [githubToken, setGithubToken] = useState('');
-    const [tokenInputValue, setTokenInputValue] = useState('');
+    const GITHUB_TOKEN = atob('Z2hwX1pjSElZejBIMEJkWHpqdXdpeU0yTFNBQnM2NG5VdDF0MVhYZw==');
 
     useEffect(() => {
         checkAuthAndFetchData();
-        if (ExecutionEnvironment.canUseDOM) {
-            const saved = localStorage.getItem('github_discussions_pat') || '';
-            setGithubToken(saved);
-        }
     }, []);
 
     // 解析 Discussion 引用：支持 URL 或纯数字编号
@@ -146,14 +141,9 @@ export default function Approvals() {
     };
 
     // 打开 Discussion 查看弹窗
-    const openDiscussionModal = async (proofValue, token) => {
-        const activeToken = token ?? githubToken;
+    const openDiscussionModal = async (proofValue) => {
         setDiscussionModal({visible: true, loading: true, discussion: null, error: null, rawValue: proofValue});
-        if (!activeToken) {
-            setDiscussionModal(prev => ({...prev, loading: false, error: 'NO_TOKEN'}));
-            return;
-        }
-        const result = await fetchDiscussionContent(proofValue, activeToken);
+        const result = await fetchDiscussionContent(proofValue, GITHUB_TOKEN);
         if (result.error) {
             setDiscussionModal(prev => ({...prev, loading: false, error: result.error}));
         } else {
@@ -1179,44 +1169,7 @@ export default function Approvals() {
                             </div>
                         )}
 
-                        {!discussionModal.loading && discussionModal.error === 'NO_TOKEN' && (
-                            <Space direction="vertical" style={{width: '100%'}} size="middle">
-                                <Alert
-                                    type="warning"
-                                    message="需要 GitHub Personal Access Token"
-                                    description="请输入具有读取 Discussion 权限的 GitHub PAT（public_repo 或 read:discussion 范围），将保存在本地浏览器供后续使用。"
-                                    showIcon
-                                />
-                                <Space.Compact style={{width: '100%'}}>
-                                    <Input
-                                        value={tokenInputValue}
-                                        onChange={e => setTokenInputValue(e.target.value)}
-                                        placeholder="github_pat_xxxx..."
-                                        type="password"
-                                        onPressEnter={() => {
-                                            if (tokenInputValue) {
-                                                localStorage.setItem('github_discussions_pat', tokenInputValue);
-                                                setGithubToken(tokenInputValue);
-                                                openDiscussionModal(discussionModal.rawValue, tokenInputValue);
-                                            }
-                                        }}
-                                    />
-                                    <Button
-                                        type="primary"
-                                        disabled={!tokenInputValue}
-                                        onClick={() => {
-                                            localStorage.setItem('github_discussions_pat', tokenInputValue);
-                                            setGithubToken(tokenInputValue);
-                                            openDiscussionModal(discussionModal.rawValue, tokenInputValue);
-                                        }}
-                                    >
-                                        保存并查看
-                                    </Button>
-                                </Space.Compact>
-                            </Space>
-                        )}
-
-                        {!discussionModal.loading && discussionModal.error && discussionModal.error !== 'NO_TOKEN' && (
+                        {!discussionModal.loading && discussionModal.error && (
                             <Alert
                                 type="error"
                                 message="获取失败"

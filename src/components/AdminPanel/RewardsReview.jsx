@@ -110,8 +110,6 @@ export default function RewardsReview({
                   <th>奖励类型</th>
                   <th>描述</th>
                   <th>证明材料</th>
-                  <th>自评分</th>
-                  <th>最终评分</th>
                   <th>奖励金额</th>
                   <th>状态</th>
                   <th>申请时间</th>
@@ -135,8 +133,6 @@ export default function RewardsReview({
                         查看证明
                       </button>
                     </td>
-                    <td>{reward.selfScore || '-'}</td>
-                    <td>{reward.finalScore || '-'}</td>
                     <td className={styles.amount}>
                       {reward.amount ? `¥${reward.amount.toFixed(2)}` : '-'}
                     </td>

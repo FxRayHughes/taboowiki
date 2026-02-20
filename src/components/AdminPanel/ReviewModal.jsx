@@ -10,11 +10,9 @@ export default function ReviewModal({
   action,
   remark,
   amount,
-  score,
   processing,
   onRemarkChange,
   onAmountChange,
-  onScoreChange,
   onConfirm,
   onClose,
 }) {
@@ -47,32 +45,18 @@ export default function ReviewModal({
 
         <div className={styles.modalBody}>
           {isRewardApprove && (
-            <>
-              <div className={styles.formGroup}>
-                <label>奖励金额 (必填) *</label>
-                <input
-                  type="number"
-                  value={amount}
-                  onChange={(e) => onAmountChange(e.target.value)}
-                  placeholder="请输入奖励金额"
-                  className={styles.input}
-                  step="0.01"
-                  min="0"
-                />
-              </div>
-              <div className={styles.formGroup}>
-                <label>最终评分 (0-100)</label>
-                <input
-                  type="number"
-                  value={score}
-                  onChange={(e) => onScoreChange(e.target.value)}
-                  placeholder="请输入最终评分"
-                  className={styles.input}
-                  min="0"
-                  max="100"
-                />
-              </div>
-            </>
+            <div className={styles.formGroup}>
+              <label>奖励金额 (必填) *</label>
+              <input
+                type="number"
+                value={amount}
+                onChange={(e) => onAmountChange(e.target.value)}
+                placeholder="请输入奖励金额"
+                className={styles.input}
+                step="0.01"
+                min="0"
+              />
+            </div>
           )}
 
           <div className={styles.formGroup}>

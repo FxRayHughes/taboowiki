@@ -36,7 +36,6 @@ export default function AdminPanel() {
   const [reviewAction, setReviewAction] = useState(null);
   const [reviewRemark, setReviewRemark] = useState('');
   const [reviewAmount, setReviewAmount] = useState('');
-  const [reviewScore, setReviewScore] = useState('');
   const [showReviewModal, setShowReviewModal] = useState(false);
   const [processing, setProcessing] = useState(false);
 
@@ -123,7 +122,6 @@ export default function AdminPanel() {
     setReviewAction(action);
     setReviewRemark('');
     setReviewAmount(type === 'reward' && action === 'approve' ? '' : '');
-    setReviewScore(type === 'reward' && action === 'approve' ? item.selfScore || '' : '');
     setShowReviewModal(true);
   };
 
@@ -133,7 +131,6 @@ export default function AdminPanel() {
     setReviewAction(null);
     setReviewRemark('');
     setReviewAmount('');
-    setReviewScore('');
   };
 
   const handleReview = async () => {
@@ -153,7 +150,6 @@ export default function AdminPanel() {
       } else if (type === 'reward') {
         if (reviewAction === 'approve') {
           const amount = parseFloat(reviewAmount);
-          const score = reviewScore ? parseInt(reviewScore) : null;
 
           if (!amount || amount <= 0) {
             showMessage('请输入有效的奖励金额', 'error');
@@ -161,7 +157,7 @@ export default function AdminPanel() {
             return;
           }
 
-          result = await SponsorAPI.adminApproveReward(reviewingItem.id, amount, score, reviewRemark);
+          result = await SponsorAPI.adminApproveReward(reviewingItem.id, amount, reviewRemark);
         } else if (reviewAction === 'reject') {
           result = await SponsorAPI.adminRejectReward(reviewingItem.id, reviewRemark);
         } else if (reviewAction === 'pay') {
@@ -320,11 +316,9 @@ export default function AdminPanel() {
           action={reviewAction}
           remark={reviewRemark}
           amount={reviewAmount}
-          score={reviewScore}
           processing={processing}
           onRemarkChange={setReviewRemark}
           onAmountChange={setReviewAmount}
-          onScoreChange={setReviewScore}
           onConfirm={handleReview}
           onClose={closeReviewModal}
         />
