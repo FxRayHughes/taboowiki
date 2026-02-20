@@ -6,6 +6,8 @@ import {SponsorAPI} from '@site/src/utils/api';
 import {AntdThemeProvider} from '@site/src/components/AntdThemeProvider';
 import dayjs from 'dayjs';
 import {
+    Alert,
+    Avatar,
     Button,
     Card,
     DatePicker,
@@ -37,6 +39,7 @@ import {
     EditOutlined,
     EyeOutlined,
     GiftOutlined,
+    LinkOutlined,
     ReloadOutlined,
     SafetyOutlined,
     StarFilled,
@@ -67,9 +70,100 @@ export default function Approvals() {
     const [rewardForm] = Form.useForm();
     const [payForm] = Form.useForm();
 
+    // Discussion 查看相关
+    const [discussionModal, setDiscussionModal] = useState({
+        visible: false,
+        loading: false,
+        discussion: null,
+        error: null,
+        rawValue: null,
+    });
+    const [githubToken, setGithubToken] = useState('');
+    const [tokenInputValue, setTokenInputValue] = useState('');
+
     useEffect(() => {
         checkAuthAndFetchData();
+        if (ExecutionEnvironment.canUseDOM) {
+            const saved = localStorage.getItem('github_discussions_pat') || '';
+            setGithubToken(saved);
+        }
     }, []);
+
+    // 解析 Discussion 引用：支持 URL 或纯数字编号
+    const parseDiscussionRef = (value) => {
+        if (!value) return null;
+        const urlMatch = value.match(/github\.com\/([^/]+)\/([^/]+)\/discussions\/(\d+)/);
+        if (urlMatch) {
+            return {owner: urlMatch[1], repo: urlMatch[2], number: parseInt(urlMatch[3], 10)};
+        }
+        const numMatch = value.trim().match(/^(\d+)$/);
+        if (numMatch) {
+            return {owner: 'TabooLib', repo: 'taboolib', number: parseInt(numMatch[1], 10)};
+        }
+        return null;
+    };
+
+    // 通过 GitHub GraphQL API 获取 Discussion 内容
+    const fetchDiscussionContent = async (proofValue, token) => {
+        const ref = parseDiscussionRef(proofValue);
+        if (!ref) {
+            return {error: '无法解析证明材料，请确认格式为 GitHub Discussion 链接或编号'};
+        }
+        const query = `
+            query GetDiscussion($owner: String!, $name: String!, $number: Int!) {
+                repository(owner: $owner, name: $name) {
+                    discussion(number: $number) {
+                        title
+                        bodyHTML
+                        author { login avatarUrl }
+                        createdAt
+                        url
+                    }
+                }
+            }
+        `;
+        try {
+            const resp = await fetch('https://api.github.com/graphql', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `bearer ${token}`,
+                },
+                body: JSON.stringify({query, variables: {owner: ref.owner, name: ref.repo, number: ref.number}}),
+            });
+            const data = await resp.json();
+            if (data.errors) {
+                return {error: data.errors[0]?.message || 'GraphQL 查询失败'};
+            }
+            const discussion = data.data?.repository?.discussion;
+            if (!discussion) {
+                return {error: `未找到 Discussion #${ref.number}，请检查编号是否正确`};
+            }
+            return {discussion};
+        } catch (err) {
+            return {error: `网络请求失败: ${err.message}`};
+        }
+    };
+
+    // 打开 Discussion 查看弹窗
+    const openDiscussionModal = async (proofValue, token) => {
+        const activeToken = token ?? githubToken;
+        setDiscussionModal({visible: true, loading: true, discussion: null, error: null, rawValue: proofValue});
+        if (!activeToken) {
+            setDiscussionModal(prev => ({...prev, loading: false, error: 'NO_TOKEN'}));
+            return;
+        }
+        const result = await fetchDiscussionContent(proofValue, activeToken);
+        if (result.error) {
+            setDiscussionModal(prev => ({...prev, loading: false, error: result.error}));
+        } else {
+            setDiscussionModal(prev => ({...prev, loading: false, discussion: result.discussion}));
+        }
+    };
+
+    const closeDiscussionModal = () => {
+        setDiscussionModal({visible: false, loading: false, discussion: null, error: null, rawValue: null});
+    };
 
     const checkAuthAndFetchData = async () => {
         if (!ExecutionEnvironment.canUseDOM) return;
@@ -190,7 +284,8 @@ export default function Approvals() {
                 selectedReward.id,
                 values.amount,
                 values.finalScore,
-                values.remark
+                values.remark,
+                values.description
             );
             if (data.success) {
                 message.success('审批成功');
@@ -467,20 +562,14 @@ export default function Approvals() {
             dataIndex: 'proofUrl',
             key: 'proofUrl',
             width: 100,
-            render: (proofUrl, record) => {
+            render: (proofUrl) => {
                 if (!proofUrl) return <Text type="secondary">-</Text>;
                 return (
                     <Button
                         type="link"
                         size="small"
                         icon={<EyeOutlined/>}
-                        onClick={() => {
-                            Modal.info({
-                                title: '证明材料',
-                                content: <div dangerouslySetInnerHTML={{__html: proofUrl}} style={{maxHeight: 400, overflow: 'auto'}}/>,
-                                width: 700,
-                            });
-                        }}
+                        onClick={() => openDiscussionModal(proofUrl)}
                     >
                         查看
                     </Button>
@@ -514,6 +603,7 @@ export default function Approvals() {
                                     rewardForm.setFieldsValue({
                                         finalScore: record.selfScore,
                                         amount: record.selfScore * 10, // 默认 1分 = 10元
+                                        description: record.description,
                                     });
                                 }}
                             >
@@ -889,25 +979,16 @@ export default function Approvals() {
                                     </Descriptions.Item>
                                 </Descriptions>
 
-                                {/* 证明材料 - 富文本显示 */}
+                                {/* 证明材料 */}
                                 {selectedReward.proofUrl && (
-                                    <Card
-                                        title="证明材料"
-                                        size="small"
-                                        style={{marginBottom: 16}}
-                                        bodyStyle={{maxHeight: 400, overflow: 'auto'}}
-                                    >
-                                        <div
-                                            dangerouslySetInnerHTML={{__html: selectedReward.proofUrl}}
-                                            style={{
-                                                wordBreak: 'break-word',
-                                                '& img': {
-                                                    maxWidth: '100%',
-                                                    height: 'auto'
-                                                }
-                                            }}
-                                        />
-                                    </Card>
+                                    <div style={{marginBottom: 16}}>
+                                        <Button
+                                            icon={<EyeOutlined/>}
+                                            onClick={() => openDiscussionModal(selectedReward.proofUrl)}
+                                        >
+                                            查看证明材料
+                                        </Button>
+                                    </div>
                                 )}
 
                                 <Divider/>
@@ -950,6 +1031,21 @@ export default function Approvals() {
                                                     step={10}
                                                     precision={2}
                                                     placeholder="请输入奖励金额（元）"
+                                                />
+                                            </Form.Item>
+
+                                            <Form.Item
+                                                label="修正后的贡献描述"
+                                                name="description"
+                                                rules={[
+                                                    {required: true, message: '请填写贡献描述'},
+                                                ]}
+                                                extra="将替换申请人原始描述，请确保内容准确"
+                                            >
+                                                <TextArea
+                                                    placeholder="输入修正后的贡献描述"
+                                                    rows={4}
+                                                    showCount
                                                 />
                                             </Form.Item>
                                         </>
@@ -1089,6 +1185,119 @@ export default function Approvals() {
                                     </Form.Item>
                                 </Form>
                             </>
+                        )}
+                    </Modal>
+
+                    {/* Discussion 证明材料查看弹窗 */}
+                    <Modal
+                        title={
+                            <Space>
+                                <EyeOutlined/>
+                                <span>证明材料</span>
+                            </Space>
+                        }
+                        open={discussionModal.visible}
+                        onCancel={closeDiscussionModal}
+                        footer={
+                            discussionModal.discussion ? (
+                                <Space>
+                                    <Button
+                                        icon={<LinkOutlined/>}
+                                        href={discussionModal.discussion.url}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                    >
+                                        在 GitHub 中查看
+                                    </Button>
+                                    <Button onClick={closeDiscussionModal}>关闭</Button>
+                                </Space>
+                            ) : (
+                                <Button onClick={closeDiscussionModal}>关闭</Button>
+                            )
+                        }
+                        width={800}
+                    >
+                        {discussionModal.loading && (
+                            <div style={{textAlign: 'center', padding: '48px 0'}}>
+                                <Spin size="large" tip="正在获取 Discussion 内容..."/>
+                            </div>
+                        )}
+
+                        {!discussionModal.loading && discussionModal.error === 'NO_TOKEN' && (
+                            <Space direction="vertical" style={{width: '100%'}} size="middle">
+                                <Alert
+                                    type="warning"
+                                    message="需要 GitHub Personal Access Token"
+                                    description="请输入具有读取 Discussion 权限的 GitHub PAT（public_repo 或 read:discussion 范围），将保存在本地浏览器供后续使用。"
+                                    showIcon
+                                />
+                                <Space.Compact style={{width: '100%'}}>
+                                    <Input
+                                        value={tokenInputValue}
+                                        onChange={e => setTokenInputValue(e.target.value)}
+                                        placeholder="github_pat_xxxx..."
+                                        type="password"
+                                        onPressEnter={() => {
+                                            if (tokenInputValue) {
+                                                localStorage.setItem('github_discussions_pat', tokenInputValue);
+                                                setGithubToken(tokenInputValue);
+                                                openDiscussionModal(discussionModal.rawValue, tokenInputValue);
+                                            }
+                                        }}
+                                    />
+                                    <Button
+                                        type="primary"
+                                        disabled={!tokenInputValue}
+                                        onClick={() => {
+                                            localStorage.setItem('github_discussions_pat', tokenInputValue);
+                                            setGithubToken(tokenInputValue);
+                                            openDiscussionModal(discussionModal.rawValue, tokenInputValue);
+                                        }}
+                                    >
+                                        保存并查看
+                                    </Button>
+                                </Space.Compact>
+                            </Space>
+                        )}
+
+                        {!discussionModal.loading && discussionModal.error && discussionModal.error !== 'NO_TOKEN' && (
+                            <Alert
+                                type="error"
+                                message="获取失败"
+                                description={discussionModal.error}
+                                showIcon
+                            />
+                        )}
+
+                        {!discussionModal.loading && discussionModal.discussion && (
+                            <Space direction="vertical" style={{width: '100%'}} size="small">
+                                <Typography.Title level={4} style={{marginBottom: 4}}>
+                                    {discussionModal.discussion.title}
+                                </Typography.Title>
+                                <Space>
+                                    <Avatar
+                                        size="small"
+                                        src={discussionModal.discussion.author?.avatarUrl}
+                                    />
+                                    <Text type="secondary">
+                                        {discussionModal.discussion.author?.login}
+                                    </Text>
+                                    <Text type="secondary">·</Text>
+                                    <Text type="secondary">
+                                        {new Date(discussionModal.discussion.createdAt).toLocaleString('zh-CN')}
+                                    </Text>
+                                </Space>
+                                <Divider style={{margin: '8px 0'}}/>
+                                <div
+                                    dangerouslySetInnerHTML={{__html: discussionModal.discussion.bodyHTML}}
+                                    style={{
+                                        maxHeight: 520,
+                                        overflow: 'auto',
+                                        padding: '4px 0',
+                                        wordBreak: 'break-word',
+                                    }}
+                                />
+                            </Space>
                         )}
                     </Modal>
                 </AntdThemeProvider>

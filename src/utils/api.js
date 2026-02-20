@@ -227,10 +227,10 @@ export const SponsorAPI = {
     },
 
     // 管理员：批准奖励
-    adminApproveReward: async (id, amount, finalScore, remark) => {
+    adminApproveReward: async (id, amount, finalScore, remark, description) => {
         return apiRequest(API_ENDPOINTS.ADMIN_REWARDS_APPROVE(id), {
             method: 'PUT',
-            body: {amount, finalScore, remark},
+            body: {amount, finalScore, remark, description},
             needAuth: true,
         });
     },
