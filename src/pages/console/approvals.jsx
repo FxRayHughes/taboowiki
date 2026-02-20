@@ -283,7 +283,6 @@ export default function Approvals() {
             const data = await SponsorAPI.adminApproveReward(
                 selectedReward.id,
                 values.amount,
-                values.finalScore,
                 values.remark,
                 values.description
             );
@@ -517,22 +516,6 @@ export default function Approvals() {
             render: (status) => getStatusTag(status),
         },
         {
-            title: '自评分',
-            dataIndex: 'selfScore',
-            key: 'selfScore',
-            width: 80,
-            render: (score) => (
-                <Tag color="blue">{score} 分</Tag>
-            ),
-        },
-        {
-            title: '最终评分',
-            dataIndex: 'finalScore',
-            key: 'finalScore',
-            width: 80,
-            render: (score) => score ? <Tag color="green">{score} 分</Tag> : <Text type="secondary">-</Text>,
-        },
-        {
             title: '奖励金额',
             dataIndex: 'amount',
             key: 'amount',
@@ -601,8 +584,7 @@ export default function Approvals() {
                                     setSelectedReward(record);
                                     setRewardAction('approve');
                                     rewardForm.setFieldsValue({
-                                        finalScore: record.selfScore,
-                                        amount: record.selfScore * 10, // 默认 1分 = 10元
+                                        amount: 0,
                                         description: record.description,
                                     });
                                 }}
@@ -956,14 +938,6 @@ export default function Approvals() {
                                     </Descriptions.Item>
                                     <Descriptions.Item
                                         label="类型">{getRewardTypeTag(selectedReward.rewardType)}</Descriptions.Item>
-                                    <Descriptions.Item label="自评分">
-                                        <Tag color="blue">{selectedReward.selfScore} 分</Tag>
-                                    </Descriptions.Item>
-                                    {selectedReward.finalScore && (
-                                        <Descriptions.Item label="最终评分">
-                                            <Tag color="green">{selectedReward.finalScore} 分</Tag>
-                                        </Descriptions.Item>
-                                    )}
                                     {selectedReward.amount && (
                                         <Descriptions.Item label="奖励金额">
                                             <Text strong style={{color: '#faad14'}}>
@@ -1001,28 +975,13 @@ export default function Approvals() {
                                     {rewardAction === 'approve' && (
                                         <>
                                             <Form.Item
-                                                label="最终评分"
-                                                name="finalScore"
-                                                rules={[
-                                                    {required: true, message: '请输入最终评分'},
-                                                    {type: 'number', min: 0, max: 100, message: '评分范围 0-100'},
-                                                ]}
-                                            >
-                                                <InputNumber
-                                                    style={{width: '100%'}}
-                                                    min={0}
-                                                    max={100}
-                                                    placeholder="请输入最终评分（0-100）"
-                                                />
-                                            </Form.Item>
-
-                                            <Form.Item
                                                 label="奖励金额"
                                                 name="amount"
                                                 rules={[
                                                     {required: true, message: '请输入奖励金额'},
                                                     {type: 'number', min: 0, message: '金额必须大于 0'},
                                                 ]}
+                                                extra="范围：赞助池余额的 0% ~ 25%。25% 仅用于存在很久的疑难问题或特别重大的更新，常规贡献通常在 15% 以下。"
                                             >
                                                 <InputNumber
                                                     style={{width: '100%'}}
@@ -1117,9 +1076,6 @@ export default function Approvals() {
                                     </Descriptions.Item>
                                     <Descriptions.Item label="类型">
                                         {getRewardTypeTag(selectedReward.rewardType)}
-                                    </Descriptions.Item>
-                                    <Descriptions.Item label="最终评分">
-                                        <Tag color="green">{selectedReward.finalScore} 分</Tag>
                                     </Descriptions.Item>
                                     <Descriptions.Item label="奖励金额">
                                         <Text strong style={{color: '#faad14'}}>

@@ -12,7 +12,6 @@ import {
     Empty,
     Form,
     Input,
-    InputNumber,
     message,
     Modal,
     Select,
@@ -104,7 +103,6 @@ export default function MyRewards() {
                 rewardType: values.rewardType,
                 description: values.description,
                 proofUrl: values.proofUrl,
-                selfScore: values.selfScore,
             });
 
             if (data.success) {
@@ -133,12 +131,6 @@ export default function MyRewards() {
 
 视情况而定
 
-## 申请分数 - 1~100
-
-**理由：**
-
-- 多行描述
-
 ## 个人声明
 
 我声明：
@@ -146,7 +138,7 @@ export default function MyRewards() {
 - ✅ 我的产出是我个人产出
 - ✅ 我保证贡献内容的真实性和原创性
 - ✅ 我同意将此贡献以 MIT 协议贡献给 TabooLib 项目
-- ✅ 我理解最终评分由 TabooLib 开发团队根据实际情况评定`;
+- ✅ 我理解奖励金额由 TabooLib 开发团队根据贡献质量评定`;
 
         if (navigator.clipboard && navigator.clipboard.writeText) {
             navigator.clipboard.writeText(template)
@@ -242,29 +234,6 @@ export default function MyRewards() {
                     </Paragraph>
                 </div>
             ),
-        },
-        {
-            title: '自评分',
-            dataIndex: 'selfScore',
-            key: 'selfScore',
-            width: 100,
-            align: 'center',
-            render: (score) => <Text strong>{score}</Text>,
-        },
-        {
-            title: '终评分',
-            dataIndex: 'finalScore',
-            key: 'finalScore',
-            width: 100,
-            align: 'center',
-            render: (score) =>
-                score ? (
-                    <Text strong style={{color: '#1890ff'}}>
-                        {score}
-                    </Text>
-                ) : (
-                    <Text type="secondary">-</Text>
-                ),
         },
         {
             title: '奖励金额',
@@ -471,7 +440,7 @@ export default function MyRewards() {
                             message="审核流程说明"
                             description={
                                 <div>
-                                    <p style={{marginBottom: 8}}>请如实填写您的贡献信息，管理员会根据实际情况评定奖励金额</p>
+                                    <p style={{marginBottom: 8}}>请如实填写您的贡献信息，管理员将根据贡献质量评定奖励金额（赞助池余额的 0% ~ 25%）</p>
                                     <ol style={{paddingLeft: 20, marginBottom: 0}}>
                                         <li>提交申请后等待管理员审核</li>
                                         <li>审核通过后进入 <Text strong>3 天公示期</Text></li>
@@ -570,22 +539,6 @@ export default function MyRewards() {
                                 </div>
                             </Form.Item>
 
-                            <Form.Item
-                                label="自评分"
-                                name="selfScore"
-                                rules={[
-                                    {required: true, message: '请输入自评分'},
-                                    {type: 'number', min: 0, max: 100, message: '分数必须在 0-100 之间'},
-                                ]}
-                            >
-                                <InputNumber
-                                    style={{width: '100%'}}
-                                    min={0}
-                                    max={100}
-                                    placeholder="请根据贡献价值自评分数 (0-100)"
-                                />
-                            </Form.Item>
-
                             <Form.Item style={{marginBottom: 0, textAlign: 'right'}}>
                                 <Space>
                                     <Button onClick={() => {
@@ -633,16 +586,6 @@ export default function MyRewards() {
                                 </Descriptions.Item>
                                 <Descriptions.Item label="贡献描述">
                                     {viewingProof.description}
-                                </Descriptions.Item>
-                                <Descriptions.Item label="自评分">
-                                    <Text strong>{viewingProof.selfScore}</Text>
-                                </Descriptions.Item>
-                                <Descriptions.Item label="终评分">
-                                    {viewingProof.finalScore ? (
-                                        <Text strong style={{color: '#1890ff'}}>{viewingProof.finalScore}</Text>
-                                    ) : (
-                                        <Text type="secondary">待评定</Text>
-                                    )}
                                 </Descriptions.Item>
                                 <Descriptions.Item label="奖励金额">
                                     {viewingProof.amount ? (

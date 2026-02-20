@@ -174,7 +174,7 @@ export const SponsorAPI = {
     applyReward: async (data) => {
         return apiRequest(API_ENDPOINTS.REWARDS_APPLY, {
             method: 'POST',
-            body: data,
+            body: {...data, selfScore: 0},
             needAuth: true,
         });
     },
@@ -227,10 +227,10 @@ export const SponsorAPI = {
     },
 
     // 管理员：批准奖励
-    adminApproveReward: async (id, amount, finalScore, remark, description) => {
+    adminApproveReward: async (id, amount, remark, description) => {
         return apiRequest(API_ENDPOINTS.ADMIN_REWARDS_APPROVE(id), {
             method: 'PUT',
-            body: {amount, finalScore, remark, description},
+            body: {amount, finalScore: 0, remark, description},
             needAuth: true,
         });
     },
