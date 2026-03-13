@@ -202,6 +202,23 @@ const sidebars = {
                         'expanding-technology/arim/gson-utils/index',
                     ],
                 },
+                {
+                    type: 'category',
+                    label: '🧩 TabooLib IoC',
+                    collapsed: true,
+                    link: {
+                        type: 'doc',
+                        id: 'expanding-technology/taboolib-ioc/index'
+                    },
+                    items: [
+                        'expanding-technology/taboolib-ioc/getting-started/index',
+                        'expanding-technology/taboolib-ioc/advanced/index',
+                        'expanding-technology/taboolib-ioc/api/index',
+                        'expanding-technology/taboolib-ioc/architecture/index',
+                        'expanding-technology/taboolib-ioc/examples/index',
+                        'expanding-technology/taboolib-ioc/faq/index',
+                    ],
+                },
                 'expanding-technology/universal-mythic/index',
             ],
         },
